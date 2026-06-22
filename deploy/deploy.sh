@@ -9,17 +9,7 @@ echo "==> Install dependencies"
 npm ci
 
 echo "==> Database migrations"
-if [[ -f .env ]]; then
-  set -a
-  # shellcheck disable=SC1091
-  source .env
-  set +a
-fi
-if [[ -n "${DATABASE_URL:-}" ]]; then
-  node scripts/run-migrations.mjs
-else
-  echo "    skip (no DATABASE_URL)"
-fi
+node scripts/run-migrations.mjs
 
 echo "==> Build Next.js (standalone)"
 npm run build
