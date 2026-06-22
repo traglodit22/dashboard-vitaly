@@ -31,17 +31,18 @@ import { reorderById } from "@/lib/procurement/reorderList";
 import {
   effectiveRowHighlight,
   ROW_HIGHLIGHT_CLASS,
-  ROW_HIGHLIGHT_LABEL,
   HIGHLIGHT_COLORS,
+  highlightSwatchTitle,
   type RowHighlight,
 } from "@/lib/procurement/rowHighlight";
 import type { ProcurementCategory, ProcurementItem } from "@/lib/procurement/mapRow";
 
 const ROW_SWATCH: Record<RowHighlight, string> = {
-  red: "bg-red-500 border-red-600",
-  yellow: "bg-amber-400 border-amber-500",
-  green: "bg-emerald-500 border-emerald-600",
-  gray: "bg-slate-400 border-slate-500",
+  red: "bg-red-500 border-red-700",
+  yellow: "bg-amber-400 border-amber-600",
+  green: "bg-emerald-500 border-emerald-700",
+  gray: "bg-neutral-500 border-neutral-700",
+  white: "bg-white border-neutral-400 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]",
 };
 
 const QTY_INPUT =
@@ -1015,15 +1016,15 @@ function ItemRow({
         />
       </TableCell>
       <TableCell className="px-1">
-        <div className="flex flex-col items-center gap-1">
+        <div className="grid grid-cols-2 place-items-center gap-1">
           {HIGHLIGHT_COLORS.map((c) => (
             <button
               key={c}
               type="button"
-              title={ROW_HIGHLIGHT_LABEL[c]}
+              title={highlightSwatchTitle(c)}
               onClick={() => setHighlight(c)}
               className={cn(
-                "size-3.5 rounded-full border-2 transition-transform hover:scale-110",
+                "size-4 shrink-0 rounded-full border-2 transition-transform hover:scale-110",
                 ROW_SWATCH[c],
                 item.highlightColor === c && "ring-2 ring-foreground ring-offset-1",
                 item.highlightColor === null &&

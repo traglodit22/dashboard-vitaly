@@ -63,7 +63,14 @@ export async function PATCH(
   }
   if (body.highlightColor !== undefined) {
     const c = body.highlightColor
-    if (c !== null && c !== 'red' && c !== 'yellow' && c !== 'green' && c !== 'gray') {
+    if (
+      c !== null &&
+      c !== 'red' &&
+      c !== 'yellow' &&
+      c !== 'green' &&
+      c !== 'gray' &&
+      c !== 'white'
+    ) {
       return NextResponse.json({ error: 'Недопустимый цвет' }, { status: 400 })
     }
     setClauses.push(`highlight_color = $${idx++}`)
