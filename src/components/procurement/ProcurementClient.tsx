@@ -9,6 +9,7 @@ import {
   Search,
   GripVertical,
   Pencil,
+  ImageIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -152,6 +153,10 @@ export function ProcurementClient() {
     const data = await res.json();
     setItems((prev) => prev.map((i) => (i.id === id ? data.item : i)));
     return true;
+  }
+
+  function replaceItem(item: ProcurementItem) {
+    setItems((prev) => prev.map((i) => (i.id === item.id ? item : i)));
   }
 
   async function removeItem(id: string, name: string) {
@@ -522,9 +527,10 @@ export function ProcurementClient() {
                 : "Ничего не найдено по запросу."}
             </p>
           ) : (
-            <Table className="w-full min-w-[880px] table-fixed">
+            <Table className="w-full min-w-[940px] table-fixed">
               <colgroup>
                 <col className="w-8" />
+                <col className="w-14" />
                 <col />
                 <col className="hidden md:table-column md:w-[10%]" />
                 <col className="w-[4.75rem]" />
@@ -539,6 +545,7 @@ export function ProcurementClient() {
               <TableHeader>
                 <TableRow>
                   <TableHead />
+                  <TableHead className="hidden sm:table-cell">Фото</TableHead>
                   <TableHead>Название</TableHead>
                   <TableHead className="hidden md:table-cell">Группа</TableHead>
                   <TableHead className="text-right">Надо</TableHead>
@@ -590,6 +597,7 @@ export function ProcurementClient() {
                       }}
                       onPatch={patchItem}
                       onRemove={removeItem}
+                      onItemReplace={replaceItem}
                     />
                   ),
                 )}
@@ -649,7 +657,8 @@ function TypeRow({
           <GripVertical className="size-4 cursor-grab text-muted-foreground active:cursor-grabbing" />
         )}
       </TableCell>
-      <TableCell colSpan={9} className="whitespace-normal py-2">
+      <TableCell className="hidden sm:table-cell" />
+      <TableCell colSpan={8} className="whitespace-normal py-2">
         <div className="flex min-w-0 items-center gap-3">
           <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Тип
@@ -668,6 +677,7 @@ function TypeRow({
           />
         </div>
       </TableCell>
+      <TableCell className="hidden sm:table-cell" />
       <TableCell>
         <Button
           variant="ghost"
@@ -693,6 +703,7 @@ function ItemRow({
   onDrop,
   onPatch,
   onRemove,
+  onItemReplace,
 }: {
   item: ProcurementItem;
   draggable: boolean;
@@ -703,6 +714,7 @@ function ItemRow({
   onDrop: (e: React.DragEvent) => void;
   onPatch: (id: string, patch: Partial<ProcurementItem>) => Promise<boolean>;
   onRemove: (id: string, name: string) => void;
+  onItemReplace: (item: ProcurementItem) => void;
 }) {
   const [need, setNeed] = useState(String(item.needQty));
   const [have, setHave] = useState(String(item.haveQty));
@@ -765,6 +777,9 @@ function ItemRow({
         {draggable && (
           <GripVertical className="size-4 cursor-grab text-muted-foreground active:cursor-grabbing" />
         )}
+      </TableCell>
+      <TableCell className="hidden px-1 sm:table-cell">
+        <ItemImageCell item={item} onUpdated={onItemReplace} />
       </TableCell>
       <TableCell className="whitespace-normal">
         <div className="line-clamp-2 font-medium leading-snug">{item.name}</div>
@@ -854,6 +869,135 @@ function ItemRow({
         </Button>
       </TableCell>
     </TableRow>
+  );
+}
+
+function ItemImageCell({
+  item,
+  onUpdated,
+}: {
+  item: ProcurementItem;
+  onUpdated: (item: ProcurementItem) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const hasImage = Boolean(item.imageMime);
+  const imageUrl = hasImage
+    ? `/api/procurement/items/${item.id}/image?v=${encodeURIComponent(item.imageUpdatedAt ?? "")}`
+    : null;
+
+  async function uploadFile(file: File) {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Нужен файл изображения");
+      return;
+    }
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await apiFetch(`/api/procurement/items/${item.id}/image`, {
+        method: "POST",
+        body: fd,
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error("Не удалось загрузить фото", { description: data.error });
+        return;
+      }
+      onUpdated(data.item);
+      toast.success("Фото загружено");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function removeImage() {
+    const res = await apiFetch(`/api/procurement/items/${item.id}/image`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      toast.error("Не удалось удалить фото");
+      return;
+    }
+    onUpdated(data.item);
+  }
+
+  function onDropFile(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) void uploadFile(file);
+  }
+
+  return (
+    <div
+      className={cn(
+        "group relative flex size-11 items-center justify-center overflow-hidden rounded-md border border-dashed bg-muted/30 transition-colors",
+        dragOver && "border-primary bg-primary/10",
+        hasImage && "border-solid border-border bg-background",
+      )}
+      onDragOver={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragOver(true);
+      }}
+      onDragLeave={(e) => {
+        e.stopPropagation();
+        setDragOver(false);
+      }}
+      onDrop={onDropFile}
+    >
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) void uploadFile(file);
+          e.target.value = "";
+        }}
+      />
+      {uploading ? (
+        <Loader2 className="size-4 animate-spin text-muted-foreground" />
+      ) : hasImage && imageUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={imageUrl} alt="" className="size-full object-cover" />
+      ) : (
+        <button
+          type="button"
+          className="flex size-full flex-col items-center justify-center text-muted-foreground hover:text-foreground"
+          title="Перетащите фото или нажмите"
+          onClick={() => inputRef.current?.click()}
+        >
+          <ImageIcon className="size-4" />
+        </button>
+      )}
+      {!uploading && hasImage && (
+        <div className="absolute inset-0 flex items-center justify-center gap-0.5 bg-black/45 opacity-0 transition-opacity group-hover:opacity-100">
+          <button
+            type="button"
+            className="rounded p-1 text-white hover:bg-white/20"
+            title="Заменить"
+            onClick={() => inputRef.current?.click()}
+          >
+            <Pencil className="size-3" />
+          </button>
+          <button
+            type="button"
+            className="rounded p-1 text-white hover:bg-white/20"
+            title="Удалить"
+            onClick={() => void removeImage()}
+          >
+            <Trash2 className="size-3" />
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 

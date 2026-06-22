@@ -17,6 +17,9 @@ if [[ $migrate_rc -ne 0 ]]; then
   echo "WARNING: migrations exited with code $migrate_rc (deploy continues)"
 fi
 
+echo "==> Ensure upload directories"
+mkdir -p uploads/procurement
+
 echo "==> Stop app during build (standalone path is overwritten)"
 if pm2 describe dashboard >/dev/null 2>&1; then
   pm2 stop dashboard

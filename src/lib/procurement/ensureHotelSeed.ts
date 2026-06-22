@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS procurement_items (
   notes          TEXT,
   link           TEXT,
   link_label     TEXT,
+  image_mime     TEXT,
+  image_updated_at TIMESTAMPTZ,
   highlight_color TEXT,
   row_type       TEXT NOT NULL DEFAULT 'item',
   sort_order     INTEGER NOT NULL DEFAULT 0,
@@ -145,6 +147,12 @@ export async function ensureHotelProcurement(): Promise<void> {
   )
   await pool.query(
     'ALTER TABLE procurement_items ADD COLUMN IF NOT EXISTS link_label TEXT',
+  )
+  await pool.query(
+    'ALTER TABLE procurement_items ADD COLUMN IF NOT EXISTS image_mime TEXT',
+  )
+  await pool.query(
+    'ALTER TABLE procurement_items ADD COLUMN IF NOT EXISTS image_updated_at TIMESTAMPTZ',
   )
 
   const [{ count }] = await query<{ count: string }>(

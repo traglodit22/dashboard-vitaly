@@ -19,6 +19,8 @@ export interface ProcurementItem {
   notes: string | null
   link: string | null
   linkLabel: string | null
+  imageMime: string | null
+  imageUpdatedAt: string | null
   sortOrder: number
   rowType: ProcurementRowType
   highlightColor: RowHighlight | null
@@ -51,6 +53,8 @@ export function rowToItem(row: Record<string, unknown>): ProcurementItem {
     notes: (row.notes as string) ?? null,
     link: (row.link as string) ?? null,
     linkLabel: (row.link_label as string) ?? null,
+    imageMime: (row.image_mime as string) ?? null,
+    imageUpdatedAt: (row.image_updated_at as string) ?? null,
     sortOrder: Number(row.sort_order ?? 0),
     rowType: parseRowType(row.row_type),
     highlightColor: parseHighlight(row.highlight_color),

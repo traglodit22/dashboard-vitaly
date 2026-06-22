@@ -3,6 +3,7 @@ import { query } from '@/lib/db/index'
 import { requireAuth } from '@/lib/auth/requireAuth'
 import { rowToItem } from '@/lib/procurement/mapRow'
 import { ensureHotelProcurement } from '@/lib/procurement/ensureHotelSeed'
+import { deleteItemImageFiles } from '@/lib/procurement/itemImage'
 
 export const runtime = 'nodejs'
 
@@ -97,6 +98,7 @@ export async function DELETE(
   if (unauth) return unauth
 
   const { id } = await params
+  await deleteItemImageFiles(id)
   await query('DELETE FROM procurement_items WHERE id = $1', [id])
   return NextResponse.json({ ok: true })
 }
