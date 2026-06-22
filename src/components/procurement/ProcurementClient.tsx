@@ -413,16 +413,6 @@ export function ProcurementClient() {
         </p>
       )}
 
-      <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-        {(["red", "yellow", "green"] as const).map((c) => (
-          <span key={c} className="inline-flex items-center gap-2">
-            <span className={cn("h-3 w-3 rounded-full border", ROW_SWATCH[c])} />
-            {ROW_HIGHLIGHT_LABEL[c]}
-          </span>
-        ))}
-        <span>— клик по кружку в строке задаёт цвет вручную (повторный клик — авто)</span>
-      </div>
-
       {showAdd && (
         <Card>
           <CardHeader>
@@ -519,7 +509,7 @@ export function ProcurementClient() {
           ) : (
             <Table className="w-full min-w-[720px] table-fixed">
               <colgroup>
-                <col className="w-12" />
+                <col className="w-8" />
                 <col />
                 <col className="hidden md:table-column md:w-[11%]" />
                 <col className="w-14" />
@@ -528,6 +518,7 @@ export function ProcurementClient() {
                 <col className="w-16" />
                 <col className="w-[22%]" />
                 <col className="w-[14%]" />
+                <col className="w-12" />
                 <col className="w-10" />
               </colgroup>
               <TableHeader>
@@ -541,6 +532,7 @@ export function ProcurementClient() {
                   <TableHead className="text-right">Осталось</TableHead>
                   <TableHead>Ссылка</TableHead>
                   <TableHead>Заметка</TableHead>
+                  <TableHead />
                   <TableHead />
                 </TableRow>
               </TableHeader>
@@ -637,12 +629,12 @@ function TypeRow({
       onDrop={draggable ? onDrop : undefined}
       className={cn("bg-muted/50 hover:bg-muted/70", dragging && "opacity-50")}
     >
-      <TableCell className="w-12 px-2">
+      <TableCell className="w-8 px-2">
         {draggable && (
           <GripVertical className="size-4 cursor-grab text-muted-foreground active:cursor-grabbing" />
         )}
       </TableCell>
-      <TableCell colSpan={8} className="whitespace-normal py-2">
+      <TableCell colSpan={9} className="whitespace-normal py-2">
         <div className="flex min-w-0 items-center gap-3">
           <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Тип
@@ -759,30 +751,10 @@ function ItemRow({
         liveHighlight && ROW_HIGHLIGHT_CLASS[liveHighlight],
       )}
     >
-      <TableCell className="w-12 px-2">
-        <div className="flex items-center gap-1.5">
-          {draggable && (
-            <GripVertical className="size-4 shrink-0 cursor-grab text-muted-foreground active:cursor-grabbing" />
-          )}
-          <div className="flex flex-col gap-1">
-            {(["red", "yellow", "green"] as const).map((c) => (
-              <button
-                key={c}
-                type="button"
-                title={ROW_HIGHLIGHT_LABEL[c]}
-                onClick={() => setHighlight(c)}
-                className={cn(
-                  "size-3.5 rounded-full border-2 transition-transform hover:scale-110",
-                  ROW_SWATCH[c],
-                  item.highlightColor === c && "ring-2 ring-foreground ring-offset-1",
-                  item.highlightColor === null &&
-                    liveHighlight === c &&
-                    "ring-1 ring-muted-foreground",
-                )}
-              />
-            ))}
-          </div>
-        </div>
+      <TableCell className="w-8 px-2">
+        {draggable && (
+          <GripVertical className="size-4 cursor-grab text-muted-foreground active:cursor-grabbing" />
+        )}
       </TableCell>
       <TableCell className="whitespace-normal">
         <div className="line-clamp-2 font-medium leading-snug">{item.name}</div>
@@ -858,6 +830,26 @@ function ItemRow({
           onBlur={saveNotes}
           placeholder="—"
         />
+      </TableCell>
+      <TableCell className="px-1">
+        <div className="flex flex-col items-center gap-1">
+          {(["red", "yellow", "green"] as const).map((c) => (
+            <button
+              key={c}
+              type="button"
+              title={ROW_HIGHLIGHT_LABEL[c]}
+              onClick={() => setHighlight(c)}
+              className={cn(
+                "size-3.5 rounded-full border-2 transition-transform hover:scale-110",
+                ROW_SWATCH[c],
+                item.highlightColor === c && "ring-2 ring-foreground ring-offset-1",
+                item.highlightColor === null &&
+                  liveHighlight === c &&
+                  "ring-1 ring-muted-foreground",
+              )}
+            />
+          ))}
+        </div>
       </TableCell>
       <TableCell>
         <Button
