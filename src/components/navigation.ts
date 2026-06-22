@@ -1,4 +1,4 @@
-import { Package, Boxes, Users, Wallet, UserSquare, LayoutDashboard } from "lucide-react";
+import { Package, Boxes, Users, Wallet, UserSquare, LayoutDashboard, ShoppingCart } from "lucide-react";
 
 export interface NavItem {
   href: string;
@@ -32,6 +32,7 @@ export const SECTIONS: NavSection[] = [
       { href: "/orders/new", label: "Создать", icon: Package },
       { href: "/orders", label: "Отправки", icon: Boxes },
       { href: "/recipients", label: "Получатели", icon: Users },
+      { href: "/procurement", label: "Закупки", icon: ShoppingCart },
     ],
   },
   {

@@ -22,6 +22,8 @@ psql postgres -v ON_ERROR_STOP=1 -tc "SELECT 1 FROM pg_database WHERE datname='$
 
 psql "$DB_NAME" -v ON_ERROR_STOP=1 -f "$ROOT/src/lib/db/schema.sql"
 psql "$DB_NAME" -v ON_ERROR_STOP=1 -f "$ROOT/src/lib/db/migrations/001_extras.sql"
+psql "$DB_NAME" -v ON_ERROR_STOP=1 -f "$ROOT/src/lib/db/migrations/002_procurement.sql"
+psql "$DB_NAME" -v ON_ERROR_STOP=1 -f "$ROOT/src/lib/db/migrations/003_hotel_procurement_full.sql"
 
 psql postgres -v ON_ERROR_STOP=1 -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;"
 psql "$DB_NAME" -v ON_ERROR_STOP=1 -c "GRANT ALL ON SCHEMA public TO $DB_USER;"
