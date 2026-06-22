@@ -17,7 +17,10 @@ export interface ProcurementItem {
   notes: string | null
   link: string | null
   sortOrder: number
+  highlightColor: RowHighlight | null
 }
+
+export type RowHighlight = 'red' | 'yellow' | 'green'
 
 export function rowToCategory(row: Record<string, unknown>): ProcurementCategory {
   return {
@@ -44,5 +47,11 @@ export function rowToItem(row: Record<string, unknown>): ProcurementItem {
     notes: (row.notes as string) ?? null,
     link: (row.link as string) ?? null,
     sortOrder: Number(row.sort_order ?? 0),
+    highlightColor: parseHighlight(row.highlight_color),
   }
+}
+
+function parseHighlight(value: unknown): RowHighlight | null {
+  if (value === 'red' || value === 'yellow' || value === 'green') return value
+  return null
 }

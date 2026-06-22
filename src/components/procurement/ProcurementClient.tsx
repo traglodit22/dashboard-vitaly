@@ -26,7 +26,19 @@ import {
 import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
 import { reorderById } from "@/lib/procurement/reorderList";
+import {
+  effectiveRowHighlight,
+  ROW_HIGHLIGHT_CLASS,
+  ROW_HIGHLIGHT_LABEL,
+  type RowHighlight,
+} from "@/lib/procurement/rowHighlight";
 import type { ProcurementCategory, ProcurementItem } from "@/lib/procurement/mapRow";
+
+const ROW_SWATCH: Record<RowHighlight, string> = {
+  red: "bg-red-500 border-red-600",
+  yellow: "bg-amber-400 border-amber-500",
+  green: "bg-emerald-500 border-emerald-600",
+};
 
 export function ProcurementClient() {
   const [categories, setCategories] = useState<ProcurementCategory[]>([]);
@@ -343,6 +355,16 @@ export function ProcurementClient() {
         </p>
       )}
 
+      <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+        {(["red", "yellow", "green"] as const).map((c) => (
+          <span key={c} className="inline-flex items-center gap-2">
+            <span className={cn("h-3 w-3 rounded-full border", ROW_SWATCH[c])} />
+            {ROW_HIGHLIGHT_LABEL[c]}
+          </span>
+        ))}
+        <span>— клик по кружку в строке задаёт цвет вручную (повторный клик — авто)</span>
+      </div>
+
       {showAdd && (
         <Card>
           <CardHeader>
@@ -440,7 +462,7 @@ export function ProcurementClient() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-8" />
+                  <TableHead className="w-12" />
                   <TableHead className="min-w-[180px]">Название</TableHead>
                   <TableHead className="hidden min-w-[120px] md:table-cell">Группа</TableHead>
                   <TableHead className="w-20 text-right">Надо</TableHead>
@@ -540,6 +562,19 @@ function ItemRow({
 
   const linkHref = link.trim();
 
+  const liveHighlight = effectiveRowHighlight({
+    ...item,
+    needQty: Number(need) || 0,
+    haveQty: Number(have) || 0,
+    inTransitQty: Number(transit) || 0,
+    remaining,
+  });
+
+  async function setHighlight(color: RowHighlight) {
+    const next = item.highlightColor === color ? null : color;
+    await onPatch(item.id, { highlightColor: next });
+  }
+
   return (
     <TableRow
       draggable={draggable}
@@ -547,12 +582,35 @@ function ItemRow({
       onDragEnd={draggable ? onDragEnd : undefined}
       onDragOver={draggable ? onDragOver : undefined}
       onDrop={draggable ? onDrop : undefined}
-      className={cn(dragging && "opacity-50")}
+      className={cn(
+        dragging && "opacity-50",
+        liveHighlight && ROW_HIGHLIGHT_CLASS[liveHighlight],
+      )}
     >
-      <TableCell className="w-8 px-2">
-        {draggable && (
-          <GripVertical className="size-4 cursor-grab text-muted-foreground active:cursor-grabbing" />
-        )}
+      <TableCell className="w-12 px-2">
+        <div className="flex items-center gap-1.5">
+          {draggable && (
+            <GripVertical className="size-4 shrink-0 cursor-grab text-muted-foreground active:cursor-grabbing" />
+          )}
+          <div className="flex flex-col gap-1">
+            {(["red", "yellow", "green"] as const).map((c) => (
+              <button
+                key={c}
+                type="button"
+                title={ROW_HIGHLIGHT_LABEL[c]}
+                onClick={() => setHighlight(c)}
+                className={cn(
+                  "size-3.5 rounded-full border-2 transition-transform hover:scale-110",
+                  ROW_SWATCH[c],
+                  item.highlightColor === c && "ring-2 ring-foreground ring-offset-1",
+                  item.highlightColor === null &&
+                    liveHighlight === c &&
+                    "ring-1 ring-muted-foreground",
+                )}
+              />
+            ))}
+          </div>
+        </div>
       </TableCell>
       <TableCell>
         <div className="font-medium">{item.name}</div>

@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS procurement_items (
   in_transit_qty INTEGER NOT NULL DEFAULT 0,
   notes          TEXT,
   link           TEXT,
+  highlight_color TEXT,
   sort_order     INTEGER NOT NULL DEFAULT 0,
   created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -131,6 +132,9 @@ WHERE c.name = 'Отель'
 /** Создаёт таблицы и заливает «Отель» — без чтения SQL-файлов с диска. */
 export async function ensureHotelProcurement(): Promise<void> {
   await pool.query(PROCUREMENT_DDL)
+  await pool.query(
+    'ALTER TABLE procurement_items ADD COLUMN IF NOT EXISTS highlight_color TEXT',
+  )
 
   const [{ count }] = await query<{ count: string }>(
     `SELECT COUNT(*)::text AS count FROM procurement_items i

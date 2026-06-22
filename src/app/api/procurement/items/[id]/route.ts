@@ -47,6 +47,14 @@ export async function PATCH(
     setClauses.push(`link = $${idx++}`)
     values.push(body.link ? String(body.link).trim() : null)
   }
+  if (body.highlightColor !== undefined) {
+    const c = body.highlightColor
+    if (c !== null && c !== 'red' && c !== 'yellow' && c !== 'green') {
+      return NextResponse.json({ error: 'Недопустимый цвет' }, { status: 400 })
+    }
+    setClauses.push(`highlight_color = $${idx++}`)
+    values.push(c)
+  }
 
   if (setClauses.length === 1) {
     return NextResponse.json({ error: 'Нет полей для обновления' }, { status: 400 })
