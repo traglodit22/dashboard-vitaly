@@ -160,9 +160,8 @@ export function OrdersClient() {
     setOrders(archivedLoaded ? [...base, ...(await fetchOrders(true))] : base);
   }, [archivedLoaded]);
 
-  // «Доставляется» — архив, подгружается по требованию (кнопка во вкладке),
-  // чтобы основной список не разрастался доставленными посылками.
-  const loadArchived = useCallback(async () => {
+  const mergeArchived = useCallback(async (showToast = false) => {
+    if (archivedLoaded) return;
     setLoadingArchived(true);
     try {
       const archived = await fetchOrders(true);
@@ -171,11 +170,15 @@ export function OrdersClient() {
         return [...prev, ...archived.filter((o) => !ids.has(o.id))];
       });
       setArchivedLoaded(true);
-      toast.success(`Загружено доставленных: ${archived.length}`);
+      if (showToast) toast.success(`Загружено доставленных: ${archived.length}`);
     } finally {
       setLoadingArchived(false);
     }
-  }, []);
+  }, [archivedLoaded]);
+
+  // «Доставляется» — архив, подгружается по требованию (кнопка во вкладке),
+  // чтобы основной список не разрастался доставленными посылками.
+  const loadArchived = useCallback(() => mergeArchived(true), [mergeArchived]);
 
   useEffect(() => {
     let active = true;
@@ -189,6 +192,12 @@ export function OrdersClient() {
       active = false;
     };
   }, []);
+
+  // Поиск должен находить и доставленные (архив), даже если вкладку ещё не открывали.
+  useEffect(() => {
+    if (!query.trim() || archivedLoaded) return;
+    void mergeArchived(false);
+  }, [query, archivedLoaded, mergeArchived]);
 
   // Сначала фильтр по поиску, затем счётчики/вкладки считаются от найденного.
   const searched = useMemo(() => {
@@ -493,10 +502,10 @@ export function OrdersClient() {
           </div>
         )}
 
-        {loading ? (
+        {loading || (query.trim() && loadingArchived && !archivedLoaded) ? (
           <div className="flex items-center gap-2 py-8 text-muted-foreground">
             <Loader2 className="size-4 animate-spin" />
-            Загрузка…
+            {query.trim() && loadingArchived ? "Поиск в архиве…" : "Загрузка…"}
           </div>
         ) : tab === "delivering" && !archivedLoaded ? (
           <p className="py-8 text-center text-sm text-muted-foreground">
