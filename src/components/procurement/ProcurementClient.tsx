@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, Fragment } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Loader2,
   Plus,
@@ -8,6 +8,7 @@ import {
   Trash2,
   ExternalLink,
   Search,
+  GripVertical,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -24,18 +25,8 @@ import {
 } from "@/components/ui/table";
 import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
+import { reorderById } from "@/lib/procurement/reorderList";
 import type { ProcurementCategory, ProcurementItem } from "@/lib/procurement/mapRow";
-
-function groupItems(items: ProcurementItem[]): Map<string, ProcurementItem[]> {
-  const map = new Map<string, ProcurementItem[]>();
-  for (const item of items) {
-    const key = item.groupName?.trim() || "Без группы";
-    const list = map.get(key) ?? [];
-    list.push(item);
-    map.set(key, list);
-  }
-  return map;
-}
 
 export function ProcurementClient() {
   const [categories, setCategories] = useState<ProcurementCategory[]>([]);
@@ -45,6 +36,8 @@ export function ProcurementClient() {
   const [search, setSearch] = useState("");
   const [showAdd, setShowAdd] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [dragCatId, setDragCatId] = useState<string | null>(null);
+  const [dragItemId, setDragItemId] = useState<string | null>(null);
   const [draft, setDraft] = useState({
     groupName: "",
     name: "",
@@ -91,6 +84,8 @@ export function ProcurementClient() {
     if (categoryId) loadItems(categoryId);
   }, [categoryId, loadItems]);
 
+  const searchActive = search.trim().length > 0;
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return items;
@@ -98,11 +93,15 @@ export function ProcurementClient() {
       (i) =>
         i.name.toLowerCase().includes(q) ||
         (i.groupName?.toLowerCase().includes(q) ?? false) ||
-        (i.notes?.toLowerCase().includes(q) ?? false),
+        (i.notes?.toLowerCase().includes(q) ?? false) ||
+        (i.link?.toLowerCase().includes(q) ?? false),
     );
   }, [items, search]);
 
-  const grouped = useMemo(() => groupItems(filtered), [filtered]);
+  const sortedItems = useMemo(
+    () => [...filtered].sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, "ru")),
+    [filtered],
+  );
 
   const stats = useMemo(() => {
     let need = 0;
@@ -141,6 +140,52 @@ export function ProcurementClient() {
     } else {
       toast.error("Не удалось удалить");
     }
+  }
+
+  async function persistCategoryOrder(next: ProcurementCategory[]) {
+    const res = await apiFetch("/api/procurement/categories/reorder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids: next.map((c) => c.id) }),
+    });
+    if (!res.ok) {
+      toast.error("Не удалось сохранить порядок категорий");
+      loadCategories();
+    }
+  }
+
+  async function persistItemOrder(next: ProcurementItem[]) {
+    const res = await apiFetch("/api/procurement/items/reorder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids: next.map((i) => i.id) }),
+    });
+    if (!res.ok) {
+      toast.error("Не удалось сохранить порядок позиций");
+      if (categoryId) loadItems(categoryId);
+      return;
+    }
+    const sortMap = new Map(next.map((item, i) => [item.id, (i + 1) * 10]));
+    setItems((prev) =>
+      prev.map((item) =>
+        sortMap.has(item.id) ? { ...item, sortOrder: sortMap.get(item.id)! } : item,
+      ),
+    );
+  }
+
+  function onCategoryDrop(targetId: string) {
+    if (!dragCatId || dragCatId === targetId) return;
+    const next = reorderById(categories, dragCatId, targetId);
+    setCategories(next);
+    setDragCatId(null);
+    persistCategoryOrder(next);
+  }
+
+  function onItemDrop(targetId: string) {
+    if (!dragItemId || dragItemId === targetId || searchActive) return;
+    const next = reorderById(sortedItems, dragItemId, targetId);
+    setDragItemId(null);
+    persistItemOrder(next);
   }
 
   async function addCategory() {
@@ -209,28 +254,49 @@ export function ProcurementClient() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end gap-3">
-        <div className="min-w-[200px] flex-1">
-          <Label className="mb-1.5 block text-xs text-muted-foreground">Категория</Label>
-          <select
-            className="flex h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-          >
-            {categories.length === 0 && <option value="">Нет категорий</option>}
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+      <div className="space-y-2">
+        <Label className="text-xs text-muted-foreground">
+          Категории — перетащите для сортировки, кликните для выбора
+        </Label>
+        <div className="flex flex-wrap items-center gap-2">
+          {categories.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              draggable={categories.length > 1}
+              onDragStart={() => setDragCatId(c.id)}
+              onDragEnd={() => setDragCatId(null)}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "move";
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                onCategoryDrop(c.id);
+              }}
+              onClick={() => setCategoryId(c.id)}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-colors",
+                categoryId === c.id
+                  ? "border-primary bg-primary/10 font-medium"
+                  : "border-border bg-background hover:bg-muted/50",
+                dragCatId === c.id && "opacity-50",
+              )}
+            >
+              <GripVertical className="size-3.5 shrink-0 cursor-grab text-muted-foreground active:cursor-grabbing" />
+              {c.name}
+            </button>
+          ))}
+          {categories.length === 0 && (
+            <span className="text-sm text-muted-foreground">Нет категорий</span>
+          )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 pt-1">
           <Input
             placeholder="Новая категория"
             value={newCategoryName}
             onChange={(e) => setNewCategoryName(e.target.value)}
-            className="w-40"
+            className="max-w-xs"
           />
           <Button type="button" variant="outline" onClick={addCategory}>
             <Plus className="mr-1 size-4" />
@@ -259,7 +325,7 @@ export function ProcurementClient() {
         <div className="relative min-w-[200px] flex-1">
           <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
           <Input
-            placeholder="Поиск по названию, группе, заметке…"
+            placeholder="Поиск по названию, группе, заметке, ссылке…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
@@ -270,6 +336,12 @@ export function ProcurementClient() {
           Позиция
         </Button>
       </div>
+
+      {searchActive && (
+        <p className="text-xs text-muted-foreground">
+          Сортировка перетаскиванием отключена при активном поиске.
+        </p>
+      )}
 
       {showAdd && (
         <Card>
@@ -321,7 +393,7 @@ export function ProcurementClient() {
                   onChange={(e) => setDraft((d) => ({ ...d, inTransitQty: e.target.value }))}
                 />
               </div>
-              <div>
+              <div className="sm:col-span-2">
                 <Label>Ссылка</Label>
                 <Input
                   value={draft.link}
@@ -353,12 +425,12 @@ export function ProcurementClient() {
             <ShoppingCart className="size-5 text-primary" />
             {categories.find((c) => c.id === categoryId)?.name ?? "Закупки"}
             <span className="font-mono text-sm font-normal text-muted-foreground">
-              {filtered.length}
+              {sortedItems.length}
             </span>
           </CardTitle>
         </CardHeader>
         <CardContent className="overflow-x-auto p-0">
-          {filtered.length === 0 ? (
+          {sortedItems.length === 0 ? (
             <p className="px-6 py-10 text-center text-sm text-muted-foreground">
               {items.length === 0
                 ? "Нет позиций в этой категории."
@@ -368,32 +440,38 @@ export function ProcurementClient() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="min-w-[220px]">Название</TableHead>
+                  <TableHead className="w-8" />
+                  <TableHead className="min-w-[180px]">Название</TableHead>
+                  <TableHead className="hidden min-w-[120px] md:table-cell">Группа</TableHead>
                   <TableHead className="w-20 text-right">Надо</TableHead>
                   <TableHead className="w-20 text-right">Есть</TableHead>
                   <TableHead className="w-20 text-right">Едут</TableHead>
                   <TableHead className="w-20 text-right">Осталось</TableHead>
-                  <TableHead className="min-w-[160px]">Заметка</TableHead>
+                  <TableHead className="min-w-[200px]">Ссылка</TableHead>
+                  <TableHead className="min-w-[140px]">Заметка</TableHead>
                   <TableHead className="w-10" />
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {[...grouped.entries()].map(([group, groupItemsList]) => (
-                  <Fragment key={`g-${group}`}>
-                    <TableRow className="bg-muted/40 hover:bg-muted/40">
-                      <TableCell colSpan={7} className="py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                        {group}
-                      </TableCell>
-                    </TableRow>
-                    {groupItemsList.map((item) => (
-                      <ItemRow
-                        key={item.id}
-                        item={item}
-                        onPatch={patchItem}
-                        onRemove={removeItem}
-                      />
-                    ))}
-                  </Fragment>
+                {sortedItems.map((item) => (
+                  <ItemRow
+                    key={item.id}
+                    item={item}
+                    draggable={!searchActive}
+                    dragging={dragItemId === item.id}
+                    onDragStart={() => setDragItemId(item.id)}
+                    onDragEnd={() => setDragItemId(null)}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.dataTransfer.dropEffect = "move";
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      onItemDrop(item.id);
+                    }}
+                    onPatch={patchItem}
+                    onRemove={removeItem}
+                  />
                 ))}
               </TableBody>
             </Table>
@@ -406,10 +484,22 @@ export function ProcurementClient() {
 
 function ItemRow({
   item,
+  draggable,
+  dragging,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDrop,
   onPatch,
   onRemove,
 }: {
   item: ProcurementItem;
+  draggable: boolean;
+  dragging: boolean;
+  onDragStart: () => void;
+  onDragEnd: () => void;
+  onDragOver: (e: React.DragEvent) => void;
+  onDrop: (e: React.DragEvent) => void;
   onPatch: (id: string, patch: Partial<ProcurementItem>) => Promise<boolean>;
   onRemove: (id: string, name: string) => void;
 }) {
@@ -417,12 +507,14 @@ function ItemRow({
   const [have, setHave] = useState(String(item.haveQty));
   const [transit, setTransit] = useState(String(item.inTransitQty));
   const [notes, setNotes] = useState(item.notes ?? "");
+  const [link, setLink] = useState(item.link ?? "");
 
   useEffect(() => {
     setNeed(String(item.needQty));
     setHave(String(item.haveQty));
     setTransit(String(item.inTransitQty));
     setNotes(item.notes ?? "");
+    setLink(item.link ?? "");
   }, [item]);
 
   const remaining =
@@ -441,21 +533,32 @@ function ItemRow({
     await onPatch(item.id, { notes: notes || null });
   }
 
+  async function saveLink() {
+    if (link === (item.link ?? "")) return;
+    await onPatch(item.id, { link: link.trim() || null });
+  }
+
+  const linkHref = link.trim();
+
   return (
-    <TableRow>
+    <TableRow
+      draggable={draggable}
+      onDragStart={draggable ? onDragStart : undefined}
+      onDragEnd={draggable ? onDragEnd : undefined}
+      onDragOver={draggable ? onDragOver : undefined}
+      onDrop={draggable ? onDrop : undefined}
+      className={cn(dragging && "opacity-50")}
+    >
+      <TableCell className="w-8 px-2">
+        {draggable && (
+          <GripVertical className="size-4 cursor-grab text-muted-foreground active:cursor-grabbing" />
+        )}
+      </TableCell>
       <TableCell>
         <div className="font-medium">{item.name}</div>
-        {item.link && (
-          <a
-            href={item.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-          >
-            Ссылка
-            <ExternalLink className="size-3" />
-          </a>
-        )}
+      </TableCell>
+      <TableCell className="hidden text-xs text-muted-foreground md:table-cell">
+        {item.groupName ?? "—"}
       </TableCell>
       <TableCell>
         <Input
@@ -490,14 +593,36 @@ function ItemRow({
       <TableCell
         className={cn(
           "text-right font-mono tabular-nums",
-          remaining > 0 ? "text-destructive font-semibold" : "text-emerald-600",
+          remaining > 0 ? "font-semibold text-destructive" : "text-emerald-600",
         )}
       >
         {remaining}
       </TableCell>
       <TableCell>
+        <div className="flex items-center gap-1">
+          <Input
+            className="h-8 min-w-[160px] text-xs"
+            value={link}
+            onChange={(e) => setLink(e.target.value)}
+            onBlur={saveLink}
+            placeholder="https://…"
+          />
+          {linkHref && /^https?:\/\//i.test(linkHref) && (
+            <a
+              href={linkHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 text-primary hover:text-primary/80"
+              title="Открыть ссылку"
+            >
+              <ExternalLink className="size-4" />
+            </a>
+          )}
+        </div>
+      </TableCell>
+      <TableCell>
         <Input
-          className="h-8 min-w-[140px] text-xs"
+          className="h-8 min-w-[120px] text-xs"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           onBlur={saveNotes}
