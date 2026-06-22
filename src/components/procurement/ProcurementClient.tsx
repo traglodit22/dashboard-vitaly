@@ -837,16 +837,35 @@ function ItemRow({
   const [have, setHave] = useState(String(item.haveQty));
   const [transit, setTransit] = useState(String(item.inTransitQty));
   const [notes, setNotes] = useState(item.notes ?? "");
+  const [editingName, setEditingName] = useState(false);
+  const [draftName, setDraftName] = useState(item.name);
 
   useEffect(() => {
     setNeed(String(item.needQty));
     setHave(String(item.haveQty));
     setTransit(String(item.inTransitQty));
     setNotes(item.notes ?? "");
+    setDraftName(item.name);
   }, [item]);
 
   const remaining =
     (Number(need) || 0) - (Number(have) || 0) - (Number(transit) || 0);
+
+  async function saveName() {
+    const trimmed = draftName.trim();
+    if (!trimmed) {
+      toast.error("Название не может быть пустым");
+      setDraftName(item.name);
+      setEditingName(false);
+      return;
+    }
+    if (trimmed === item.name) {
+      setEditingName(false);
+      return;
+    }
+    const ok = await onPatch(item.id, { name: trimmed });
+    if (ok) setEditingName(false);
+  }
 
   async function saveQty() {
     await onPatch(item.id, {
@@ -899,7 +918,37 @@ function ItemRow({
         <ItemImageCell item={item} onUpdated={onItemReplace} />
       </TableCell>
       <TableCell className="whitespace-normal">
-        <div className="line-clamp-2 font-medium leading-snug">{item.name}</div>
+        {editingName ? (
+          <Input
+            autoFocus
+            className="h-8 font-medium"
+            value={draftName}
+            onChange={(e) => setDraftName(e.target.value)}
+            onBlur={() => void saveName()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                void saveName();
+              }
+              if (e.key === "Escape") {
+                setDraftName(item.name);
+                setEditingName(false);
+              }
+            }}
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              setDraftName(item.name);
+              setEditingName(true);
+            }}
+            className="line-clamp-2 w-full cursor-text text-left font-medium leading-snug hover:text-primary"
+            title="Нажмите, чтобы изменить название"
+          >
+            {item.name}
+          </button>
+        )}
       </TableCell>
       <TableCell className="whitespace-normal">
         {typeName ? (
