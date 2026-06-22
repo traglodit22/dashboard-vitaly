@@ -265,7 +265,7 @@ export function ProcurementClient() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6">
       <div className="space-y-2">
         <Label className="text-xs text-muted-foreground">
           Категории — перетащите для сортировки, кликните для выбора
@@ -441,7 +441,7 @@ export function ProcurementClient() {
         </Card>
       )}
 
-      <Card>
+      <Card className="min-w-0 overflow-visible">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <ShoppingCart className="size-5 text-primary" />
@@ -451,7 +451,7 @@ export function ProcurementClient() {
             </span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="overflow-x-auto p-0">
+        <CardContent className="min-w-0 overflow-x-auto p-0">
           {sortedItems.length === 0 ? (
             <p className="px-6 py-10 text-center text-sm text-muted-foreground">
               {items.length === 0
@@ -459,19 +459,31 @@ export function ProcurementClient() {
                 : "Ничего не найдено по запросу."}
             </p>
           ) : (
-            <Table>
+            <Table className="w-full min-w-[720px] table-fixed">
+              <colgroup>
+                <col className="w-12" />
+                <col />
+                <col className="hidden md:table-column md:w-[11%]" />
+                <col className="w-14" />
+                <col className="w-14" />
+                <col className="w-14" />
+                <col className="w-16" />
+                <col className="w-[22%]" />
+                <col className="w-[14%]" />
+                <col className="w-10" />
+              </colgroup>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-12" />
-                  <TableHead className="min-w-[180px]">Название</TableHead>
-                  <TableHead className="hidden min-w-[120px] md:table-cell">Группа</TableHead>
-                  <TableHead className="w-20 text-right">Надо</TableHead>
-                  <TableHead className="w-20 text-right">Есть</TableHead>
-                  <TableHead className="w-20 text-right">Едут</TableHead>
-                  <TableHead className="w-20 text-right">Осталось</TableHead>
-                  <TableHead className="min-w-[200px]">Ссылка</TableHead>
-                  <TableHead className="min-w-[140px]">Заметка</TableHead>
-                  <TableHead className="w-10" />
+                  <TableHead />
+                  <TableHead>Название</TableHead>
+                  <TableHead className="hidden md:table-cell">Группа</TableHead>
+                  <TableHead className="text-right">Надо</TableHead>
+                  <TableHead className="text-right">Есть</TableHead>
+                  <TableHead className="text-right">Едут</TableHead>
+                  <TableHead className="text-right">Осталось</TableHead>
+                  <TableHead>Ссылка</TableHead>
+                  <TableHead>Заметка</TableHead>
+                  <TableHead />
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -612,17 +624,17 @@ function ItemRow({
           </div>
         </div>
       </TableCell>
-      <TableCell>
-        <div className="font-medium">{item.name}</div>
+      <TableCell className="whitespace-normal">
+        <div className="line-clamp-2 font-medium leading-snug">{item.name}</div>
       </TableCell>
-      <TableCell className="hidden text-xs text-muted-foreground md:table-cell">
-        {item.groupName ?? "—"}
+      <TableCell className="hidden whitespace-normal text-xs text-muted-foreground md:table-cell">
+        <span className="line-clamp-2">{item.groupName ?? "—"}</span>
       </TableCell>
       <TableCell>
         <Input
           type="number"
           min={0}
-          className="h-8 w-16 text-right tabular-nums"
+          className="h-8 w-full min-w-0 text-right tabular-nums"
           value={need}
           onChange={(e) => setNeed(e.target.value)}
           onBlur={saveQty}
@@ -632,7 +644,7 @@ function ItemRow({
         <Input
           type="number"
           min={0}
-          className="h-8 w-16 text-right tabular-nums"
+          className="h-8 w-full min-w-0 text-right tabular-nums"
           value={have}
           onChange={(e) => setHave(e.target.value)}
           onBlur={saveQty}
@@ -642,7 +654,7 @@ function ItemRow({
         <Input
           type="number"
           min={0}
-          className="h-8 w-16 text-right tabular-nums"
+          className="h-8 w-full min-w-0 text-right tabular-nums"
           value={transit}
           onChange={(e) => setTransit(e.target.value)}
           onBlur={saveQty}
@@ -656,10 +668,10 @@ function ItemRow({
       >
         {remaining}
       </TableCell>
-      <TableCell>
-        <div className="flex items-center gap-1">
+      <TableCell className="whitespace-normal">
+        <div className="flex min-w-0 items-center gap-1">
           <Input
-            className="h-8 min-w-[160px] text-xs"
+            className="h-8 min-w-0 flex-1 text-xs"
             value={link}
             onChange={(e) => setLink(e.target.value)}
             onBlur={saveLink}
@@ -678,9 +690,9 @@ function ItemRow({
           )}
         </div>
       </TableCell>
-      <TableCell>
+      <TableCell className="whitespace-normal">
         <Input
-          className="h-8 min-w-[120px] text-xs"
+          className="h-8 w-full min-w-0 text-xs"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           onBlur={saveNotes}
