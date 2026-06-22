@@ -21,6 +21,10 @@
 /build
 /uploads/*
 !uploads/procurement/.gitkeep
+/runtime/current
+/runtime/current.new
+/runtime/current.bak
+.deploy.lock
 
 # misc
 .DS_Store

@@ -7,13 +7,13 @@ module.exports = {
   apps: [
     {
       name: "dashboard",
-      cwd: path.join(appDir, ".next/standalone"),
+      cwd: path.join(appDir, "runtime/current"),
       script: "server.js",
       env: {
         NODE_ENV: "production",
         PORT: "3000",
         HOSTNAME: "127.0.0.1",
-        MIGRATIONS_DIR: path.join(appDir, ".next/standalone/db/migrations"),
+        MIGRATIONS_DIR: path.join(appDir, "runtime/current/db/migrations"),
         UPLOAD_DIR: path.join(appDir, "uploads"),
       },
       env_file: path.join(appDir, ".env"),

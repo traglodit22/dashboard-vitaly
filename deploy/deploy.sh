@@ -5,21 +5,40 @@ set -euo pipefail
 APP_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$APP_DIR"
 
-rollback_standalone() {
-  if [[ -d .next/standalone.bak ]]; then
-    echo "==> Rollback: restoring previous standalone bundle"
-    rm -rf .next/standalone
-    mv .next/standalone.bak .next/standalone
+RUNTIME="$APP_DIR/runtime/current"
+RUNTIME_NEW="$APP_DIR/runtime/current.new"
+RUNTIME_BAK="$APP_DIR/runtime/current.bak"
+LOCK_FILE="$APP_DIR/.deploy.lock"
+
+exec 9>"$LOCK_FILE"
+if ! flock -n 9; then
+  echo "ERROR: another deploy is already running"
+  exit 1
+fi
+
+rollback_runtime() {
+  if [[ -d "$RUNTIME_BAK" ]]; then
+    echo "==> Rollback: restoring previous runtime"
+    rm -rf "$RUNTIME"
+    mv "$RUNTIME_BAK" "$RUNTIME"
   fi
   if pm2 describe dashboard >/dev/null 2>&1; then
     pm2 restart dashboard --update-env || true
-  elif [[ -f .next/standalone/server.js ]]; then
+  elif [[ -f "$RUNTIME/server.js" ]]; then
+    pm2 delete dashboard 2>/dev/null || true
     pm2 start ecosystem.config.cjs --only dashboard --update-env || true
     pm2 save || true
   fi
 }
 
-trap 'echo "DEPLOY FAILED"; rollback_standalone' ERR
+verify_bundle() {
+  local dir="$1"
+  [[ -f "$dir/server.js" ]] || return 1
+  [[ -f "$dir/.next/server/middleware-manifest.json" ]] || return 1
+  return 0
+}
+
+trap 'echo "DEPLOY FAILED"; rollback_runtime' ERR
 
 echo "==> Install dependencies"
 npm ci
@@ -34,24 +53,46 @@ if [[ $migrate_rc -ne 0 ]]; then
 fi
 
 echo "==> Ensure upload directories"
-mkdir -p uploads/procurement
+mkdir -p uploads/procurement runtime
 
-if [[ -f .next/standalone/server.js ]]; then
-  echo "==> Backup current standalone (for rollback)"
-  rm -rf .next/standalone.bak
-  cp -a .next/standalone .next/standalone.bak
+# One-time / recovery: serve from runtime/current (PM2 cwd), not .next/standalone
+if [[ ! -d "$RUNTIME" && -f .next/standalone/server.js ]]; then
+  echo "==> Bootstrap runtime from existing standalone"
+  mkdir -p "$RUNTIME"
+  rsync -a .next/standalone/ "$RUNTIME/"
 fi
 
-echo "==> Build Next.js (standalone) — app keeps running until build succeeds"
+if [[ -d "$RUNTIME" ]]; then
+  echo "==> Backup current runtime (app keeps serving during build)"
+  rm -rf "$RUNTIME_BAK"
+  cp -a "$RUNTIME" "$RUNTIME_BAK"
+fi
+
+echo "==> Build Next.js (standalone) in .next/ — runtime untouched"
 npm run build
 
-echo "==> Copy static assets into standalone bundle"
+echo "==> Stage new runtime bundle"
+rm -rf "$RUNTIME_NEW"
+mkdir -p "$RUNTIME_NEW"
 cp -r public .next/standalone/
 cp -r .next/static .next/standalone/.next/static
 mkdir -p .next/standalone/db
 cp -r src/lib/db/migrations .next/standalone/db/migrations
+rsync -a .next/standalone/ "$RUNTIME_NEW/"
 
-echo "==> Start PM2 (fresh — ensures standalone server.js, not next start)"
+if ! verify_bundle "$RUNTIME_NEW"; then
+  echo "ERROR: incomplete standalone bundle"
+  exit 1
+fi
+
+echo "==> Swap runtime (atomic)"
+if [[ -d "$RUNTIME" ]]; then
+  rm -rf "$RUNTIME_BAK"
+  mv "$RUNTIME" "$RUNTIME_BAK"
+fi
+mv "$RUNTIME_NEW" "$RUNTIME"
+
+echo "==> Start PM2"
 pm2 delete dashboard 2>/dev/null || true
 pm2 start ecosystem.config.cjs --only dashboard --update-env
 pm2 save
@@ -71,7 +112,7 @@ for i in $(seq 1 15); do
   sleep 2
 done
 
-rm -rf .next/standalone.bak
+rm -rf "$RUNTIME_BAK"
 trap - ERR
 
 echo "==> Database migrations (via running app)"
