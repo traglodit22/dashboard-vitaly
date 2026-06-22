@@ -1,0 +1,15 @@
+---
+description: После завершения задачи — сразу коммит и деплой на VPS
+alwaysApply: true
+---
+
+# Commit and deploy
+
+When a feature or fix is ready:
+
+1. Commit all related changes with a clear message (unless the user explicitly says not to).
+2. Push to `main` — GitHub Actions deploys to VPS automatically.
+3. Verify deploy succeeded (SSH `git log -1` on VPS or check Actions).
+4. Do not leave finished work uncommitted.
+
+Exception: never commit secrets (`.env`, credentials, `.local/`).

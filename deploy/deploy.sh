@@ -15,13 +15,10 @@ if [[ -f .env ]]; then
   source .env
   set +a
 fi
-if [[ -n "${DATABASE_URL:-}" ]] && command -v psql >/dev/null; then
-  for f in src/lib/db/migrations/*.sql; do
-    echo "    $f"
-    psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"
-  done
+if [[ -n "${DATABASE_URL:-}" ]]; then
+  node scripts/run-migrations.mjs
 else
-  echo "    skip (no DATABASE_URL or psql)"
+  echo "    skip (no DATABASE_URL)"
 fi
 
 echo "==> Build Next.js (standalone)"
