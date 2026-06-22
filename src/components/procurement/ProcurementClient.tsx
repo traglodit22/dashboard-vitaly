@@ -32,6 +32,7 @@ import {
   effectiveRowHighlight,
   ROW_HIGHLIGHT_CLASS,
   ROW_HIGHLIGHT_LABEL,
+  HIGHLIGHT_COLORS,
   type RowHighlight,
 } from "@/lib/procurement/rowHighlight";
 import type { ProcurementCategory, ProcurementItem } from "@/lib/procurement/mapRow";
@@ -40,6 +41,7 @@ const ROW_SWATCH: Record<RowHighlight, string> = {
   red: "bg-red-500 border-red-600",
   yellow: "bg-amber-400 border-amber-500",
   green: "bg-emerald-500 border-emerald-600",
+  gray: "bg-slate-400 border-slate-500",
 };
 
 const QTY_INPUT =
@@ -1014,7 +1016,7 @@ function ItemRow({
       </TableCell>
       <TableCell className="px-1">
         <div className="flex flex-col items-center gap-1">
-          {(["red", "yellow", "green"] as const).map((c) => (
+          {HIGHLIGHT_COLORS.map((c) => (
             <button
               key={c}
               type="button"
