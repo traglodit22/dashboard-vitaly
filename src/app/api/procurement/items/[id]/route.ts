@@ -56,6 +56,10 @@ export async function PATCH(
     setClauses.push(`link = $${idx++}`)
     values.push(body.link ? String(body.link).trim() : null)
   }
+  if (body.linkLabel !== undefined) {
+    setClauses.push(`link_label = $${idx++}`)
+    values.push(body.linkLabel ? String(body.linkLabel).trim() : null)
+  }
   if (body.highlightColor !== undefined) {
     const c = body.highlightColor
     if (c !== null && c !== 'red' && c !== 'yellow' && c !== 'green') {

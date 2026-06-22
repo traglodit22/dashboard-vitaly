@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS procurement_items (
   in_transit_qty INTEGER NOT NULL DEFAULT 0,
   notes          TEXT,
   link           TEXT,
+  link_label     TEXT,
   highlight_color TEXT,
   row_type       TEXT NOT NULL DEFAULT 'item',
   sort_order     INTEGER NOT NULL DEFAULT 0,
@@ -141,6 +142,9 @@ export async function ensureHotelProcurement(): Promise<void> {
   )
   await pool.query(
     "UPDATE procurement_items SET row_type = 'item' WHERE row_type IS NULL",
+  )
+  await pool.query(
+    'ALTER TABLE procurement_items ADD COLUMN IF NOT EXISTS link_label TEXT',
   )
 
   const [{ count }] = await query<{ count: string }>(

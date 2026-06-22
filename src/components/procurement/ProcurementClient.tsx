@@ -1,14 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Loader2,
   Plus,
   ShoppingCart,
   Trash2,
-  ExternalLink,
   Search,
   GripVertical,
+  Pencil,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,9 @@ const ROW_SWATCH: Record<RowHighlight, string> = {
   green: "bg-emerald-500 border-emerald-600",
 };
 
+const QTY_INPUT =
+  "h-8 w-[4.5rem] min-w-[4.5rem] shrink-0 px-1.5 text-right tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none";
+
 export function ProcurementClient() {
   const [categories, setCategories] = useState<ProcurementCategory[]>([]);
   const [items, setItems] = useState<ProcurementItem[]>([]);
@@ -60,6 +63,7 @@ export function ProcurementClient() {
     inTransitQty: "0",
     notes: "",
     link: "",
+    linkLabel: "",
   });
 
   const loadCategories = useCallback(async () => {
@@ -108,7 +112,8 @@ export function ProcurementClient() {
         i.name.toLowerCase().includes(q) ||
         (i.groupName?.toLowerCase().includes(q) ?? false) ||
         (i.notes?.toLowerCase().includes(q) ?? false) ||
-        (i.link?.toLowerCase().includes(q) ?? false),
+        (i.link?.toLowerCase().includes(q) ?? false) ||
+        (i.linkLabel?.toLowerCase().includes(q) ?? false),
     );
   }, [items, search]);
 
@@ -239,6 +244,7 @@ export function ProcurementClient() {
         inTransitQty: Number(draft.inTransitQty) || 0,
         notes: draft.notes.trim() || null,
         link: draft.link.trim() || null,
+        linkLabel: draft.linkLabel.trim() || null,
       }),
     });
     if (!res.ok) {
@@ -255,6 +261,7 @@ export function ProcurementClient() {
       inTransitQty: "0",
       notes: "",
       link: "",
+      linkLabel: "",
     });
     setShowAdd(false);
     toast.success("Позиция добавлена");
@@ -463,12 +470,20 @@ export function ProcurementClient() {
                   onChange={(e) => setDraft((d) => ({ ...d, inTransitQty: e.target.value }))}
                 />
               </div>
-              <div className="sm:col-span-2">
-                <Label>Ссылка</Label>
+              <div>
+                <Label>Ссылка (URL)</Label>
                 <Input
                   value={draft.link}
                   onChange={(e) => setDraft((d) => ({ ...d, link: e.target.value }))}
                   placeholder="https://…"
+                />
+              </div>
+              <div>
+                <Label>Текст ссылки</Label>
+                <Input
+                  value={draft.linkLabel}
+                  onChange={(e) => setDraft((d) => ({ ...d, linkLabel: e.target.value }))}
+                  placeholder="Купить"
                 />
               </div>
               <div className="sm:col-span-2">
@@ -507,17 +522,17 @@ export function ProcurementClient() {
                 : "Ничего не найдено по запросу."}
             </p>
           ) : (
-            <Table className="w-full min-w-[720px] table-fixed">
+            <Table className="w-full min-w-[880px] table-fixed">
               <colgroup>
                 <col className="w-8" />
                 <col />
-                <col className="hidden md:table-column md:w-[11%]" />
-                <col className="w-14" />
-                <col className="w-14" />
-                <col className="w-14" />
-                <col className="w-16" />
-                <col className="w-[22%]" />
-                <col className="w-[14%]" />
+                <col className="hidden md:table-column md:w-[10%]" />
+                <col className="w-[4.75rem]" />
+                <col className="w-[4.75rem]" />
+                <col className="w-[4.75rem]" />
+                <col className="w-[4.75rem]" />
+                <col className="w-[5.5rem]" />
+                <col />
                 <col className="w-12" />
                 <col className="w-10" />
               </colgroup>
@@ -693,14 +708,12 @@ function ItemRow({
   const [have, setHave] = useState(String(item.haveQty));
   const [transit, setTransit] = useState(String(item.inTransitQty));
   const [notes, setNotes] = useState(item.notes ?? "");
-  const [link, setLink] = useState(item.link ?? "");
 
   useEffect(() => {
     setNeed(String(item.needQty));
     setHave(String(item.haveQty));
     setTransit(String(item.inTransitQty));
     setNotes(item.notes ?? "");
-    setLink(item.link ?? "");
   }, [item]);
 
   const remaining =
@@ -719,12 +732,9 @@ function ItemRow({
     await onPatch(item.id, { notes: notes || null });
   }
 
-  async function saveLink() {
-    if (link === (item.link ?? "")) return;
-    await onPatch(item.id, { link: link.trim() || null });
+  async function saveLink(link: string | null, linkLabel: string | null) {
+    await onPatch(item.id, { link, linkLabel });
   }
-
-  const linkHref = link.trim();
 
   const liveHighlight = effectiveRowHighlight({
     ...item,
@@ -762,31 +772,31 @@ function ItemRow({
       <TableCell className="hidden whitespace-normal text-xs text-muted-foreground md:table-cell">
         <span className="line-clamp-2">{item.groupName ?? "—"}</span>
       </TableCell>
-      <TableCell>
+      <TableCell className="px-1">
         <Input
           type="number"
           min={0}
-          className="h-8 w-full min-w-0 text-right tabular-nums"
+          className={QTY_INPUT}
           value={need}
           onChange={(e) => setNeed(e.target.value)}
           onBlur={saveQty}
         />
       </TableCell>
-      <TableCell>
+      <TableCell className="px-1">
         <Input
           type="number"
           min={0}
-          className="h-8 w-full min-w-0 text-right tabular-nums"
+          className={QTY_INPUT}
           value={have}
           onChange={(e) => setHave(e.target.value)}
           onBlur={saveQty}
         />
       </TableCell>
-      <TableCell>
+      <TableCell className="px-1">
         <Input
           type="number"
           min={0}
-          className="h-8 w-full min-w-0 text-right tabular-nums"
+          className={QTY_INPUT}
           value={transit}
           onChange={(e) => setTransit(e.target.value)}
           onBlur={saveQty}
@@ -794,33 +804,14 @@ function ItemRow({
       </TableCell>
       <TableCell
         className={cn(
-          "text-right font-mono tabular-nums",
+          "px-1 text-right font-mono tabular-nums",
           remaining > 0 ? "font-semibold text-destructive" : "text-emerald-600",
         )}
       >
         {remaining}
       </TableCell>
-      <TableCell className="whitespace-normal">
-        <div className="flex min-w-0 items-center gap-1">
-          <Input
-            className="h-8 min-w-0 flex-1 text-xs"
-            value={link}
-            onChange={(e) => setLink(e.target.value)}
-            onBlur={saveLink}
-            placeholder="https://…"
-          />
-          {linkHref && /^https?:\/\//i.test(linkHref) && (
-            <a
-              href={linkHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shrink-0 text-primary hover:text-primary/80"
-              title="Открыть ссылку"
-            >
-              <ExternalLink className="size-4" />
-            </a>
-          )}
-        </div>
+      <TableCell className="whitespace-normal px-1">
+        <LinkCell link={item.link} linkLabel={item.linkLabel} onSave={saveLink} />
       </TableCell>
       <TableCell className="whitespace-normal">
         <Input
@@ -863,5 +854,152 @@ function ItemRow({
         </Button>
       </TableCell>
     </TableRow>
+  );
+}
+
+function LinkCell({
+  link,
+  linkLabel,
+  onSave,
+}: {
+  link: string | null;
+  linkLabel: string | null;
+  onSave: (link: string | null, linkLabel: string | null) => Promise<void>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [url, setUrl] = useState(link ?? "");
+  const [label, setLabel] = useState(linkLabel ?? "");
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setUrl(link ?? "");
+    setLabel(linkLabel ?? "");
+  }, [link, linkLabel]);
+
+  useEffect(() => {
+    if (!open) return;
+    function onDown(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [open]);
+
+  const href = link?.trim() ?? "";
+  const valid = Boolean(href && /^https?:\/\//i.test(href));
+  const display = linkLabel?.trim() || (valid ? "ссылка" : "");
+
+  async function save() {
+    const u = url.trim();
+    const l = label.trim();
+    if (u && !/^https?:\/\//i.test(u)) {
+      toast.error("URL должен начинаться с http:// или https://");
+      return;
+    }
+    await onSave(u || null, l || null);
+    setOpen(false);
+  }
+
+  async function clear() {
+    await onSave(null, null);
+    setUrl("");
+    setLabel("");
+    setOpen(false);
+  }
+
+  return (
+    <div className="relative min-w-0" ref={ref}>
+      <div className="flex min-w-0 items-center gap-0.5">
+        {valid && display ? (
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="min-w-0 truncate text-xs text-primary underline-offset-2 hover:underline"
+            title={href}
+          >
+            {display}
+          </a>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="truncate text-xs text-muted-foreground hover:text-foreground"
+          >
+            + ссылка
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="shrink-0 rounded p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+          title="Изменить ссылку"
+        >
+          <Pencil className="size-3" />
+        </button>
+      </div>
+      {open && (
+        <div className="absolute right-0 top-full z-30 mt-1 w-56 rounded-lg border bg-card p-2.5 shadow-lg ring-1 ring-foreground/10">
+          <div className="space-y-2">
+            <div>
+              <Label className="text-xs">URL</Label>
+              <Input
+                autoFocus
+                className="h-8 text-xs"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="https://…"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    void save();
+                  }
+                }}
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Текст ссылки</Label>
+              <Input
+                className="h-8 text-xs"
+                value={label}
+                onChange={(e) => setLabel(e.target.value)}
+                placeholder="Купить"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    void save();
+                  }
+                }}
+              />
+            </div>
+            <div className="flex flex-wrap gap-1">
+              <Button type="button" size="sm" className="h-7 text-xs" onClick={() => void save()}>
+                OK
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                className="h-7 text-xs"
+                onClick={() => setOpen(false)}
+              >
+                Отмена
+              </Button>
+              {valid && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 text-xs text-destructive"
+                  onClick={() => void clear()}
+                >
+                  Удалить
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
