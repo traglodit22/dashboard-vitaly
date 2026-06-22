@@ -31,13 +31,25 @@ cp -r .next/static .next/standalone/.next/static
 mkdir -p .next/standalone/db
 cp -r src/lib/db/migrations .next/standalone/db/migrations
 
-echo "==> Reload PM2 processes"
-if pm2 describe dashboard >/dev/null 2>&1; then
-  pm2 startOrReload ecosystem.config.cjs --only dashboard --update-env
-else
-  pm2 start ecosystem.config.cjs --only dashboard
-  pm2 save
-fi
+echo "==> Start PM2 (fresh — ensures standalone server.js, not next start)"
+pm2 delete dashboard 2>/dev/null || true
+pm2 start ecosystem.config.cjs --only dashboard --update-env
+pm2 save
+
+echo "==> Health check"
+for i in $(seq 1 15); do
+  code="$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/auth/me || true)"
+  if [[ "$code" == "401" || "$code" == "200" ]]; then
+    echo "App is up (HTTP $code)"
+    break
+  fi
+  if [[ "$i" -eq 15 ]]; then
+    echo "ERROR: app did not become healthy"
+    pm2 logs dashboard --lines 30 --nostream || true
+    exit 1
+  fi
+  sleep 2
+done
 
 echo "==> Database migrations (via running app)"
 env_val() {
