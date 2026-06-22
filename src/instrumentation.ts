@@ -1,13 +1,10 @@
 export async function register() {
   if (process.env.NEXT_RUNTIME !== 'nodejs') return
 
-  const { runMigrations } = await import('@/lib/db/runMigrations')
+  const { ensureHotelProcurement } = await import('@/lib/procurement/ensureHotelSeed')
   try {
-    const applied = await runMigrations()
-    if (applied.length) {
-      console.log('[migrations] applied:', applied.join(', '))
-    }
+    await ensureHotelProcurement()
   } catch (err) {
-    console.error('[migrations] startup failed:', err)
+    console.error('[procurement] startup seed failed:', err)
   }
 }

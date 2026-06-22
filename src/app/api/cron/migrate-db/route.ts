@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { runMigrations } from '@/lib/db/runMigrations'
+import { ensureHotelProcurement } from '@/lib/procurement/ensureHotelSeed'
 import { query } from '@/lib/db/index'
 
 export const runtime = 'nodejs'
@@ -11,14 +11,14 @@ export async function GET(req: Request) {
   }
 
   try {
-    const applied = await runMigrations()
+    await ensureHotelProcurement()
     const [{ count }] = await query<{ count: string }>(
       `SELECT COUNT(*)::text AS count
        FROM procurement_items i
        JOIN procurement_categories c ON c.id = i.category_id
        WHERE c.name = 'Отель'`,
     )
-    return NextResponse.json({ ok: true, applied, hotelItems: Number(count) })
+    return NextResponse.json({ ok: true, hotelItems: Number(count) })
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     return NextResponse.json({ ok: false, error: message }, { status: 500 })

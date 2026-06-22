@@ -2,33 +2,19 @@ import { NextResponse } from 'next/server'
 import { query } from '@/lib/db/index'
 import { requireAuth } from '@/lib/auth/requireAuth'
 import { rowToCategory } from '@/lib/procurement/mapRow'
-import { runMigrations } from '@/lib/db/runMigrations'
+import { ensureHotelProcurement } from '@/lib/procurement/ensureHotelSeed'
 
 export const runtime = 'nodejs'
-
-async function loadCategories() {
-  return query<Record<string, unknown>>(
-    'SELECT * FROM procurement_categories ORDER BY sort_order ASC, name ASC',
-  )
-}
-
-async function ensureProcurementSeeded() {
-  try {
-    const rows = await loadCategories()
-    if (rows.length > 0) return rows
-  } catch {
-    // таблицы ещё не созданы
-  }
-  await runMigrations()
-  return loadCategories()
-}
 
 export async function GET(req: Request) {
   const unauth = await requireAuth(req)
   if (unauth) return unauth
 
   try {
-    const rows = await ensureProcurementSeeded()
+    await ensureHotelProcurement()
+    const rows = await query<Record<string, unknown>>(
+      'SELECT * FROM procurement_categories ORDER BY sort_order ASC, name ASC',
+    )
     return NextResponse.json({ categories: rows.map(rowToCategory) })
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)

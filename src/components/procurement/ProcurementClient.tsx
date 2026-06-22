@@ -58,6 +58,10 @@ export function ProcurementClient() {
   const loadCategories = useCallback(async () => {
     const res = await apiFetch("/api/procurement/categories", { cache: "no-store" });
     const data = await res.json();
+    if (!res.ok) {
+      toast.error("Не удалось загрузить закупки", { description: data.error });
+      return [];
+    }
     const list: ProcurementCategory[] = data.categories ?? [];
     setCategories(list);
     setCategoryId((prev) => {
