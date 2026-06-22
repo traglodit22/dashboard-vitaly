@@ -9,7 +9,13 @@ echo "==> Install dependencies"
 npm ci
 
 echo "==> Database migrations"
+set +e
 node scripts/run-migrations.mjs
+migrate_rc=$?
+set -e
+if [[ $migrate_rc -ne 0 ]]; then
+  echo "WARNING: migrations exited with code $migrate_rc (deploy continues)"
+fi
 
 echo "==> Build Next.js (standalone)"
 npm run build

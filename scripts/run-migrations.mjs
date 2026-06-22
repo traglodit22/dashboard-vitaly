@@ -42,7 +42,10 @@ async function main() {
     .filter((f) => f.endsWith('.sql'))
     .sort()
 
-  const client = new Client({ connectionString: url })
+  const client = new Client({
+    connectionString: url,
+    connectionTimeoutMillis: 10_000,
+  })
   await client.connect()
 
   try {
