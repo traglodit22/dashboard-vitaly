@@ -10,6 +10,7 @@ import {
   GripVertical,
   Pencil,
   ImageIcon,
+  Copy,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -193,11 +194,16 @@ export function ProcurementClient() {
       return;
     }
     const sortMap = new Map(next.map((item, i) => [item.id, (i + 1) * 10]));
-    setItems((prev) =>
-      prev.map((item) =>
-        sortMap.has(item.id) ? { ...item, sortOrder: sortMap.get(item.id)! } : item,
-      ),
-    );
+    setItems((prev) => {
+      const byId = new Map(prev.map((item) => [item.id, item]));
+      for (const row of next) {
+        if (!byId.has(row.id)) byId.set(row.id, row);
+      }
+      return next.map((row) => ({
+        ...byId.get(row.id)!,
+        sortOrder: sortMap.get(row.id)!,
+      }));
+    });
   }
 
   function onCategoryDrop(targetId: string) {
@@ -293,6 +299,32 @@ export function ProcurementClient() {
     setTypeDraftName("");
     setShowAddType(false);
     toast.success("Тип добавлен");
+  }
+
+  async function duplicateType(source: ProcurementItem) {
+    const res = await apiFetch("/api/procurement/items", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        categoryId: source.categoryId,
+        name: source.name,
+        rowType: "type",
+      }),
+    });
+    if (!res.ok) {
+      toast.error("Не удалось скопировать тип");
+      return;
+    }
+    const data = await res.json();
+    const newItem: ProcurementItem = data.item;
+    const ordered = [...items].sort(
+      (a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, "ru"),
+    );
+    const idx = ordered.findIndex((i) => i.id === source.id);
+    const next = [...ordered];
+    next.splice(idx + 1, 0, newItem);
+    await persistItemOrder(next);
+    toast.success("Тип скопирован");
   }
 
   if (loading) {
@@ -578,6 +610,7 @@ export function ProcurementClient() {
                       }}
                       onPatch={patchItem}
                       onRemove={removeItem}
+                      onDuplicate={duplicateType}
                     />
                   ) : (
                     <ItemRow
@@ -620,6 +653,7 @@ function TypeRow({
   onDrop,
   onPatch,
   onRemove,
+  onDuplicate,
 }: {
   item: ProcurementItem;
   draggable: boolean;
@@ -630,17 +664,27 @@ function TypeRow({
   onDrop: (e: React.DragEvent) => void;
   onPatch: (id: string, patch: Partial<ProcurementItem>) => Promise<boolean>;
   onRemove: (id: string, name: string) => void;
+  onDuplicate: (item: ProcurementItem) => void;
 }) {
-  const [name, setName] = useState(item.name);
+  const [editing, setEditing] = useState(false);
+  const [draftName, setDraftName] = useState(item.name);
 
   useEffect(() => {
-    setName(item.name);
+    setDraftName(item.name);
   }, [item.name]);
 
   async function saveName() {
-    const trimmed = name.trim();
-    if (!trimmed || trimmed === item.name) return;
-    await onPatch(item.id, { name: trimmed });
+    const trimmed = draftName.trim();
+    if (!trimmed) {
+      toast.error("Название не может быть пустым");
+      return;
+    }
+    if (trimmed === item.name) {
+      setEditing(false);
+      return;
+    }
+    const ok = await onPatch(item.id, { name: trimmed });
+    if (ok) setEditing(false);
   }
 
   return (
@@ -659,22 +703,69 @@ function TypeRow({
       </TableCell>
       <TableCell className="hidden sm:table-cell" />
       <TableCell colSpan={8} className="whitespace-normal py-2">
-        <div className="flex min-w-0 items-center gap-3">
-          <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Тип
-          </span>
-          <Input
-            className="h-8 max-w-xl border-transparent bg-transparent font-semibold shadow-none focus-visible:border-input focus-visible:bg-background"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onBlur={saveName}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                void saveName();
-              }
-            }}
-          />
+        <div className="flex min-w-0 items-center gap-2">
+          {editing ? (
+            <>
+              <Input
+                autoFocus
+                className="h-8 max-w-xl font-semibold"
+                value={draftName}
+                onChange={(e) => setDraftName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    void saveName();
+                  }
+                  if (e.key === "Escape") {
+                    setDraftName(item.name);
+                    setEditing(false);
+                  }
+                }}
+              />
+              <Button type="button" size="sm" className="h-8 shrink-0" onClick={() => void saveName()}>
+                OK
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                className="h-8 shrink-0"
+                onClick={() => {
+                  setDraftName(item.name);
+                  setEditing(false);
+                }}
+              >
+                Отмена
+              </Button>
+            </>
+          ) : (
+            <>
+              <span className="min-w-0 truncate font-semibold">{item.name}</span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="size-7 shrink-0 text-muted-foreground"
+                title="Редактировать"
+                onClick={() => {
+                  setDraftName(item.name);
+                  setEditing(true);
+                }}
+              >
+                <Pencil className="size-3.5" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="size-7 shrink-0 text-muted-foreground"
+                title="Копировать"
+                onClick={() => void onDuplicate(item)}
+              >
+                <Copy className="size-3.5" />
+              </Button>
+            </>
+          )}
         </div>
       </TableCell>
       <TableCell className="hidden sm:table-cell" />
