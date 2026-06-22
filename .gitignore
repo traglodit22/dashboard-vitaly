@@ -33,9 +33,21 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
-# vercel
-.vercel
+# firebase secrets — НИКОГДА не коммитить
+service-account.json
+*-firebase-adminsdk-*.json
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.localtools/
+
+# локальные заметки агента (секреты, доступы) — не коммитить
+.local/
+
+# claude/cursor локальные настройки
+.claude/
+
+# миграционные данные и зависимости скриптов
+scripts/firestore-export/
+scripts/node_modules/

@@ -1,0 +1,5 @@
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Автопроверка складских статусов (замена Vercel Cron)
+0 */6 * * * root /var/www/dashboard/deploy/cron-refresh-warehouse.sh

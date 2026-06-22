@@ -1,0 +1,23 @@
+---
+description: VPS, деплой, доступы и инфраструктура проекта
+alwaysApply: true
+---
+
+# Инфраструктура Dashboard Vitaly
+
+Перед работой с деплоем, cron, SSH или секретами — прочитай **`.local/ACCESS.md`** (gitignored, только локально).
+
+## Кратко
+
+- **Прод**: http://135.106.161.215 — nginx + Next.js + PostgreSQL на том же VPS
+- **БД**: `dashboard_db` на `127.0.0.1:5432`
+- **Cron**: `GET /api/cron/refresh-warehouse` с `Authorization: Bearer $CRON_SECRET`
+- **Telegram-уведомления**: токен в `system_settings.telegram_bot_token` (Настройки UI), chat IDs в `telegram_notify_chat_ids`
+- **Автодеплой**: `.github/workflows/deploy.yml` → SSH → `deploy/deploy.sh`
+- **Vercel удалён** — cron на сервере: `deploy/cron-dashboard` → `deploy/cron-refresh-warehouse.sh`
+
+## Частые проблемы
+
+1. Cron не срабатывает — на VPS нет `/etc/cron.d/dashboard` (после ухода с Vercel)
+2. Telegram молчит — проверь токен в Настройках, `telegram_notify_enabled`, chat IDs; уведомления только при изменении статусов или низком балансе
+3. `skipped: too_soon` — интервал автопроверки (6/12/24 ч) ещё не прошёл

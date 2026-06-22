@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dashboard Vitaly
 
-## Getting Started
+Next.js dashboard + Telegram-бот. Прод на VPS, разработка локально.
 
-First, run the development server:
+## Быстрый старт (локально)
 
 ```bash
+cp .env.local.example .env.local
+npm install
+npm run db:setup          # локальный Postgres
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+→ [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Локально + облако
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+┌─────────────┐    git push     ┌────────┐    SSH deploy    ┌─────────────────────┐
+│  Mac (dev)  │ ──────────────► │ GitHub │ ───────────────► │ VPS 135.106.161.215 │
+│ npm run dev │                 │  main  │                  │ PM2 + nginx + cron  │
+│ .env.local  │                 └────────┘                  │ .env (прод)         │
+└─────────────┘                                             └─────────────────────┘
+```
 
-## Learn More
+| | Локально | VPS (прод) |
+|--|----------|------------|
+| Код | эта папка | `/var/www/dashboard` |
+| Env | `.env.local` | `.env` |
+| БД | `npm run db:setup` | PostgreSQL на сервере |
+| Запуск | `npm run dev` | PM2 `dashboard` |
+| Telegram proxy | не нужен | `TELEGRAM_PROXY_URL=127.0.0.1:8118` |
 
-To learn more about Next.js, take a look at the following resources:
+### БД: два режима
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Своя локальная** (безопасно):
+```bash
+npm run db:setup
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Туннель к проду** (реальные данные, осторожно):
+```bash
+npm run db:tunnel          # терминал 1
+# в .env.local: DATABASE_URL=...@127.0.0.1:5433/...
+npm run dev                # терминал 2
+```
 
-## Deploy on Vercel
+### GitHub + автодеплой
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Создай пустой репозиторий на GitHub
+2. Привяжи и запушь:
+   ```bash
+   ./scripts/link-github.sh YOUR_GITHUB_USER dashboard-vitaly
+   ```
+3. GitHub → Settings → Secrets → Actions:
+   - `SSH_HOST` = `135.106.161.215`
+   - `SSH_USER` = `root`
+   - `SSH_PRIVATE_KEY` = приватный SSH-ключ
+   - `APP_DIR` = `/var/www/dashboard`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+После `git push origin main` — GitHub Actions деплоит на VPS.
+
+## Прод (VPS)
+
+Стек: Node 22, PM2, nginx, PostgreSQL, privoxy (Telegram).
+
+```bash
+pm2 status
+pm2 logs dashboard
+tail -f /var/log/dashboard-cron.log
+```
+
+Первичная настройка сервера: `deploy/setup-server.sh` (см. `deploy/`).

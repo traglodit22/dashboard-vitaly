@@ -6,20 +6,44 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "start:bot": "tsx bot/index.ts",
+    "lint": "eslint",
+    "db:setup": "bash scripts/setup-local-db.sh",
+    "db:tunnel": "bash scripts/db-tunnel.sh"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.2",
+    "@base-ui/react": "^1.5.0",
+    "bcryptjs": "^3.0.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "jose": "^5.10.0",
+    "lucide-react": "^1.18.0",
     "next": "16.2.9",
+    "next-themes": "^0.4.6",
+    "node-telegram-bot-api": "^0.66.0",
+    "pg": "^8.16.0",
+    "undici": "^7.28.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "shadcn": "^4.11.0",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.6.0",
+    "tsx": "^4.22.4",
+    "tw-animate-css": "^1.4.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.19.43",
+    "@types/node-telegram-bot-api": "^0.64.8",
+    "@types/pg": "^8.11.14",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "puppeteer-core": "^24.43.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
