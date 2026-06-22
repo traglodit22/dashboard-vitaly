@@ -139,6 +139,9 @@ export async function ensureHotelProcurement(): Promise<void> {
   await pool.query(
     "ALTER TABLE procurement_items ADD COLUMN IF NOT EXISTS row_type TEXT NOT NULL DEFAULT 'item'",
   )
+  await pool.query(
+    "UPDATE procurement_items SET row_type = 'item' WHERE row_type IS NULL",
+  )
 
   const [{ count }] = await query<{ count: string }>(
     `SELECT COUNT(*)::text AS count FROM procurement_items i

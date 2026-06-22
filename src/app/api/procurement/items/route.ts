@@ -2,12 +2,21 @@ import { NextResponse } from 'next/server'
 import { query } from '@/lib/db/index'
 import { requireAuth } from '@/lib/auth/requireAuth'
 import { rowToItem } from '@/lib/procurement/mapRow'
+import { ensureHotelProcurement } from '@/lib/procurement/ensureHotelSeed'
 
 export const runtime = 'nodejs'
 
 export async function GET(req: Request) {
   const unauth = await requireAuth(req)
   if (unauth) return unauth
+
+  try {
+    await ensureHotelProcurement()
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('[procurement/items] ensure schema:', message)
+    return NextResponse.json({ error: message, items: [] }, { status: 500 })
+  }
 
   const { searchParams } = new URL(req.url)
   const categoryId = searchParams.get('categoryId')
@@ -27,6 +36,14 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const unauth = await requireAuth(req)
   if (unauth) return unauth
+
+  try {
+    await ensureHotelProcurement()
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('[procurement/items] ensure schema:', message)
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
 
   const body = await req.json()
   const categoryId = String(body.categoryId ?? '').trim()

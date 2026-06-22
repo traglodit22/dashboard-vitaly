@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { query } from '@/lib/db/index'
 import { requireAuth } from '@/lib/auth/requireAuth'
 import { rowToItem } from '@/lib/procurement/mapRow'
+import { ensureHotelProcurement } from '@/lib/procurement/ensureHotelSeed'
 
 export const runtime = 'nodejs'
 
@@ -11,6 +12,14 @@ export async function PATCH(
 ) {
   const unauth = await requireAuth(req)
   if (unauth) return unauth
+
+  try {
+    await ensureHotelProcurement()
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('[procurement/items/id] ensure schema:', message)
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
 
   const { id } = await params
   const body = await req.json()
