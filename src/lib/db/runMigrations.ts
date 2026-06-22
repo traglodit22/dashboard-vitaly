@@ -3,6 +3,9 @@ import { join } from 'path'
 import { pool } from '@/lib/db/index'
 
 function migrationsDir(): string {
+  if (process.env.MIGRATIONS_DIR && existsSync(process.env.MIGRATIONS_DIR)) {
+    return process.env.MIGRATIONS_DIR
+  }
   const candidates = [
     join(process.cwd(), 'db/migrations'),
     join(process.cwd(), 'src/lib/db/migrations'),

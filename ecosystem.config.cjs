@@ -13,6 +13,7 @@ module.exports = {
         NODE_ENV: "production",
         PORT: "3000",
         HOSTNAME: "127.0.0.1",
+        MIGRATIONS_DIR: path.join(appDir, ".next/standalone/db/migrations"),
       },
       env_file: path.join(appDir, ".env"),
       max_memory_restart: "512M",
