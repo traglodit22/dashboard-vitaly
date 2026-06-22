@@ -7,7 +7,8 @@ cd "$APP_DIR"
 
 RUNTIME="$APP_DIR/runtime/current"
 RUNTIME_NEW="$APP_DIR/runtime/current.new"
-RUNTIME_BAK="$APP_DIR/runtime/current.bak"
+# Backup outside the repo so `next build` typecheck never scans old bundles.
+RUNTIME_BAK="$(dirname "$APP_DIR")/dashboard-runtime.bak"
 LOCK_FILE="$APP_DIR/.deploy.lock"
 
 exec 9>"$LOCK_FILE"
@@ -79,6 +80,8 @@ cp -r .next/static .next/standalone/.next/static
 mkdir -p .next/standalone/db
 cp -r src/lib/db/migrations .next/standalone/db/migrations
 rsync -a .next/standalone/ "$RUNTIME_NEW/"
+# Drop stray copies from older broken deploys (must not land in runtime).
+rm -rf "$RUNTIME_NEW/src" "$RUNTIME_NEW/runtime"
 
 if ! verify_bundle "$RUNTIME_NEW"; then
   echo "ERROR: incomplete standalone bundle"

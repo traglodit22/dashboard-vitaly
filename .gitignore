@@ -24,6 +24,7 @@
 /runtime/current
 /runtime/current.new
 /runtime/current.bak
+/../dashboard-runtime.bak
 .deploy.lock
 
 # misc
