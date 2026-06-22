@@ -1,4 +1,5 @@
 import { pool, query } from '@/lib/db/index'
+import { ensureBesedkaProcurement } from '@/lib/procurement/ensureBesedkaSeed'
 
 const PROCUREMENT_DDL = `
 CREATE TABLE IF NOT EXISTS procurement_categories (
@@ -133,8 +134,13 @@ WHERE c.name = 'Отель'
   );
 `
 
-/** Создаёт таблицы и заливает «Отель» — без чтения SQL-файлов с диска. */
 export async function ensureHotelProcurement(): Promise<void> {
+  await ensureProcurementSchema()
+  await ensureHotelSeedOnly()
+  await ensureBesedkaProcurement()
+}
+
+async function ensureProcurementSchema(): Promise<void> {
   await pool.query(PROCUREMENT_DDL)
   await pool.query(
     'ALTER TABLE procurement_items ADD COLUMN IF NOT EXISTS highlight_color TEXT',
@@ -154,7 +160,9 @@ export async function ensureHotelProcurement(): Promise<void> {
   await pool.query(
     'ALTER TABLE procurement_items ADD COLUMN IF NOT EXISTS image_updated_at TIMESTAMPTZ',
   )
+}
 
+async function ensureHotelSeedOnly(): Promise<void> {
   const [{ count }] = await query<{ count: string }>(
     `SELECT COUNT(*)::text AS count FROM procurement_items i
      JOIN procurement_categories c ON c.id = i.category_id
