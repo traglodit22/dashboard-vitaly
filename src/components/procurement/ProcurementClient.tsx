@@ -45,6 +45,22 @@ const ROW_SWATCH: Record<RowHighlight, string> = {
 const QTY_INPUT =
   "h-8 w-[4.5rem] min-w-[4.5rem] shrink-0 px-1.5 text-right tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none";
 
+function buildTypeByItemId(items: ProcurementItem[]): Map<string, string | null> {
+  const sorted = [...items].sort(
+    (a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, "ru"),
+  );
+  const map = new Map<string, string | null>();
+  let currentType: string | null = null;
+  for (const row of sorted) {
+    if (row.rowType === "type") {
+      currentType = row.name;
+    } else {
+      map.set(row.id, currentType);
+    }
+  }
+  return map;
+}
+
 export function ProcurementClient() {
   const [categories, setCategories] = useState<ProcurementCategory[]>([]);
   const [items, setItems] = useState<ProcurementItem[]>([]);
@@ -58,7 +74,6 @@ export function ProcurementClient() {
   const [dragCatId, setDragCatId] = useState<string | null>(null);
   const [dragItemId, setDragItemId] = useState<string | null>(null);
   const [draft, setDraft] = useState({
-    groupName: "",
     name: "",
     needQty: "0",
     haveQty: "0",
@@ -106,18 +121,25 @@ export function ProcurementClient() {
 
   const searchActive = search.trim().length > 0;
 
+  const typeByItemId = useMemo(() => buildTypeByItemId(items), [items]);
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return items;
-    return items.filter(
-      (i) =>
+    return items.filter((i) => {
+      if (i.rowType === "type") {
+        return i.name.toLowerCase().includes(q);
+      }
+      const typeName = typeByItemId.get(i.id);
+      return (
         i.name.toLowerCase().includes(q) ||
-        (i.groupName?.toLowerCase().includes(q) ?? false) ||
+        (typeName?.toLowerCase().includes(q) ?? false) ||
         (i.notes?.toLowerCase().includes(q) ?? false) ||
         (i.link?.toLowerCase().includes(q) ?? false) ||
-        (i.linkLabel?.toLowerCase().includes(q) ?? false),
-    );
-  }, [items, search]);
+        (i.linkLabel?.toLowerCase().includes(q) ?? false)
+      );
+    });
+  }, [items, search, typeByItemId]);
 
   const sortedItems = useMemo(
     () => [...filtered].sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, "ru")),
@@ -248,7 +270,6 @@ export function ProcurementClient() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         categoryId,
-        groupName: draft.groupName.trim() || null,
         name: draft.name.trim(),
         needQty: Number(draft.needQty) || 0,
         haveQty: Number(draft.haveQty) || 0,
@@ -265,7 +286,6 @@ export function ProcurementClient() {
     const data = await res.json();
     setItems((prev) => [...prev, data.item]);
     setDraft({
-      groupName: draft.groupName,
       name: "",
       needQty: "0",
       haveQty: "0",
@@ -409,7 +429,7 @@ export function ProcurementClient() {
         <div className="relative min-w-[200px] flex-1">
           <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
           <Input
-            placeholder="Поиск по названию, группе, заметке, ссылке…"
+            placeholder="Поиск по названию, типу, заметке, ссылке…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
@@ -464,14 +484,6 @@ export function ProcurementClient() {
           </CardHeader>
           <CardContent>
             <form onSubmit={addItem} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <div>
-                <Label>Группа</Label>
-                <Input
-                  value={draft.groupName}
-                  onChange={(e) => setDraft((d) => ({ ...d, groupName: e.target.value }))}
-                  placeholder="Постельное и текстиль"
-                />
-              </div>
               <div className="sm:col-span-2">
                 <Label>Название</Label>
                 <Input
@@ -559,12 +571,12 @@ export function ProcurementClient() {
                 : "Ничего не найдено по запросу."}
             </p>
           ) : (
-            <Table className="w-full min-w-[940px] table-fixed">
+            <Table className="w-full min-w-[900px] table-fixed">
               <colgroup>
                 <col className="w-8" />
                 <col className="w-14" />
                 <col />
-                <col className="hidden md:table-column md:w-[10%]" />
+                <col className="w-[11%]" />
                 <col className="w-[4.75rem]" />
                 <col className="w-[4.75rem]" />
                 <col className="w-[4.75rem]" />
@@ -575,11 +587,11 @@ export function ProcurementClient() {
                 <col className="w-10" />
               </colgroup>
               <TableHeader>
-                <TableRow>
+                <TableRow className="hover:bg-transparent">
                   <TableHead />
                   <TableHead className="hidden sm:table-cell">Фото</TableHead>
                   <TableHead>Название</TableHead>
-                  <TableHead className="hidden md:table-cell">Группа</TableHead>
+                  <TableHead>Тип</TableHead>
                   <TableHead className="text-right">Надо</TableHead>
                   <TableHead className="text-right">Есть</TableHead>
                   <TableHead className="text-right">Едут</TableHead>
@@ -616,6 +628,7 @@ export function ProcurementClient() {
                     <ItemRow
                       key={item.id}
                       item={item}
+                      typeName={typeByItemId.get(item.id) ?? null}
                       draggable={!searchActive}
                       dragging={dragItemId === item.id}
                       onDragStart={() => setDragItemId(item.id)}
@@ -694,7 +707,10 @@ function TypeRow({
       onDragEnd={draggable ? onDragEnd : undefined}
       onDragOver={draggable ? onDragOver : undefined}
       onDrop={draggable ? onDrop : undefined}
-      className={cn("bg-muted/50 hover:bg-muted/70", dragging && "opacity-50")}
+      className={cn(
+        "border-y border-primary/20 bg-primary/[0.06] hover:bg-primary/[0.09]",
+        dragging && "opacity-50",
+      )}
     >
       <TableCell className="w-8 px-2">
         {draggable && (
@@ -702,13 +718,14 @@ function TypeRow({
         )}
       </TableCell>
       <TableCell className="hidden sm:table-cell" />
-      <TableCell colSpan={8} className="whitespace-normal py-2">
-        <div className="flex min-w-0 items-center gap-2">
-          {editing ? (
-            <>
+      <TableCell colSpan={8} className="whitespace-normal py-2.5">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-2.5">
+            <div className="h-5 w-1 shrink-0 rounded-full bg-primary/70" aria-hidden />
+            {editing ? (
               <Input
                 autoFocus
-                className="h-8 max-w-xl font-semibold"
+                className="h-8 max-w-md font-semibold"
                 value={draftName}
                 onChange={(e) => setDraftName(e.target.value)}
                 onKeyDown={(e) => {
@@ -722,70 +739,78 @@ function TypeRow({
                   }
                 }}
               />
-              <Button type="button" size="sm" className="h-8 shrink-0" onClick={() => void saveName()}>
-                OK
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                className="h-8 shrink-0"
-                onClick={() => {
-                  setDraftName(item.name);
-                  setEditing(false);
-                }}
-              >
-                Отмена
-              </Button>
-            </>
-          ) : (
-            <>
-              <span className="min-w-0 truncate font-semibold">{item.name}</span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="size-7 shrink-0 text-muted-foreground"
-                title="Редактировать"
-                onClick={() => {
-                  setDraftName(item.name);
-                  setEditing(true);
-                }}
-              >
-                <Pencil className="size-3.5" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="size-7 shrink-0 text-muted-foreground"
-                title="Копировать"
-                onClick={() => void onDuplicate(item)}
-              >
-                <Copy className="size-3.5" />
-              </Button>
-            </>
-          )}
+            ) : (
+              <span className="truncate text-sm font-semibold tracking-tight">{item.name}</span>
+            )}
+          </div>
+          <div className="flex shrink-0 items-center gap-0.5">
+            {editing ? (
+              <>
+                <Button type="button" size="sm" className="h-8" onClick={() => void saveName()}>
+                  OK
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-8"
+                  onClick={() => {
+                    setDraftName(item.name);
+                    setEditing(false);
+                  }}
+                >
+                  Отмена
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 text-muted-foreground hover:text-foreground"
+                  title="Редактировать"
+                  onClick={() => {
+                    setDraftName(item.name);
+                    setEditing(true);
+                  }}
+                >
+                  <Pencil className="size-3.5" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 text-muted-foreground hover:text-foreground"
+                  title="Копировать"
+                  onClick={() => void onDuplicate(item)}
+                >
+                  <Copy className="size-3.5" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 text-muted-foreground hover:text-destructive"
+                  title="Удалить"
+                  onClick={() => onRemove(item.id, item.name)}
+                >
+                  <Trash2 className="size-3.5" />
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </TableCell>
-      <TableCell className="hidden sm:table-cell" />
-      <TableCell>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-muted-foreground hover:text-destructive"
-          onClick={() => onRemove(item.id, item.name)}
-          title="Удалить"
-        >
-          <Trash2 className="size-4" />
-        </Button>
-      </TableCell>
+      <TableCell className="px-1" />
+      <TableCell className="w-10" />
     </TableRow>
   );
 }
 
 function ItemRow({
   item,
+  typeName,
   draggable,
   dragging,
   onDragStart,
@@ -797,6 +822,7 @@ function ItemRow({
   onItemReplace,
 }: {
   item: ProcurementItem;
+  typeName: string | null;
   draggable: boolean;
   dragging: boolean;
   onDragStart: () => void;
@@ -875,8 +901,17 @@ function ItemRow({
       <TableCell className="whitespace-normal">
         <div className="line-clamp-2 font-medium leading-snug">{item.name}</div>
       </TableCell>
-      <TableCell className="hidden whitespace-normal text-xs text-muted-foreground md:table-cell">
-        <span className="line-clamp-2">{item.groupName ?? "—"}</span>
+      <TableCell className="whitespace-normal">
+        {typeName ? (
+          <span
+            className="inline-block max-w-full truncate rounded-md bg-muted/80 px-2 py-0.5 text-xs text-muted-foreground"
+            title={typeName}
+          >
+            {typeName}
+          </span>
+        ) : (
+          <span className="text-xs text-muted-foreground/40">—</span>
+        )}
       </TableCell>
       <TableCell className="px-1">
         <Input
