@@ -17,9 +17,9 @@ cp -r .next/static .next/standalone/.next/static
 
 echo "==> Reload PM2 processes"
 if pm2 describe dashboard >/dev/null 2>&1; then
-  pm2 reload ecosystem.config.cjs --update-env
+  pm2 startOrReload ecosystem.config.cjs --only dashboard --update-env
 else
-  pm2 start ecosystem.config.cjs
+  pm2 start ecosystem.config.cjs --only dashboard
   pm2 save
 fi
 
