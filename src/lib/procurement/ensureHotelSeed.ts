@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS procurement_items (
   notes          TEXT,
   link           TEXT,
   highlight_color TEXT,
+  row_type       TEXT NOT NULL DEFAULT 'item',
   sort_order     INTEGER NOT NULL DEFAULT 0,
   created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -134,6 +135,9 @@ export async function ensureHotelProcurement(): Promise<void> {
   await pool.query(PROCUREMENT_DDL)
   await pool.query(
     'ALTER TABLE procurement_items ADD COLUMN IF NOT EXISTS highlight_color TEXT',
+  )
+  await pool.query(
+    "ALTER TABLE procurement_items ADD COLUMN IF NOT EXISTS row_type TEXT NOT NULL DEFAULT 'item'",
   )
 
   const [{ count }] = await query<{ count: string }>(

@@ -47,6 +47,8 @@ export function ProcurementClient() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showAdd, setShowAdd] = useState(false);
+  const [showAddType, setShowAddType] = useState(false);
+  const [typeDraftName, setTypeDraftName] = useState("");
   const [newCategoryName, setNewCategoryName] = useState("");
   const [dragCatId, setDragCatId] = useState<string | null>(null);
   const [dragItemId, setDragItemId] = useState<string | null>(null);
@@ -120,13 +122,16 @@ export function ProcurementClient() {
     let have = 0;
     let transit = 0;
     let open = 0;
+    let total = 0;
     for (const i of items) {
+      if (i.rowType === "type") continue;
+      total += 1;
       need += i.needQty;
       have += i.haveQty;
       transit += i.inTransitQty;
       if (i.remaining > 0) open += 1;
     }
-    return { need, have, transit, open, total: items.length };
+    return { need, have, transit, open, total };
   }, [items]);
 
   async function patchItem(id: string, patch: Partial<ProcurementItem>) {
@@ -255,6 +260,29 @@ export function ProcurementClient() {
     toast.success("Позиция добавлена");
   }
 
+  async function addTypeRow(e: React.FormEvent) {
+    e.preventDefault();
+    if (!categoryId || !typeDraftName.trim()) return;
+    const res = await apiFetch("/api/procurement/items", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        categoryId,
+        name: typeDraftName.trim(),
+        rowType: "type",
+      }),
+    });
+    if (!res.ok) {
+      toast.error("Не удалось добавить тип");
+      return;
+    }
+    const data = await res.json();
+    setItems((prev) => [...prev, data.item]);
+    setTypeDraftName("");
+    setShowAddType(false);
+    toast.success("Тип добавлен");
+  }
+
   if (loading) {
     return (
       <div className="flex items-center gap-2 py-12 text-muted-foreground">
@@ -343,11 +371,41 @@ export function ProcurementClient() {
             className="pl-9"
           />
         </div>
+        <Button type="button" variant="outline" onClick={() => setShowAddType((v) => !v)}>
+          <Plus className="mr-1 size-4" />
+          Тип
+        </Button>
         <Button type="button" onClick={() => setShowAdd((v) => !v)}>
           <Plus className="mr-1 size-4" />
           Позиция
         </Button>
       </div>
+
+      {showAddType && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Новый тип (разделитель)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={addTypeRow} className="flex flex-wrap items-end gap-3">
+              <div className="min-w-[240px] flex-1">
+                <Label>Название типа</Label>
+                <Input
+                  required
+                  autoFocus
+                  value={typeDraftName}
+                  onChange={(e) => setTypeDraftName(e.target.value)}
+                  placeholder="Постельное и текстиль"
+                />
+              </div>
+              <Button type="submit">Добавить</Button>
+              <Button type="button" variant="ghost" onClick={() => setShowAddType(false)}>
+                Отмена
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      )}
 
       {searchActive && (
         <p className="text-xs text-muted-foreground">
@@ -447,7 +505,7 @@ export function ProcurementClient() {
             <ShoppingCart className="size-5 text-primary" />
             {categories.find((c) => c.id === categoryId)?.name ?? "Закупки"}
             <span className="font-mono text-sm font-normal text-muted-foreground">
-              {sortedItems.length}
+              {sortedItems.filter((i) => i.rowType !== "type").length}
             </span>
           </CardTitle>
         </CardHeader>
@@ -487,32 +545,134 @@ export function ProcurementClient() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedItems.map((item) => (
-                  <ItemRow
-                    key={item.id}
-                    item={item}
-                    draggable={!searchActive}
-                    dragging={dragItemId === item.id}
-                    onDragStart={() => setDragItemId(item.id)}
-                    onDragEnd={() => setDragItemId(null)}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      e.dataTransfer.dropEffect = "move";
-                    }}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      onItemDrop(item.id);
-                    }}
-                    onPatch={patchItem}
-                    onRemove={removeItem}
-                  />
-                ))}
+                {sortedItems.map((item) =>
+                  item.rowType === "type" ? (
+                    <TypeRow
+                      key={item.id}
+                      item={item}
+                      draggable={!searchActive}
+                      dragging={dragItemId === item.id}
+                      onDragStart={() => setDragItemId(item.id)}
+                      onDragEnd={() => setDragItemId(null)}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = "move";
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        onItemDrop(item.id);
+                      }}
+                      onPatch={patchItem}
+                      onRemove={removeItem}
+                    />
+                  ) : (
+                    <ItemRow
+                      key={item.id}
+                      item={item}
+                      draggable={!searchActive}
+                      dragging={dragItemId === item.id}
+                      onDragStart={() => setDragItemId(item.id)}
+                      onDragEnd={() => setDragItemId(null)}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = "move";
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        onItemDrop(item.id);
+                      }}
+                      onPatch={patchItem}
+                      onRemove={removeItem}
+                    />
+                  ),
+                )}
               </TableBody>
             </Table>
           )}
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function TypeRow({
+  item,
+  draggable,
+  dragging,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDrop,
+  onPatch,
+  onRemove,
+}: {
+  item: ProcurementItem;
+  draggable: boolean;
+  dragging: boolean;
+  onDragStart: () => void;
+  onDragEnd: () => void;
+  onDragOver: (e: React.DragEvent) => void;
+  onDrop: (e: React.DragEvent) => void;
+  onPatch: (id: string, patch: Partial<ProcurementItem>) => Promise<boolean>;
+  onRemove: (id: string, name: string) => void;
+}) {
+  const [name, setName] = useState(item.name);
+
+  useEffect(() => {
+    setName(item.name);
+  }, [item.name]);
+
+  async function saveName() {
+    const trimmed = name.trim();
+    if (!trimmed || trimmed === item.name) return;
+    await onPatch(item.id, { name: trimmed });
+  }
+
+  return (
+    <TableRow
+      draggable={draggable}
+      onDragStart={draggable ? onDragStart : undefined}
+      onDragEnd={draggable ? onDragEnd : undefined}
+      onDragOver={draggable ? onDragOver : undefined}
+      onDrop={draggable ? onDrop : undefined}
+      className={cn("bg-muted/50 hover:bg-muted/70", dragging && "opacity-50")}
+    >
+      <TableCell className="w-12 px-2">
+        {draggable && (
+          <GripVertical className="size-4 cursor-grab text-muted-foreground active:cursor-grabbing" />
+        )}
+      </TableCell>
+      <TableCell colSpan={8} className="whitespace-normal py-2">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Тип
+          </span>
+          <Input
+            className="h-8 max-w-xl border-transparent bg-transparent font-semibold shadow-none focus-visible:border-input focus-visible:bg-background"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onBlur={saveName}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                void saveName();
+              }
+            }}
+          />
+        </div>
+      </TableCell>
+      <TableCell>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-muted-foreground hover:text-destructive"
+          onClick={() => onRemove(item.id, item.name)}
+          title="Удалить"
+        >
+          <Trash2 className="size-4" />
+        </Button>
+      </TableCell>
+    </TableRow>
   );
 }
 

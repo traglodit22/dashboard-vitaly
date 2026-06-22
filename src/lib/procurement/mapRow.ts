@@ -1,3 +1,5 @@
+export type ProcurementRowType = 'item' | 'type'
+
 export interface ProcurementCategory {
   id: string
   name: string
@@ -17,6 +19,7 @@ export interface ProcurementItem {
   notes: string | null
   link: string | null
   sortOrder: number
+  rowType: ProcurementRowType
   highlightColor: RowHighlight | null
 }
 
@@ -47,8 +50,13 @@ export function rowToItem(row: Record<string, unknown>): ProcurementItem {
     notes: (row.notes as string) ?? null,
     link: (row.link as string) ?? null,
     sortOrder: Number(row.sort_order ?? 0),
+    rowType: parseRowType(row.row_type),
     highlightColor: parseHighlight(row.highlight_color),
   }
+}
+
+function parseRowType(value: unknown): ProcurementRowType {
+  return value === 'type' ? 'type' : 'item'
 }
 
 function parseHighlight(value: unknown): RowHighlight | null {
