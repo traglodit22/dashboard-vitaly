@@ -5,6 +5,22 @@ set -euo pipefail
 APP_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$APP_DIR"
 
+rollback_standalone() {
+  if [[ -d .next/standalone.bak ]]; then
+    echo "==> Rollback: restoring previous standalone bundle"
+    rm -rf .next/standalone
+    mv .next/standalone.bak .next/standalone
+  fi
+  if pm2 describe dashboard >/dev/null 2>&1; then
+    pm2 restart dashboard --update-env || true
+  elif [[ -f .next/standalone/server.js ]]; then
+    pm2 start ecosystem.config.cjs --only dashboard --update-env || true
+    pm2 save || true
+  fi
+}
+
+trap 'echo "DEPLOY FAILED"; rollback_standalone' ERR
+
 echo "==> Install dependencies"
 npm ci
 
@@ -20,12 +36,13 @@ fi
 echo "==> Ensure upload directories"
 mkdir -p uploads/procurement
 
-echo "==> Stop app during build (standalone path is overwritten)"
-if pm2 describe dashboard >/dev/null 2>&1; then
-  pm2 stop dashboard
+if [[ -f .next/standalone/server.js ]]; then
+  echo "==> Backup current standalone (for rollback)"
+  rm -rf .next/standalone.bak
+  cp -a .next/standalone .next/standalone.bak
 fi
 
-echo "==> Build Next.js (standalone)"
+echo "==> Build Next.js (standalone) — app keeps running until build succeeds"
 npm run build
 
 echo "==> Copy static assets into standalone bundle"
@@ -53,6 +70,9 @@ for i in $(seq 1 15); do
   fi
   sleep 2
 done
+
+rm -rf .next/standalone.bak
+trap - ERR
 
 echo "==> Database migrations (via running app)"
 env_val() {
