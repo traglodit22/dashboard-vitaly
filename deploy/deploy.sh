@@ -23,6 +23,8 @@ npm run build
 echo "==> Copy static assets into standalone bundle"
 cp -r public .next/standalone/
 cp -r .next/static .next/standalone/.next/static
+mkdir -p .next/standalone/db
+cp -r src/lib/db/migrations .next/standalone/db/migrations
 
 echo "==> Reload PM2 processes"
 if pm2 describe dashboard >/dev/null 2>&1; then
@@ -30,6 +32,22 @@ if pm2 describe dashboard >/dev/null 2>&1; then
 else
   pm2 start ecosystem.config.cjs --only dashboard
   pm2 save
+fi
+
+echo "==> Database migrations (via running app)"
+env_val() {
+  local key="$1"
+  [[ -f .env ]] || return 0
+  grep -E "^${key}=" .env | head -1 | cut -d= -f2- | sed 's/^["'\'']//; s/["'\'']$//'
+}
+CRON_SECRET="$(env_val CRON_SECRET)"
+if [[ -n "${CRON_SECRET:-}" ]]; then
+  sleep 2
+  curl -fsS -H "Authorization: Bearer ${CRON_SECRET}" \
+    "http://127.0.0.1:3000/api/cron/migrate-db" || \
+    echo "WARNING: migrate-db request failed"
+else
+  echo "WARNING: CRON_SECRET not set, skip migrate-db"
 fi
 
 echo "==> Deploy finished"
