@@ -26,7 +26,7 @@ export interface ProcurementItem {
   highlightColor: RowHighlight | null
 }
 
-export type RowHighlight = 'red' | 'yellow' | 'green' | 'gray' | 'white'
+export type RowHighlight = 'red' | 'yellow' | 'green' | 'gray' | 'white' | 'purple'
 
 export function rowToCategory(row: Record<string, unknown>): ProcurementCategory {
   return {
@@ -71,7 +71,8 @@ function parseHighlight(value: unknown): RowHighlight | null {
     value === 'yellow' ||
     value === 'green' ||
     value === 'gray' ||
-    value === 'white'
+    value === 'white' ||
+    value === 'purple'
   ) {
     return value
   }

@@ -69,7 +69,8 @@ export async function PATCH(
       c !== 'yellow' &&
       c !== 'green' &&
       c !== 'gray' &&
-      c !== 'white'
+      c !== 'white' &&
+      c !== 'purple'
     ) {
       return NextResponse.json({ error: 'Недопустимый цвет' }, { status: 400 })
     }

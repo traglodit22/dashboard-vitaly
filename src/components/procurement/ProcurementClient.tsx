@@ -43,6 +43,7 @@ const ROW_SWATCH: Record<RowHighlight, string> = {
   green: "bg-emerald-500 border-emerald-700",
   gray: "bg-neutral-500 border-neutral-700",
   white: "bg-white border-neutral-400 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]",
+  purple: "bg-violet-500 border-violet-700",
 };
 
 const QTY_INPUT =

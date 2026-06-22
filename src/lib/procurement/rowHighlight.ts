@@ -1,8 +1,8 @@
 import type { ProcurementItem } from '@/lib/procurement/mapRow'
 
-export type RowHighlight = 'red' | 'yellow' | 'green' | 'gray' | 'white'
+export type RowHighlight = 'red' | 'yellow' | 'green' | 'gray' | 'white' | 'purple'
 
-export const HIGHLIGHT_COLORS = ['red', 'yellow', 'green', 'gray', 'white'] as const satisfies readonly RowHighlight[]
+export const HIGHLIGHT_COLORS = ['red', 'yellow', 'green', 'gray', 'white', 'purple'] as const satisfies readonly RowHighlight[]
 
 export function autoRowHighlight(
   needQty: number,
@@ -27,6 +27,7 @@ export const ROW_HIGHLIGHT_CLASS: Record<RowHighlight, string> = {
   gray: '!bg-neutral-400/35 border-l-4 border-l-neutral-600 hover:!bg-neutral-400/40',
   white:
     '!bg-white border-l-4 border-l-neutral-300 hover:!bg-white dark:!bg-white/20 dark:border-l-neutral-400 dark:hover:!bg-white/25',
+  purple: '!bg-violet-500/35 border-l-4 border-l-violet-600 hover:!bg-violet-500/40',
 }
 
 export const ROW_HIGHLIGHT_LABEL: Partial<Record<RowHighlight, string>> = {
@@ -34,6 +35,7 @@ export const ROW_HIGHLIGHT_LABEL: Partial<Record<RowHighlight, string>> = {
   yellow: 'Частично закрыто',
   green: 'Закрыто',
   gray: 'Дима',
+  purple: 'ТЕСТ',
 }
 
 export function highlightSwatchTitle(color: RowHighlight): string | undefined {
