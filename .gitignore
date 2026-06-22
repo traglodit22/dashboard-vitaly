@@ -32,10 +32,14 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.local.example
 
 # firebase secrets — НИКОГДА не коммитить
 service-account.json
 *-firebase-adminsdk-*.json
+
+# кастомный прод-бот (DeepSeek), живёт только на VPS
+bot/bot.js
 
 # typescript
 *.tsbuildinfo

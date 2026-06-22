@@ -1,23 +1,27 @@
 ---
-description: VPS, деплой, доступы и инфраструктура проекта
+description: VPS, деплой, синхронизация локально ↔ облако
 alwaysApply: true
 ---
 
-# Инфраструктура Dashboard Vitaly
+# Dashboard Vitaly — инфраструктура
 
-Перед работой с деплоем, cron, SSH или секретами — прочитай **`.local/ACCESS.md`** (gitignored, только локально).
+Перед деплоем/SSH/секретами читай **`.local/SYNC.md`** и **`.local/ACCESS.md`** (gitignored).
 
-## Кратко
+## Синхронизация
 
-- **Прод**: http://135.106.161.215 — nginx + Next.js + PostgreSQL на том же VPS
-- **БД**: `dashboard_db` на `127.0.0.1:5432`
-- **Cron**: `GET /api/cron/refresh-warehouse` с `Authorization: Bearer $CRON_SECRET`
-- **Telegram-уведомления**: токен в `system_settings.telegram_bot_token` (Настройки UI), chat IDs в `telegram_notify_chat_ids`
-- **Автодеплой**: `.github/workflows/deploy.yml` → SSH → `deploy/deploy.sh`
-- **Vercel удалён** — cron на сервере: `deploy/cron-dashboard` → `deploy/cron-refresh-warehouse.sh`
+- **GitHub**: `traglodit22/dashboard-vitaly`, ветка `main`
+- **Локально**: `npm run dev`, `.env.local`
+- **Прод**: http://135.106.161.215, `/var/www/dashboard`, `.env` на VPS
+- **Деплой**: `git push` → GitHub Actions → `deploy/deploy.sh`
+- **Не в git**: `.env*`, `.local/`, `bot/bot.js` (кастом на VPS)
 
-## Частые проблемы
+## Прод-специфика
 
-1. Cron не срабатывает — на VPS нет `/etc/cron.d/dashboard` (после ухода с Vercel)
-2. Telegram молчит — проверь токен в Настройках, `telegram_notify_enabled`, chat IDs; уведомления только при изменении статусов или низком балансе
-3. `skipped: too_soon` — интервал автопроверки (6/12/24 ч) ещё не прошёл
+- Telegram через privoxy `127.0.0.1:8118`
+- PM2: `dashboard` (auto-deploy), `dashboard-bot` (отдельно, `bot/bot.js`)
+- Cron: `/usr/local/bin/dashboard-cron.sh` каждые 6 ч
+
+## Локальная разработка
+
+- `npm run db:setup` — локальный Postgres
+- `npm run db:tunnel` — туннель к прод-БД (осторожно)
