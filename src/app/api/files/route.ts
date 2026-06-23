@@ -4,9 +4,11 @@ import { requireAuth } from '@/lib/auth/requireAuth'
 import { ensureFilesSeed, getCategoryBySlug } from '@/lib/files/ensureFilesSeed'
 import { FILE_ITEM_FROM, FILE_ITEM_SELECT, rowToFileItem, rowToFileCategory } from '@/lib/files/mapRow'
 import { uploadFileItem } from '@/lib/files/fileService'
+import { resolveUploadMime } from '@/lib/files/mimeDetect'
 import type { FileStorageType } from '@/lib/files/types'
 
 export const runtime = 'nodejs'
+export const maxDuration = 120
 
 export async function GET(req: Request) {
   const unauth = await requireAuth(req)
@@ -72,7 +74,13 @@ export async function POST(req: Request) {
 
   const category = rowToFileCategory(categoryRow)
   const buffer = Buffer.from(await file.arrayBuffer())
-  const mime = file.type || 'application/octet-stream'
+  let mime: string
+  try {
+    mime = resolveUploadMime(file.name, file.type || '')
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    return NextResponse.json({ error: message }, { status: 400 })
+  }
   const title = titleRaw || file.name.replace(/\.[^.]+$/, '')
 
   try {

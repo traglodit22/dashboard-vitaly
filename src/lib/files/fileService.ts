@@ -18,6 +18,7 @@ import {
   saveLocalPreview,
 } from '@/lib/files/localStorage'
 import { FILE_ITEM_FROM, FILE_ITEM_SELECT, rowToFileItem } from '@/lib/files/mapRow'
+import { isImageMime } from '@/lib/files/mimeDetect'
 import type { FileStorageType } from '@/lib/files/types'
 
 export async function fetchFileItem(id: string) {
@@ -44,7 +45,9 @@ export async function uploadFileItem(opts: {
   let storagePath: string
   let previewPath: string | null = null
 
-  const previewBuffer = await buildFilePreview(opts.mime, opts.buffer)
+  // Превью PDF — тяжёлое; генерируется лениво через GET /preview (не блокируем загрузку).
+  const previewBuffer =
+    isImageMime(opts.mime) ? await buildFilePreview(opts.mime, opts.buffer) : null
 
   if (opts.storageType === 'gcs') {
     if (!isGcsConfigured()) {

@@ -3,6 +3,7 @@ import { requireAuth } from '@/lib/auth/requireAuth'
 import { fetchFileRow, ensureFilePreview, readFileContent } from '@/lib/files/fileService'
 
 export const runtime = 'nodejs'
+export const maxDuration = 60
 
 export async function GET(
   req: Request,

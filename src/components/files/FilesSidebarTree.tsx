@@ -70,7 +70,8 @@ export function FilesSidebarTree() {
   const [folders, setFolders] = useState<FileFolder[]>([])
   const [loading, setLoading] = useState(false)
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
-  const [creating, setCreating] = useState(false)
+  /** null = создать в текущей открытой папке (или в корне) */
+  const [creatingIn, setCreatingIn] = useState<string | null | false>(false)
   const [newName, setNewName] = useState("")
 
   const loadFolders = useCallback(async () => {
@@ -97,32 +98,46 @@ export function FilesSidebarTree() {
   }, [loadFolders])
 
   useEffect(() => {
-    setExpanded(collectAncestorIds(folders, currentFolderId))
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      for (const id of collectAncestorIds(folders, currentFolderId)) next.add(id)
+      return next
+    })
   }, [folders, currentFolderId])
 
   const tree = useMemo(() => buildFolderTree(folders), [folders])
 
   if (!categorySlug) return null
 
-  async function createFolder() {
+  function startCreate(parentId: string | null) {
+    setCreatingIn(parentId)
+    setNewName("")
+    if (parentId) {
+      setExpanded((prev) => new Set(prev).add(parentId))
+    }
+  }
+
+  async function submitCreateFolder() {
     const name = newName.trim()
-    if (!name) return
+    if (!name || creatingIn === false) return
+
+    const parentId = creatingIn
+
     const res = await apiFetch("/api/files/folders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        categorySlug,
-        parentId: currentFolderId,
-        name,
-      }),
+      body: JSON.stringify({ categorySlug, parentId, name }),
     })
     const data = await res.json()
     if (res.ok && data.folder) {
       setNewName("")
-      setCreating(false)
+      setCreatingIn(false)
+      if (parentId) {
+        setExpanded((prev) => new Set(prev).add(parentId))
+      }
       notifyFilesChanged()
       router.push(filesCategoryPath(categorySlug!, data.folder.id))
-      toast.success("Папка создана")
+      toast.success(parentId ? "Подпапка создана" : "Папка создана")
     } else {
       toast.error("Не удалось создать папку", { description: data.error })
     }
@@ -176,7 +191,7 @@ export function FilesSidebarTree() {
           <Loader2 className="size-4 animate-spin text-muted-foreground" />
         </div>
       ) : (
-        <div className="max-h-[min(50vh,420px)] space-y-0.5 overflow-y-auto px-1">
+        <div className="max-h-[min(55vh,480px)] space-y-0.5 overflow-y-auto px-1">
           {tree.map((node) => (
             <FolderTreeNode
               key={node.id}
@@ -187,6 +202,7 @@ export function FilesSidebarTree() {
               expanded={expanded}
               onToggle={toggleExpand}
               onDelete={deleteFolder}
+              onCreateSubfolder={startCreate}
             />
           ))}
           {!loading && tree.length === 0 && (
@@ -195,25 +211,28 @@ export function FilesSidebarTree() {
         </div>
       )}
 
-      {creating ? (
+      {creatingIn !== false ? (
         <div className="space-y-1.5 px-2 pb-1">
+          <p className="px-1 text-[10px] text-muted-foreground">
+            {creatingIn ? "Новая подпапка" : "Новая папка в корне"}
+          </p>
           <Input
             autoFocus
             className="h-8 text-xs"
-            placeholder="Название"
+            placeholder="Название папки"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") void createFolder()
+              if (e.key === "Enter") void submitCreateFolder()
               if (e.key === "Escape") {
-                setCreating(false)
+                setCreatingIn(false)
                 setNewName("")
               }
             }}
           />
           <div className="flex gap-1">
-            <Button type="button" size="sm" className="h-7 flex-1 text-xs" onClick={() => void createFolder()}>
-              OK
+            <Button type="button" size="sm" className="h-7 flex-1 text-xs" onClick={() => void submitCreateFolder()}>
+              Создать
             </Button>
             <Button
               type="button"
@@ -221,7 +240,7 @@ export function FilesSidebarTree() {
               variant="ghost"
               className="h-7 text-xs"
               onClick={() => {
-                setCreating(false)
+                setCreatingIn(false)
                 setNewName("")
               }}
             >
@@ -232,11 +251,11 @@ export function FilesSidebarTree() {
       ) : (
         <button
           type="button"
-          onClick={() => setCreating(true)}
+          onClick={() => startCreate(currentFolderId)}
           className="flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
         >
           <FolderPlus className="size-3.5 shrink-0" />
-          Новая папка
+          {currentFolderId ? "Подпапка здесь" : "Новая папка"}
         </button>
       )}
     </div>
@@ -251,6 +270,7 @@ function FolderTreeNode({
   expanded,
   onToggle,
   onDelete,
+  onCreateSubfolder,
 }: {
   node: FolderNode
   depth: number
@@ -259,42 +279,67 @@ function FolderTreeNode({
   expanded: Set<string>
   onToggle: (id: string) => void
   onDelete: (folder: FileFolder) => void
+  onCreateSubfolder: (parentId: string) => void
 }) {
   const hasChildren = node.children.length > 0
   const isOpen = expanded.has(node.id)
   const isActive = currentFolderId === node.id
+  const isOnPath =
+    isActive ||
+    node.children.some(function walk(n: FolderNode): boolean {
+      if (n.id === currentFolderId) return true
+      return n.children.some(walk)
+    })
 
   return (
     <div>
       <div
         className="group flex items-center gap-0.5"
-        style={{ paddingLeft: `${depth * 12 + 4}px` }}
+        style={{ paddingLeft: `${depth * 10 + 4}px` }}
       >
-        {hasChildren ? (
-          <button
-            type="button"
-            aria-label={isOpen ? "Свернуть" : "Развернуть"}
-            className="flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-accent"
-            onClick={() => onToggle(node.id)}
-          >
-            {isOpen ? <ChevronDown className="size-3" /> : <ChevronRight className="size-3" />}
-          </button>
-        ) : (
-          <span className="size-5 shrink-0" />
-        )}
+        <button
+          type="button"
+          aria-label={isOpen ? "Свернуть" : "Развернуть"}
+          className={cn(
+            "flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-accent",
+            !hasChildren && "opacity-30",
+          )}
+          onClick={() => onToggle(node.id)}
+        >
+          {isOpen ? <ChevronDown className="size-3" /> : <ChevronRight className="size-3" />}
+        </button>
         <Link
           href={filesCategoryPath(categorySlug, node.id)}
           className={cn(
-            "flex min-w-0 flex-1 items-center gap-1.5 rounded-md py-1 pr-1 text-sm transition-colors",
+            "flex min-w-0 flex-1 items-center gap-1.5 rounded-md py-1 pr-0.5 text-sm transition-colors",
             isActive
               ? "bg-primary/15 font-medium text-primary"
-              : "text-muted-foreground hover:bg-accent hover:text-foreground",
+              : isOnPath
+                ? "text-foreground"
+                : "text-muted-foreground hover:bg-accent hover:text-foreground",
           )}
           title={node.name}
         >
-          <Folder className="size-3.5 shrink-0 text-amber-500" />
+          <Folder
+            className={cn(
+              "size-3.5 shrink-0",
+              isActive ? "text-primary" : "text-amber-500",
+            )}
+          />
           <span className="truncate">{node.name}</span>
         </Link>
+        <button
+          type="button"
+          aria-label={`Подпапка в «${node.name}»`}
+          title="Создать подпапку"
+          className="flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground opacity-0 transition-opacity hover:bg-accent hover:text-foreground group-hover:opacity-100"
+          onClick={(e) => {
+            e.preventDefault()
+            onCreateSubfolder(node.id)
+          }}
+        >
+          <FolderPlus className="size-3" />
+        </button>
         <button
           type="button"
           aria-label={`Удалить ${node.name}`}
@@ -307,7 +352,7 @@ function FolderTreeNode({
           <Trash2 className="size-3" />
         </button>
       </div>
-      {hasChildren && isOpen &&
+      {isOpen &&
         node.children.map((child) => (
           <FolderTreeNode
             key={child.id}
@@ -318,6 +363,7 @@ function FolderTreeNode({
             expanded={expanded}
             onToggle={onToggle}
             onDelete={onDelete}
+            onCreateSubfolder={onCreateSubfolder}
           />
         ))}
     </div>

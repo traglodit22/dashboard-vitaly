@@ -1,8 +1,9 @@
 "use client";
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { FileText, Loader2, Pencil, Trash2, Upload } from "lucide-react";
+import { ChevronRight, FileText, Loader2, Pencil, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
 import { IMPORTANT_DOCS_SLUG } from "@/lib/files/types";
-import { FILES_CHANGED_EVENT, notifyFilesChanged } from "@/lib/files/routes";
+import { FILES_CHANGED_EVENT, filesCategoryPath, notifyFilesChanged } from "@/lib/files/routes";
 
 interface FileCategory {
   id: string;
@@ -32,6 +33,11 @@ interface FileItem {
   sizeBytes: number;
   hasPreview: boolean;
   createdAt: string;
+}
+
+interface BreadcrumbItem {
+  id: string;
+  name: string;
 }
 
 function formatBytes(n: number): string {
@@ -60,10 +66,11 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
 
   const [category, setCategory] = useState<FileCategory | null>(null);
   const [items, setItems] = useState<FileItem[]>([]);
-  const [folderLabel, setFolderLabel] = useState<string | null>(null);
+  const [breadcrumb, setBreadcrumb] = useState<BreadcrumbItem[]>([]);
   const [gcsConfigured, setGcsConfigured] = useState(false);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [uploadLabel, setUploadLabel] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const loadMeta = useCallback(async () => {
@@ -83,9 +90,9 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     setItems(data.items ?? []);
   }, [categorySlug, currentFolderId]);
 
-  const loadFolderLabel = useCallback(async () => {
+  const loadBreadcrumb = useCallback(async () => {
     if (!currentFolderId) {
-      setFolderLabel(null);
+      setBreadcrumb([]);
       return;
     }
     const res = await apiFetch(
@@ -93,20 +100,19 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
       { cache: "no-store" },
     );
     const data = await res.json();
-    const trail = data.breadcrumb ?? [];
-    setFolderLabel(trail.length ? trail[trail.length - 1].name : null);
+    setBreadcrumb(data.breadcrumb ?? []);
   }, [categorySlug, currentFolderId]);
 
   const refresh = useCallback(async () => {
-    await Promise.all([loadItems(), loadFolderLabel()]);
-  }, [loadItems, loadFolderLabel]);
+    await Promise.all([loadItems(), loadBreadcrumb()]);
+  }, [loadItems, loadBreadcrumb]);
 
   useEffect(() => {
     setLoading(true);
     loadMeta()
-      .then(() => Promise.all([loadItems(), loadFolderLabel()]))
+      .then(() => Promise.all([loadItems(), loadBreadcrumb()]))
       .finally(() => setLoading(false));
-  }, [loadMeta, loadItems, loadFolderLabel]);
+  }, [loadMeta, loadItems, loadBreadcrumb]);
 
   useEffect(() => {
     const onChange = () => void refresh();
@@ -126,24 +132,31 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
 
     setUploading(true);
     let ok = 0;
-    for (const file of files) {
-      const fd = new FormData();
-      fd.append("categorySlug", categorySlug);
-      if (currentFolderId) fd.append("folderId", currentFolderId);
-      fd.append("file", file);
-      const res = await apiFetch("/api/files", { method: "POST", body: fd });
-      const data = await res.json();
-      if (res.ok) {
-        ok += 1;
-        setItems((prev) => [data.item, ...prev]);
-      } else {
-        toast.error(`«${file.name}»`, { description: data.error });
+    try {
+      for (const file of files) {
+        setUploadLabel(file.name);
+        const fd = new FormData();
+        fd.append("categorySlug", categorySlug);
+        if (currentFolderId) fd.append("folderId", currentFolderId);
+        fd.append("file", file);
+        const res = await apiFetch("/api/files", { method: "POST", body: fd });
+        const data = await res.json();
+        if (res.ok) {
+          ok += 1;
+          setItems((prev) => [data.item, ...prev]);
+        } else {
+          toast.error(`«${file.name}»`, { description: data.error });
+        }
       }
-    }
-    setUploading(false);
-    if (ok > 0) {
-      notifyFilesChanged();
-      toast.success(ok === 1 ? "Файл загружен" : `Загружено файлов: ${ok}`);
+      if (ok > 0) {
+        notifyFilesChanged();
+        toast.success(ok === 1 ? "Файл загружен" : `Загружено файлов: ${ok}`);
+      }
+    } catch {
+      toast.error("Ошибка загрузки", { description: "Проверьте соединение и попробуйте снова" });
+    } finally {
+      setUploading(false);
+      setUploadLabel(null);
     }
   }
 
@@ -173,7 +186,8 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     }
   }
 
-  const locationTitle = folderLabel ?? category?.name ?? "Файлы";
+  const locationTitle =
+    breadcrumb.length > 0 ? breadcrumb[breadcrumb.length - 1]!.name : (category?.name ?? "Файлы");
 
   if (loading) {
     return (
@@ -189,26 +203,56 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
 
   return (
     <div className="w-full min-w-0 p-4 sm:p-6 lg:p-8">
-      <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{locationTitle}</h1>
-          <p className="text-sm text-muted-foreground">
-            {category.storageType === "local"
-              ? "PDF и фото на сервере · до 20 МБ"
-              : "Файлы в Google Cloud Storage"}
-          </p>
+      <header className="mb-6 space-y-3">
+        <nav className="flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
+          <Link
+            href={filesCategoryPath(categorySlug)}
+            className={cn(
+              "rounded px-1 transition-colors hover:text-foreground",
+              !currentFolderId && "font-medium text-foreground",
+            )}
+          >
+            {category.name}
+          </Link>
+          {breadcrumb.map((crumb, index) => (
+            <span key={crumb.id} className="flex items-center gap-1">
+              <ChevronRight className="size-3.5 shrink-0" />
+              <Link
+                href={filesCategoryPath(categorySlug, crumb.id)}
+                className={cn(
+                  "max-w-[180px] truncate rounded px-1 transition-colors hover:text-foreground",
+                  index === breadcrumb.length - 1 && "font-medium text-foreground",
+                )}
+                title={crumb.name}
+              >
+                {crumb.name}
+              </Link>
+            </span>
+          ))}
+        </nav>
+
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">{locationTitle}</h1>
+            <p className="text-sm text-muted-foreground">
+              {category.storageType === "local"
+                ? "PDF и фото на сервере · до 20 МБ"
+                : "Файлы в Google Cloud Storage"}
+              {currentFolderId && " · вложенная папка"}
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            disabled={uploading}
+            onClick={() => inputRef.current?.click()}
+          >
+            {uploading ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
+            Загрузить
+          </Button>
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="gap-1.5"
-          disabled={uploading}
-          onClick={() => inputRef.current?.click()}
-        >
-          {uploading ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
-          Загрузить
-        </Button>
       </header>
 
       {category.storageType === "gcs" && !gcsConfigured && (
@@ -239,7 +283,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
           type="file"
           className="hidden"
           multiple
-          accept={categorySlug === IMPORTANT_DOCS_SLUG ? "application/pdf,image/*" : undefined}
+          accept={categorySlug === IMPORTANT_DOCS_SLUG ? "application/pdf,image/*,.pdf" : undefined}
           onChange={(e) => {
             if (e.target.files?.length) void uploadFiles(e.target.files);
             e.target.value = "";
@@ -251,7 +295,11 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
           <Upload className="size-8 text-muted-foreground" />
         )}
         <p className="text-sm font-medium">
-          {uploading ? "Загрузка…" : "Перетащите файлы сюда или нажмите «Загрузить»"}
+          {uploading
+            ? uploadLabel
+              ? `Загрузка «${uploadLabel}»…`
+              : "Загрузка…"
+            : "Перетащите файлы сюда или нажмите «Загрузить»"}
         </p>
       </div>
 
@@ -287,6 +335,7 @@ function FileCard({
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(item.title);
   const [previewFailed, setPreviewFailed] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(true);
   const isPdf = item.mimeType === "application/pdf";
   const previewUrl = `/api/files/${item.id}/preview?v=${encodeURIComponent(item.createdAt)}`;
   const showPreview =
@@ -294,7 +343,9 @@ function FileCard({
 
   useEffect(() => {
     setDraft(item.title);
-  }, [item.title]);
+    setPreviewFailed(false);
+    setPreviewLoading(true);
+  }, [item.id, item.title, item.createdAt]);
 
   return (
     <Card className="group overflow-hidden">
@@ -302,16 +353,30 @@ function FileCard({
         href={`/api/files/${item.id}/content`}
         target="_blank"
         rel="noopener noreferrer"
-        className="block aspect-[4/3] bg-muted/40"
+        className="relative block aspect-[4/3] bg-muted/40"
       >
         {showPreview ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={previewUrl}
-            alt=""
-            className="size-full object-cover object-top"
-            onError={() => setPreviewFailed(true)}
-          />
+          <>
+            {previewLoading && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Loader2 className="size-6 animate-spin text-muted-foreground" />
+              </div>
+            )}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={previewUrl}
+              alt=""
+              className={cn(
+                "size-full object-cover object-top",
+                previewLoading && "opacity-0",
+              )}
+              onLoad={() => setPreviewLoading(false)}
+              onError={() => {
+                setPreviewFailed(true);
+                setPreviewLoading(false);
+              }}
+            />
+          </>
         ) : (
           <div className="flex size-full flex-col items-center justify-center gap-1">
             <FileText className="size-10 text-muted-foreground/50" />

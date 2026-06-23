@@ -12,6 +12,19 @@ function pdfjsAssetUrl(subdir: string): string {
 
 /** Рендер первой страницы PDF в WebP-превью. */
 export async function renderPdfPreview(pdfBuffer: Buffer): Promise<Buffer | null> {
+  const timeoutMs = 25_000
+  try {
+    return await Promise.race([
+      renderPdfPreviewInner(pdfBuffer),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs)),
+    ])
+  } catch (err) {
+    console.error('[files] PDF preview failed:', err)
+    return null
+  }
+}
+
+async function renderPdfPreviewInner(pdfBuffer: Buffer): Promise<Buffer | null> {
   try {
     const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs')
     const loadingTask = pdfjs.getDocument({
@@ -37,7 +50,7 @@ export async function renderPdfPreview(pdfBuffer: Buffer): Promise<Buffer | null
     }).promise
     return canvas.toBuffer('image/webp')
   } catch (err) {
-    console.error('[files] PDF preview failed:', err)
+    console.error('[files] PDF preview render failed:', err)
     return null
   }
 }
