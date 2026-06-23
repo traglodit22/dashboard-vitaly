@@ -1,3 +1,4 @@
+import fs from 'fs'
 import { Storage } from '@google-cloud/storage'
 import { MAX_FILE_BYTES } from '@/lib/files/types'
 
@@ -6,14 +7,24 @@ let storage: Storage | null = null
 function getStorage(): Storage {
   if (storage) return storage
 
+  const bucket = process.env.GCS_BUCKET?.trim()
+  const credPath = process.env.GCS_CREDENTIALS_PATH?.trim()
+
+  if (credPath && fs.existsSync(credPath)) {
+    storage = new Storage({
+      keyFilename: credPath,
+      projectId: process.env.GCS_PROJECT_ID?.trim(),
+    })
+    return storage
+  }
+
   const projectId = process.env.GCS_PROJECT_ID?.trim()
   const clientEmail = process.env.GCS_CLIENT_EMAIL?.trim()
   const privateKey = process.env.GCS_PRIVATE_KEY?.replace(/\\n/g, '\n').trim()
-  const bucket = process.env.GCS_BUCKET?.trim()
 
   if (!projectId || !clientEmail || !privateKey || !bucket) {
     throw new Error(
-      'Google Cloud Storage не настроен. Укажите GCS_PROJECT_ID, GCS_CLIENT_EMAIL, GCS_PRIVATE_KEY и GCS_BUCKET в .env',
+      'Google Cloud Storage не настроен. Укажите GCS_BUCKET и GCS_CREDENTIALS_PATH (или GCS_PROJECT_ID, GCS_CLIENT_EMAIL, GCS_PRIVATE_KEY)',
     )
   }
 
@@ -31,11 +42,16 @@ export function gcsBucketName(): string {
 }
 
 export function isGcsConfigured(): boolean {
+  const bucket = process.env.GCS_BUCKET?.trim()
+  if (!bucket) return false
+
+  const credPath = process.env.GCS_CREDENTIALS_PATH?.trim()
+  if (credPath && fs.existsSync(credPath)) return true
+
   return Boolean(
     process.env.GCS_PROJECT_ID?.trim() &&
       process.env.GCS_CLIENT_EMAIL?.trim() &&
-      process.env.GCS_PRIVATE_KEY?.trim() &&
-      process.env.GCS_BUCKET?.trim(),
+      process.env.GCS_PRIVATE_KEY?.trim(),
   )
 }
 
