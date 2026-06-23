@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Dashboard Vitaly — инфраструктура
 
-Перед деплоем/SSH/секретами читай **`.local/SYNC.md`** и **`.local/ACCESS.md`** (gitignored).
+Перед деплоем/SSH/секретами читай **`.local/CONTEXT.md`** (gitignored).
 
 ## Синхронизация
 
