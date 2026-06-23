@@ -293,7 +293,9 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     let putRes: Response;
     try {
       const fd = new FormData();
-      fd.append("uploadUrl", init.uploadUrl as string);
+      fd.append("fileId", init.fileId as string);
+      fd.append("categorySlug", categorySlug);
+      if (currentFolderId) fd.append("folderId", currentFolderId);
       fd.append("mime", init.mime as string);
       fd.append("fileName", file.name);
       fd.append("file", file);
@@ -303,8 +305,13 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     }
 
     if (!putRes.ok) {
-      const putData = await putRes.json().catch(() => ({}));
-      throw new Error(String(putData.error ?? "Google Cloud отклонил загрузку"));
+      const putData = (await putRes.json().catch(() => ({}))) as { error?: string };
+      const detail = putData.error?.trim();
+      if (detail) throw new Error(detail);
+      if (putRes.status === 413) {
+        throw new Error("Файл слишком большой для сервера (проверьте лимит nginx, нужно 50 МБ)");
+      }
+      throw new Error(`Ошибка загрузки (HTTP ${putRes.status})`);
     }
 
     const doneRes = await apiFetch(
