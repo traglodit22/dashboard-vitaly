@@ -27,7 +27,7 @@ export async function listFolders(categoryId: string, parentId: string | null) {
   const rows = await query<Record<string, unknown>>(
     `SELECT * FROM file_folders
      WHERE category_id = $1 AND parent_id IS NOT DISTINCT FROM $2
-     ORDER BY name ASC`,
+     ORDER BY sort_order ASC, name ASC`,
     [categoryId, parentId],
   )
   return rows.map(rowToFileFolder)
@@ -37,7 +37,7 @@ export async function listAllFolders(categoryId: string) {
   const rows = await query<Record<string, unknown>>(
     `SELECT * FROM file_folders
      WHERE category_id = $1
-     ORDER BY name ASC`,
+     ORDER BY sort_order ASC, name ASC`,
     [categoryId],
   )
   return rows.map(rowToFileFolder)
@@ -61,12 +61,19 @@ export async function createFolder(opts: {
   )
   if (dup.length) throw new Error('Папка с таким названием уже есть')
 
+  const [{ next_order }] = await query<{ next_order: string }>(
+    `SELECT COALESCE(MAX(sort_order), 0) + 10 AS next_order
+     FROM file_folders
+     WHERE category_id = $1 AND parent_id IS NOT DISTINCT FROM $2`,
+    [opts.categoryId, opts.parentId],
+  )
+
   const id = randomUUID()
   const rows = await query<Record<string, unknown>>(
-    `INSERT INTO file_folders (id, category_id, parent_id, name)
-     VALUES ($1, $2, $3, $4)
+    `INSERT INTO file_folders (id, category_id, parent_id, name, sort_order)
+     VALUES ($1, $2, $3, $4, $5)
      RETURNING *`,
-    [id, opts.categoryId, opts.parentId, trimmed],
+    [id, opts.categoryId, opts.parentId, trimmed, Number(next_order)],
   )
 
   const prefix =

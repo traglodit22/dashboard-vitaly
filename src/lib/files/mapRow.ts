@@ -16,6 +16,7 @@ export function rowToFileFolder(row: Record<string, unknown>): FileFolder {
     categoryId: row.category_id as string,
     parentId: (row.parent_id as string) ?? null,
     name: row.name as string,
+    sortOrder: Number(row.sort_order ?? 0),
     createdAt: (row.created_at as string) ?? '',
   }
 }
@@ -32,6 +33,7 @@ export function rowToFileItem(row: Record<string, unknown>): FileItem {
     mimeType: row.mime_type as string,
     sizeBytes: Number(row.size_bytes ?? 0),
     hasPreview: Boolean(row.preview_path),
+    sortOrder: Number(row.sort_order ?? 0),
     createdAt: (row.created_at as string) ?? '',
   }
 }

@@ -21,6 +21,16 @@ import { FILE_ITEM_FROM, FILE_ITEM_SELECT, rowToFileItem } from '@/lib/files/map
 import { isImageMime } from '@/lib/files/mimeDetect'
 import type { FileStorageType } from '@/lib/files/types'
 
+async function nextFileSortOrder(categoryId: string, folderId: string | null): Promise<number> {
+  const rows = await query<{ next_order: string }>(
+    `SELECT COALESCE(MAX(sort_order), 0) + 10 AS next_order
+     FROM file_items
+     WHERE category_id = $1 AND folder_id IS NOT DISTINCT FROM $2`,
+    [categoryId, folderId],
+  )
+  return Number(rows[0]?.next_order ?? 10)
+}
+
 export async function fetchFileItem(id: string) {
   const rows = await query<Record<string, unknown>>(
     `SELECT ${FILE_ITEM_SELECT} ${FILE_ITEM_FROM} WHERE f.id = $1`,
@@ -77,8 +87,8 @@ export async function uploadFileItem(opts: {
 
   const rows = await query<Record<string, unknown>>(
     `INSERT INTO file_items
-      (id, category_id, folder_id, title, original_name, mime_type, size_bytes, storage_path, preview_path)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      (id, category_id, folder_id, title, original_name, mime_type, size_bytes, storage_path, preview_path, sort_order)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      RETURNING id`,
     [
       id,
@@ -90,6 +100,7 @@ export async function uploadFileItem(opts: {
       opts.buffer.length,
       storagePath,
       previewPath,
+      await nextFileSortOrder(opts.categoryId, opts.folderId),
     ],
   )
 

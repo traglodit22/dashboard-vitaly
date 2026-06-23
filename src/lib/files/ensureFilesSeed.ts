@@ -38,6 +38,15 @@ CREATE INDEX IF NOT EXISTS file_folders_category_idx
   ON file_folders (category_id, parent_id, name);
 `
 
+async function ensureSortOrderColumns(): Promise<void> {
+  await pool.query(
+    'ALTER TABLE file_items ADD COLUMN IF NOT EXISTS sort_order INTEGER NOT NULL DEFAULT 0',
+  )
+  await pool.query(
+    'ALTER TABLE file_folders ADD COLUMN IF NOT EXISTS sort_order INTEGER NOT NULL DEFAULT 0',
+  )
+}
+
 const DEFAULT_CATEGORIES = [
   { slug: IMPORTANT_DOCS_SLUG, name: 'Важные документы', storageType: 'local', sortOrder: 10 },
   { slug: 'cloud', name: 'Облако (Google Cloud)', storageType: 'gcs', sortOrder: 20 },
@@ -48,6 +57,7 @@ export async function ensureFilesSchema(): Promise<void> {
   await pool.query(
     'ALTER TABLE file_items ADD COLUMN IF NOT EXISTS folder_id UUID REFERENCES file_folders(id) ON DELETE SET NULL',
   )
+  await ensureSortOrderColumns()
 }
 
 export async function ensureFilesSeed(): Promise<void> {

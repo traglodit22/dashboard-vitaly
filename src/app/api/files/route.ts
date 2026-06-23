@@ -40,7 +40,7 @@ export async function GET(req: Request) {
   const rows = await query<Record<string, unknown>>(
     `SELECT ${FILE_ITEM_SELECT} ${FILE_ITEM_FROM}
      ${where}
-     ORDER BY f.created_at DESC`,
+     ORDER BY f.sort_order ASC, f.created_at DESC`,
     values,
   )
 

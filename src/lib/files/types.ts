@@ -13,6 +13,7 @@ export interface FileFolder {
   categoryId: string
   parentId: string | null
   name: string
+  sortOrder: number
   createdAt: string
 }
 
@@ -27,6 +28,7 @@ export interface FileItem {
   mimeType: string
   sizeBytes: number
   hasPreview: boolean
+  sortOrder: number
   createdAt: string
 }
 

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChevronDown, ChevronRight, Folder, FolderPlus, Loader2, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Folder, FolderPlus, GripVertical, Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,12 +15,14 @@ import {
   filesCategoryPath,
   notifyFilesChanged,
 } from "@/lib/files/routes";
+import { reorderById } from "@/lib/files/reorderList";
 
 interface FileFolder {
   id: string;
   categoryId: string;
   parentId: string | null;
   name: string;
+  sortOrder: number;
   createdAt: string;
 }
 
@@ -42,7 +44,9 @@ function buildFolderTree(folders: FileFolder[]): FolderNode[] {
     }
   }
   const sortNodes = (nodes: FolderNode[]) => {
-    nodes.sort((a, b) => a.name.localeCompare(b.name, "ru"))
+    nodes.sort(
+      (a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, "ru"),
+    )
     nodes.forEach((n) => sortNodes(n.children))
   }
   sortNodes(roots)
@@ -73,6 +77,7 @@ export function FilesSidebarTree() {
   /** null = создать в текущей открытой папке (или в корне) */
   const [creatingIn, setCreatingIn] = useState<string | null | false>(false)
   const [newName, setNewName] = useState("")
+  const [dragFolderId, setDragFolderId] = useState<string | null>(null)
 
   const loadFolders = useCallback(async () => {
     if (!categorySlug) return
@@ -143,6 +148,43 @@ export function FilesSidebarTree() {
     }
   }
 
+  function siblingsOf(parentId: string | null): FileFolder[] {
+    return folders
+      .filter((f) => f.parentId === parentId)
+      .sort(
+        (a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, "ru"),
+      )
+  }
+
+  async function persistFolderOrder(parentId: string | null, ordered: FileFolder[]) {
+    const res = await apiFetch("/api/files/folders/reorder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ categorySlug, parentId, ids: ordered.map((f) => f.id) }),
+    })
+    if (!res.ok) {
+      const data = await res.json()
+      toast.error("Не удалось сохранить порядок", { description: data.error })
+      void loadFolders()
+      return
+    }
+    const sortMap = new Map(ordered.map((f, i) => [f.id, (i + 1) * 10]))
+    setFolders((prev) =>
+      prev.map((f) => (sortMap.has(f.id) ? { ...f, sortOrder: sortMap.get(f.id)! } : f)),
+    )
+    notifyFilesChanged()
+  }
+
+  function onFolderDrop(targetId: string, parentId: string | null) {
+    if (!dragFolderId || dragFolderId === targetId) return
+    const siblings = siblingsOf(parentId)
+    if (siblings.length < 2) return
+    if (!siblings.some((s) => s.id === dragFolderId)) return
+    const next = reorderById(siblings, dragFolderId, targetId)
+    setDragFolderId(null)
+    void persistFolderOrder(parentId, next)
+  }
+
   async function deleteFolder(folder: FileFolder) {
     if (!confirm(`Удалить папку «${folder.name}»?`)) return
     const res = await apiFetch(`/api/files/folders/${folder.id}`, { method: "DELETE" })
@@ -172,6 +214,9 @@ export function FilesSidebarTree() {
       <div className="px-3 pb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
         Папки
       </div>
+      <p className="px-3 pb-1 text-[10px] leading-tight text-muted-foreground/70">
+        За ⋮⋮ — перетащить среди соседних
+      </p>
 
       <Link
         href={filesCategoryPath(categorySlug)}
@@ -200,9 +245,14 @@ export function FilesSidebarTree() {
               categorySlug={categorySlug}
               currentFolderId={currentFolderId}
               expanded={expanded}
+              siblingCount={tree.length}
+              dragFolderId={dragFolderId}
               onToggle={toggleExpand}
               onDelete={deleteFolder}
               onCreateSubfolder={startCreate}
+              onDragStart={setDragFolderId}
+              onDragEnd={() => setDragFolderId(null)}
+              onDrop={onFolderDrop}
             />
           ))}
           {!loading && tree.length === 0 && (
@@ -268,22 +318,34 @@ function FolderTreeNode({
   categorySlug,
   currentFolderId,
   expanded,
+  siblingCount,
+  dragFolderId,
   onToggle,
   onDelete,
   onCreateSubfolder,
+  onDragStart,
+  onDragEnd,
+  onDrop,
 }: {
   node: FolderNode
   depth: number
   categorySlug: string
   currentFolderId: string | null
   expanded: Set<string>
+  siblingCount: number
+  dragFolderId: string | null
   onToggle: (id: string) => void
   onDelete: (folder: FileFolder) => void
   onCreateSubfolder: (parentId: string) => void
+  onDragStart: (id: string) => void
+  onDragEnd: () => void
+  onDrop: (targetId: string, parentId: string | null) => void
 }) {
   const hasChildren = node.children.length > 0
   const isOpen = expanded.has(node.id)
   const isActive = currentFolderId === node.id
+  const isDragging = dragFolderId === node.id
+  const canDrag = siblingCount > 1
   const isOnPath =
     isActive ||
     node.children.some(function walk(n: FolderNode): boolean {
@@ -294,9 +356,34 @@ function FolderTreeNode({
   return (
     <div>
       <div
-        className="group flex items-center gap-0.5"
+        className={cn("group flex items-center gap-0.5", isDragging && "opacity-50")}
         style={{ paddingLeft: `${depth * 10 + 4}px` }}
+        onDragOver={(e) => {
+          if (!dragFolderId || dragFolderId === node.id) return
+          e.preventDefault()
+          e.dataTransfer.dropEffect = "move"
+        }}
+        onDrop={(e) => {
+          e.preventDefault()
+          onDrop(node.id, node.parentId)
+        }}
       >
+        {canDrag ? (
+          <span
+            draggable
+            title="Перетащить"
+            className="flex size-5 shrink-0 cursor-grab items-center justify-center rounded text-muted-foreground/50 hover:bg-accent hover:text-muted-foreground active:cursor-grabbing"
+            onDragStart={(e) => {
+              e.dataTransfer.effectAllowed = "move"
+              onDragStart(node.id)
+            }}
+            onDragEnd={onDragEnd}
+          >
+            <GripVertical className="size-3" />
+          </span>
+        ) : (
+          <span className="size-5 shrink-0" />
+        )}
         <button
           type="button"
           aria-label={isOpen ? "Свернуть" : "Развернуть"}
@@ -361,9 +448,14 @@ function FolderTreeNode({
             categorySlug={categorySlug}
             currentFolderId={currentFolderId}
             expanded={expanded}
+            siblingCount={node.children.length}
+            dragFolderId={dragFolderId}
             onToggle={onToggle}
             onDelete={onDelete}
             onCreateSubfolder={onCreateSubfolder}
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
+            onDrop={onDrop}
           />
         ))}
     </div>

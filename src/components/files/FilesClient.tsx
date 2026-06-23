@@ -3,7 +3,7 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ChevronRight, FileText, Loader2, Pencil, Trash2, Upload } from "lucide-react";
+import { ChevronRight, FileText, GripVertical, Loader2, Pencil, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
 import { IMPORTANT_DOCS_SLUG } from "@/lib/files/types";
 import { FILES_CHANGED_EVENT, filesCategoryPath, notifyFilesChanged } from "@/lib/files/routes";
+import { reorderById } from "@/lib/files/reorderList";
 
 interface FileCategory {
   id: string;
@@ -32,6 +33,7 @@ interface FileItem {
   mimeType: string;
   sizeBytes: number;
   hasPreview: boolean;
+  sortOrder: number;
   createdAt: string;
 }
 
@@ -71,6 +73,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadLabel, setUploadLabel] = useState<string | null>(null);
+  const [dragItemId, setDragItemId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const loadMeta = useCallback(async () => {
@@ -120,6 +123,38 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     return () => window.removeEventListener(FILES_CHANGED_EVENT, onChange);
   }, [refresh]);
 
+  async function persistFileOrder(ordered: FileItem[]) {
+    const res = await apiFetch("/api/files/reorder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        categorySlug,
+        folderId: currentFolderId,
+        ids: ordered.map((i) => i.id),
+      }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      toast.error("Не удалось сохранить порядок", { description: data.error });
+      void loadItems();
+      return;
+    }
+    const sortMap = new Map(ordered.map((item, i) => [item.id, (i + 1) * 10]));
+    setItems((prev) =>
+      prev.map((item) =>
+        sortMap.has(item.id) ? { ...item, sortOrder: sortMap.get(item.id)! } : item,
+      ),
+    );
+  }
+
+  function onFileDrop(targetId: string) {
+    if (!dragItemId || dragItemId === targetId || items.length < 2) return;
+    const next = reorderById(items, dragItemId, targetId);
+    setDragItemId(null);
+    setItems(next);
+    void persistFileOrder(next);
+  }
+
   async function uploadFiles(fileList: FileList | File[]) {
     if (!category) return;
     if (category.storageType === "gcs" && !gcsConfigured) {
@@ -143,7 +178,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
         const data = await res.json();
         if (res.ok) {
           ok += 1;
-          setItems((prev) => [data.item, ...prev]);
+          setItems((prev) => [...prev, data.item]);
         } else {
           toast.error(`«${file.name}»`, { description: data.error });
         }
@@ -301,6 +336,9 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
               : "Загрузка…"
             : "Перетащите файлы сюда или нажмите «Загрузить»"}
         </p>
+        {!uploading && items.length > 1 && (
+          <p className="text-xs text-muted-foreground">Порядок карточек — перетаскиванием</p>
+        )}
       </div>
 
       {items.length === 0 ? (
@@ -313,6 +351,19 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
             <FileCard
               key={item.id}
               item={item}
+              draggable={items.length > 1}
+              dragging={dragItemId === item.id}
+              onDragStart={() => setDragItemId(item.id)}
+              onDragEnd={() => setDragItemId(null)}
+              onDragOver={(e) => {
+                if (!dragItemId || dragItemId === item.id) return;
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "move";
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                onFileDrop(item.id);
+              }}
               onRemove={() => void removeItem(item)}
               onRename={(t) => void renameItem(item, t)}
             />
@@ -325,10 +376,22 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
 
 function FileCard({
   item,
+  draggable,
+  dragging,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDrop,
   onRemove,
   onRename,
 }: {
   item: FileItem;
+  draggable: boolean;
+  dragging: boolean;
+  onDragStart: () => void;
+  onDragEnd: () => void;
+  onDragOver: (e: React.DragEvent) => void;
+  onDrop: (e: React.DragEvent) => void;
   onRemove: () => void;
   onRename: (title: string) => void;
 }) {
@@ -348,7 +411,29 @@ function FileCard({
   }, [item.id, item.title, item.createdAt]);
 
   return (
-    <Card className="group overflow-hidden">
+    <Card
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      className={cn(
+        "group overflow-hidden",
+        dragging && "opacity-50 ring-2 ring-primary/40",
+      )}
+    >
+      {draggable && (
+        <div
+          draggable
+          title="Перетащить"
+          onDragStart={(e) => {
+            e.dataTransfer.effectAllowed = "move";
+            onDragStart();
+          }}
+          onDragEnd={onDragEnd}
+          className="flex cursor-grab items-center gap-1 border-b border-border/50 bg-muted/30 px-2 py-1 text-muted-foreground active:cursor-grabbing"
+        >
+          <GripVertical className="size-3.5 shrink-0" />
+          <span className="text-[10px]">перетащить</span>
+        </div>
+      )}
       <a
         href={`/api/files/${item.id}/content`}
         target="_blank"
