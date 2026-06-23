@@ -27,6 +27,10 @@ interface CloudFolderViewProps {
   folder: FileFolder;
   galleryItems: CloudFileItem[];
   listItems: CloudFileItem[];
+  filesToolbar?: React.ReactNode;
+  manualSort: boolean;
+  extFilter: string;
+  allItemsCount: number;
   dragItemId: string | null;
   onFolderChange: (folder: FileFolder) => void;
   onItemChange: (item: CloudFileItem) => void;
@@ -56,6 +60,10 @@ export function CloudFolderView({
   folder,
   galleryItems,
   listItems,
+  filesToolbar,
+  manualSort,
+  extFilter,
+  allItemsCount,
   dragItemId,
   onFolderChange,
   onItemChange,
@@ -169,12 +177,13 @@ export function CloudFolderView({
   }
 
   function onGalleryItemDrop(targetId: string) {
-    if (!dragItemId || dragItemId === targetId || galleryItems.length < 2) return;
+    if (!dragItemId || dragItemId === targetId) return;
     const fromList = listItems.find((i) => i.id === dragItemId);
     if (fromList?.mimeType.startsWith("image/")) {
       void setInGallery(fromList, true).then(() => onDragEnd());
       return;
     }
+    if (!manualSort || galleryItems.length < 2) return;
     const ids = galleryItems.map((i) => i.id);
     const from = ids.indexOf(dragItemId);
     const to = ids.indexOf(targetId);
@@ -220,6 +229,8 @@ export function CloudFolderView({
         </Button>
       </div>
 
+      {filesToolbar && <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-2.5">{filesToolbar}</div>}
+
       {folder.moduleTextEnabled && (
         <section className="space-y-2">
           <h2 className="text-sm font-medium">Текст</h2>
@@ -238,7 +249,9 @@ export function CloudFolderView({
         <section className="space-y-3">
           <div className="flex items-center justify-between gap-2">
             <h2 className="text-sm font-medium">Галерея</h2>
-            <p className="text-xs text-muted-foreground">Перетащите фото сюда</p>
+            {manualSort && (
+              <p className="text-xs text-muted-foreground">Перетащите фото сюда</p>
+            )}
           </div>
           <div
             className={cn(
@@ -253,7 +266,9 @@ export function CloudFolderView({
           >
             {galleryItems.length === 0 ? (
               <p className="flex h-[120px] items-center justify-center text-sm text-muted-foreground">
-                Пока пусто — перетащите фото из списка ниже
+                {extFilter !== "all" && allItemsCount > 0
+                  ? "Нет фото с выбранным типом"
+                  : "Пока пусто — перетащите фото из списка ниже"}
               </p>
             ) : (
               <div className="columns-2 gap-3 sm:columns-3 lg:columns-4">
@@ -261,6 +276,7 @@ export function CloudFolderView({
                   <GalleryTile
                     key={item.id}
                     item={item}
+                    reorderable={manualSort && galleryItems.length > 1}
                     dragging={dragItemId === item.id}
                     onDragStart={() => onDragStart(item.id)}
                     onDragEnd={onDragEnd}
@@ -301,13 +317,17 @@ export function CloudFolderView({
         </h2>
         {listItems.length === 0 ? (
           <p className="py-8 text-center text-sm text-muted-foreground">
-            {folder.moduleGalleryEnabled ? "Нет файлов вне галереи" : "В этой папке пока нет файлов"}
+            {extFilter !== "all" && allItemsCount > 0
+              ? "Нет файлов с выбранным типом"
+              : folder.moduleGalleryEnabled
+                ? "Нет файлов вне галереи"
+                : "В этой папке пока нет файлов"}
           </p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {listItems.map((item) =>
               renderFileCard(item, {
-                draggable: listItems.length > 1,
+                draggable: manualSort && listItems.length > 1,
                 dragging: dragItemId === item.id,
                 onDragStart: () => onDragStart(item.id),
                 onDragEnd,
@@ -318,7 +338,7 @@ export function CloudFolderView({
                 },
                 onDrop: (e) => {
                   e.preventDefault();
-                  if (!dragItemId || dragItemId === item.id) return;
+                  if (!manualSort || !dragItemId || dragItemId === item.id) return;
                   const next = [...listItems];
                   const from = next.findIndex((i) => i.id === dragItemId);
                   const to = next.findIndex((i) => i.id === item.id);
@@ -379,6 +399,7 @@ function FolderTextArea({
 
 function GalleryTile({
   item,
+  reorderable,
   dragging,
   onDragStart,
   onDragEnd,
@@ -388,6 +409,7 @@ function GalleryTile({
   onOpen,
 }: {
   item: CloudFileItem;
+  reorderable: boolean;
   dragging: boolean;
   onDragStart: () => void;
   onDragEnd: () => void;
@@ -409,18 +431,20 @@ function GalleryTile({
       onDragOver={onDragOver}
       onDrop={onDrop}
     >
-      <div
-        draggable
-        onDragStart={(e) => {
-          e.dataTransfer.effectAllowed = "move";
-          onDragStart();
-        }}
-        onDragEnd={onDragEnd}
-        className="absolute left-2 top-2 z-10 flex size-7 cursor-grab items-center justify-center rounded-md bg-black/40 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100 active:cursor-grabbing"
-        title="Перетащить"
-      >
-        <GripVertical className="size-4" />
-      </div>
+      {reorderable && (
+        <div
+          draggable
+          onDragStart={(e) => {
+            e.dataTransfer.effectAllowed = "move";
+            onDragStart();
+          }}
+          onDragEnd={onDragEnd}
+          className="absolute left-2 top-2 z-10 flex size-7 cursor-grab items-center justify-center rounded-md bg-black/40 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100 active:cursor-grabbing"
+          title="Перетащить"
+        >
+          <GripVertical className="size-4" />
+        </div>
+      )}
       <button
         type="button"
         title="Убрать из галереи"

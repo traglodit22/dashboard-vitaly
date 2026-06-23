@@ -1,6 +1,6 @@
 import fs from 'fs/promises'
 import path from 'path'
-import { LOCAL_ALLOWED_MIMES, MAX_FILE_BYTES, FOLDER_KEEP_NAME } from '@/lib/files/types'
+import { LOCAL_ALLOWED_MIMES, MAX_FILE_BYTES, MAX_FILE_SIZE_ERROR, FOLDER_KEEP_NAME } from '@/lib/files/types'
 
 export function filesUploadRoot(): string {
   const base = process.env.UPLOAD_DIR ?? path.join(/* turbopackIgnore: true */ process.cwd(), 'uploads')
@@ -63,7 +63,7 @@ export function validateLocalUpload(mime: string, size: number): void {
     throw new Error('Допустимы PDF и изображения (JPEG, PNG, WebP, GIF)')
   }
   if (size > MAX_FILE_BYTES) {
-    throw new Error('Максимальный размер файла — 20 МБ')
+    throw new Error(MAX_FILE_SIZE_ERROR)
   }
 }
 

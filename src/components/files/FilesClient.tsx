@@ -10,10 +10,18 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
-import { IMPORTANT_DOCS_SLUG, CLOUD_SLUG, type FileFolder } from "@/lib/files/types";
+import { IMPORTANT_DOCS_SLUG, CLOUD_SLUG, MAX_FILE_MB, type FileFolder } from "@/lib/files/types";
 import { FILES_CHANGED_EVENT, filesCategoryPath, notifyFilesChanged } from "@/lib/files/routes";
 import { reorderById } from "@/lib/files/reorderList";
 import { CloudFolderView } from "@/components/files/CloudFolderView";
+import { FilesListToolbar } from "@/components/files/FilesListToolbar";
+import { FilesSubfolderGrid } from "@/components/files/FilesSubfolderGrid";
+import {
+  collectExtensionOptions,
+  filterByExtension,
+  sortFileList,
+  type FileSortKey,
+} from "@/lib/files/fileListFilters";
 
 interface FileCategory {
   id: string;
@@ -43,6 +51,12 @@ interface FileItem {
 interface BreadcrumbItem {
   id: string;
   name: string;
+}
+
+interface ChildFolder {
+  id: string;
+  name: string;
+  sortOrder: number;
 }
 
 function formatBytes(n: number): string {
@@ -78,9 +92,13 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
   const [uploadLabel, setUploadLabel] = useState<string | null>(null);
   const [dragItemId, setDragItemId] = useState<string | null>(null);
   const [folder, setFolder] = useState<FileFolder | null>(null);
+  const [childFolders, setChildFolders] = useState<ChildFolder[]>([]);
+  const [sortBy, setSortBy] = useState<FileSortKey>("manual");
+  const [extFilter, setExtFilter] = useState("all");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const isCloudFolder = categorySlug === CLOUD_SLUG && Boolean(currentFolderId);
+  const listPrefsKey = `files-list-prefs-${categorySlug}-${currentFolderId ?? "root"}`;
 
   const loadFolder = useCallback(async () => {
     if (!currentFolderId || categorySlug !== CLOUD_SLUG) {
@@ -122,36 +140,86 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     setBreadcrumb(data.breadcrumb ?? []);
   }, [categorySlug, currentFolderId]);
 
+  const loadChildFolders = useCallback(async () => {
+    const params = new URLSearchParams({ categorySlug });
+    if (currentFolderId) params.set("parentId", currentFolderId);
+    const res = await apiFetch(`/api/files/folders?${params}`, { cache: "no-store" });
+    const data = await res.json();
+    setChildFolders(
+      (data.folders ?? []).map((f: ChildFolder) => ({
+        id: f.id,
+        name: f.name,
+        sortOrder: f.sortOrder,
+      })),
+    );
+  }, [categorySlug, currentFolderId]);
+
   const refresh = useCallback(async () => {
-    await Promise.all([loadItems(), loadBreadcrumb(), loadFolder()]);
-  }, [loadItems, loadBreadcrumb, loadFolder]);
+    await Promise.all([loadItems(), loadBreadcrumb(), loadFolder(), loadChildFolders()]);
+  }, [loadItems, loadBreadcrumb, loadFolder, loadChildFolders]);
 
-  const galleryItems = useMemo(
-    () =>
-      [...items]
-        .filter((i) => i.inGallery)
-        .sort(
-          (a, b) =>
-            a.gallerySortOrder - b.gallerySortOrder ||
-            a.title.localeCompare(b.title, "ru"),
-        ),
-    [items],
-  );
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(listPrefsKey);
+      if (raw) {
+        const prefs = JSON.parse(raw) as { sortBy?: FileSortKey; extFilter?: string };
+        setSortBy(prefs.sortBy ?? "manual");
+        setExtFilter(prefs.extFilter ?? "all");
+      } else {
+        setSortBy("manual");
+        setExtFilter("all");
+      }
+    } catch {
+      setSortBy("manual");
+      setExtFilter("all");
+    }
+  }, [listPrefsKey]);
 
-  const listItems = useMemo(
-    () =>
-      [...items]
-        .filter((i) => !i.inGallery)
-        .sort((a, b) => a.sortOrder - b.sortOrder || a.title.localeCompare(b.title, "ru")),
-    [items],
-  );
+  useEffect(() => {
+    localStorage.setItem(listPrefsKey, JSON.stringify({ sortBy, extFilter }));
+  }, [listPrefsKey, sortBy, extFilter]);
+
+  const extensionOptions = useMemo(() => collectExtensionOptions(items), [items]);
+
+  useEffect(() => {
+    if (extFilter !== "all" && !extensionOptions.some((o) => o.ext === extFilter)) {
+      setExtFilter("all");
+    }
+  }, [extFilter, extensionOptions]);
+
+  const manualSort = sortBy === "manual" && extFilter === "all";
+
+  const galleryItems = useMemo(() => {
+    const base = items.filter((i) => i.inGallery);
+    return sortFileList(filterByExtension(base, extFilter), sortBy, "gallery");
+  }, [items, extFilter, sortBy]);
+
+  const listItems = useMemo(() => {
+    const base = items.filter((i) => !i.inGallery);
+    return sortFileList(filterByExtension(base, extFilter), sortBy, "files");
+  }, [items, extFilter, sortBy]);
+
+  const filesToolbar =
+    items.length > 0 ? (
+      <FilesListToolbar
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+        extFilter={extFilter}
+        onExtFilterChange={setExtFilter}
+        extensions={extensionOptions}
+        totalCount={items.length}
+        visibleCount={galleryItems.length + listItems.length}
+      />
+    ) : null;
 
   useEffect(() => {
     setLoading(true);
     loadMeta()
-      .then(() => Promise.all([loadItems(), loadBreadcrumb(), loadFolder()]))
+      .then(() =>
+        Promise.all([loadItems(), loadBreadcrumb(), loadFolder(), loadChildFolders()]),
+      )
       .finally(() => setLoading(false));
-  }, [loadMeta, loadItems, loadBreadcrumb, loadFolder]);
+  }, [loadMeta, loadItems, loadBreadcrumb, loadFolder, loadChildFolders]);
 
   useEffect(() => {
     const onChange = () => void refresh();
@@ -189,7 +257,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
   }
 
   function onFileDrop(targetId: string) {
-    if (!dragItemId || dragItemId === targetId) return;
+    if (!manualSort || !dragItemId || dragItemId === targetId) return;
     const pool = listItems.length ? listItems : items.filter((i) => !i.inGallery);
     if (pool.length < 2) return;
     const next = reorderById(pool, dragItemId, targetId);
@@ -229,7 +297,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
       fd.append("mime", init.mime as string);
       fd.append("fileName", file.name);
       fd.append("file", file);
-      putRes = await apiFetch("/api/files/gcs-proxy-put", { method: "POST", body: fd }, 120_000);
+      putRes = await apiFetch("/api/files/gcs-proxy-put", { method: "POST", body: fd }, 300_000);
     } catch {
       throw new Error("Таймаут загрузки в Google Cloud");
     }
@@ -267,7 +335,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     fd.append("categorySlug", categorySlug);
     if (currentFolderId) fd.append("folderId", currentFolderId);
     fd.append("file", file);
-    const res = await apiFetch("/api/files", { method: "POST", body: fd }, 120_000);
+    const res = await apiFetch("/api/files", { method: "POST", body: fd }, 300_000);
     const data = await res.json();
     if (!res.ok) {
       throw new Error(String(data.error ?? "Ошибка загрузки"));
@@ -380,7 +448,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
             : "Загрузка…"
           : "Перетащите файлы сюда или нажмите «Загрузить»"}
       </p>
-      {!uploading && listItems.length > 1 && !isCloudFolder && (
+      {!uploading && manualSort && listItems.length > 1 && !isCloudFolder && (
         <p className="text-xs text-muted-foreground">Порядок карточек — перетаскиванием</p>
       )}
     </div>
@@ -433,8 +501,8 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
             <h1 className="text-2xl font-semibold tracking-tight">{locationTitle}</h1>
             <p className="text-sm text-muted-foreground">
               {category.storageType === "local"
-                ? "PDF и фото на сервере · до 20 МБ"
-                : "Файлы в Google Cloud Storage"}
+                ? `PDF и фото на сервере · до ${MAX_FILE_MB} МБ`
+                : `Файлы в Google Cloud Storage · до ${MAX_FILE_MB} МБ`}
               {currentFolderId && " · вложенная папка"}
             </p>
           </div>
@@ -460,6 +528,12 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
         </Card>
       )}
 
+      <FilesSubfolderGrid
+        folders={childFolders}
+        categorySlug={categorySlug}
+        currentFolderId={currentFolderId}
+      />
+
       {!isCloudFolder && uploadZone}
 
       {isCloudFolder ? (
@@ -480,6 +554,10 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
           }
           galleryItems={galleryItems}
           listItems={listItems}
+          filesToolbar={filesToolbar}
+          manualSort={manualSort}
+          extFilter={extFilter}
+          allItemsCount={items.length}
           dragItemId={dragItemId}
           onFolderChange={setFolder}
           onItemChange={(item) => {
@@ -526,17 +604,28 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
             />
           )}
         />
-      ) : items.length === 0 ? (
+      ) : items.length === 0 && childFolders.length === 0 ? (
         <p className="py-12 text-center text-sm text-muted-foreground">
           {currentFolderId ? "В этой папке пока нет файлов" : "Пока нет файлов"}
         </p>
+      ) : items.length === 0 ? (
+        <p className="py-8 text-center text-sm text-muted-foreground">
+          {currentFolderId ? "В этой папке пока нет файлов" : "Пока нет файлов"}
+        </p>
       ) : (
+        <div className="space-y-4">
+          {filesToolbar}
+          {listItems.length === 0 ? (
+            <p className="py-12 text-center text-sm text-muted-foreground">
+              Нет файлов с выбранным типом
+            </p>
+          ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {listItems.map((item) => (
             <FileCard
               key={item.id}
               item={item}
-              draggable={listItems.length > 1}
+              draggable={manualSort && listItems.length > 1}
               dragging={dragItemId === item.id}
               onDragStart={() => setDragItemId(item.id)}
               onDragEnd={() => setDragItemId(null)}
@@ -553,6 +642,8 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
               onRename={(t) => void renameItem(item, t)}
             />
           ))}
+        </div>
+          )}
         </div>
       )}
     </div>

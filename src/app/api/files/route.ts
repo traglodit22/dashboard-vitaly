@@ -8,7 +8,7 @@ import { resolveUploadMime } from '@/lib/files/mimeDetect'
 import type { FileStorageType } from '@/lib/files/types'
 
 export const runtime = 'nodejs'
-export const maxDuration = 120
+export const maxDuration = 300
 
 export async function GET(req: Request) {
   const unauth = await requireAuth(req)

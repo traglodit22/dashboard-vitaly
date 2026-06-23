@@ -48,6 +48,10 @@ export const LOCAL_ALLOWED_MIMES = new Set([
   'image/gif',
 ])
 
-export const MAX_FILE_BYTES = 20 * 1024 * 1024
+export const MAX_FILE_MB = 50
+export const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024
+export const MAX_FILE_SIZE_ERROR = `Максимальный размер файла — ${MAX_FILE_MB} МБ`
+/** Таймаут загрузки через прокси (браузер → VPS → GCS). */
+export const UPLOAD_TIMEOUT_MS = 300_000
 
 export const FOLDER_KEEP_NAME = '.keep'

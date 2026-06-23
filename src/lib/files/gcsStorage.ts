@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { GoogleAuth } from 'google-auth-library'
 import { Storage } from '@google-cloud/storage'
-import { MAX_FILE_BYTES } from '@/lib/files/types'
+import { MAX_FILE_BYTES, MAX_FILE_SIZE_ERROR, UPLOAD_TIMEOUT_MS } from '@/lib/files/types'
 
 const GCS_SCOPES = ['https://www.googleapis.com/auth/devstorage.read_write']
 
@@ -131,11 +131,11 @@ export async function putBufferToSignedUrl(
 ): Promise<void> {
   assertGcsSignedUploadUrl(uploadUrl)
   if (buffer.length > MAX_FILE_BYTES) {
-    throw new Error('Максимальный размер файла — 20 МБ')
+    throw new Error(MAX_FILE_SIZE_ERROR)
   }
 
   const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), 120_000)
+  const timer = setTimeout(() => controller.abort(), UPLOAD_TIMEOUT_MS)
   try {
     const res = await fetch(uploadUrl, {
       method: 'PUT',
@@ -266,7 +266,7 @@ export async function uploadToGcs(
   mime: string,
 ): Promise<void> {
   if (buffer.length > MAX_FILE_BYTES) {
-    throw new Error('Максимальный размер файла — 20 МБ')
+    throw new Error(MAX_FILE_SIZE_ERROR)
   }
   await withGcsRetry(`upload ${objectKey}`, async (client) => {
     await client.bucket(gcsBucketName()).file(objectKey).save(buffer, {

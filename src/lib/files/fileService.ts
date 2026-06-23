@@ -21,7 +21,7 @@ import {
 import { FILE_ITEM_FROM, FILE_ITEM_SELECT, rowToFileItem } from '@/lib/files/mapRow'
 import { isImageMime, isPdfMime } from '@/lib/files/mimeDetect'
 import type { FileStorageType } from '@/lib/files/types'
-import { MAX_FILE_BYTES } from '@/lib/files/types'
+import { MAX_FILE_BYTES, MAX_FILE_SIZE_ERROR } from '@/lib/files/types'
 
 async function nextFileSortOrder(categoryId: string, folderId: string | null): Promise<number> {
   const rows = await query<{ next_order: string }>(
@@ -122,7 +122,7 @@ export async function prepareGcsDirectUpload(opts: {
     throw new Error('Google Cloud Storage не настроен на сервере')
   }
   if (opts.sizeBytes > MAX_FILE_BYTES) {
-    throw new Error('Максимальный размер файла — 20 МБ')
+    throw new Error(MAX_FILE_SIZE_ERROR)
   }
 
   const fileId = randomUUID()
