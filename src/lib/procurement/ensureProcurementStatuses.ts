@@ -5,6 +5,7 @@ export const DEFAULT_PROCUREMENT_STATUSES: { name: string; colorKey: StatusColor
   { name: 'покупается', colorKey: 'red', sortOrder: 10 },
   { name: 'куплено', colorKey: 'green', sortOrder: 20 },
   { name: 'не нужно?', colorKey: 'white', sortOrder: 30 },
+  { name: 'Рановато', colorKey: 'blue', sortOrder: 35 },
   { name: 'едет', colorKey: 'orange', sortOrder: 40 },
   { name: 'Дима', colorKey: 'gray', sortOrder: 50 },
   { name: 'тестируем', colorKey: 'purple', sortOrder: 60 },
@@ -43,12 +44,6 @@ export async function ensureProcurementStatusesSchema(): Promise<void> {
 }
 
 export async function seedDefaultStatusesForCategory(categoryId: string): Promise<void> {
-  const [{ count }] = await query<{ count: string }>(
-    `SELECT COUNT(*)::text AS count FROM procurement_statuses WHERE category_id = $1`,
-    [categoryId],
-  )
-  if (Number(count) > 0) return
-
   for (const s of DEFAULT_PROCUREMENT_STATUSES) {
     await pool.query(
       `INSERT INTO procurement_statuses (category_id, name, color_key, sort_order)
