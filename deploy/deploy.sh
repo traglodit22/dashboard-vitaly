@@ -54,7 +54,7 @@ if [[ $migrate_rc -ne 0 ]]; then
 fi
 
 echo "==> Ensure upload directories"
-mkdir -p uploads/procurement runtime
+mkdir -p uploads/procurement uploads/files runtime
 
 # One-time / recovery: serve from runtime/current (PM2 cwd), not .next/standalone
 if [[ ! -d "$RUNTIME" && -f .next/standalone/server.js ]]; then

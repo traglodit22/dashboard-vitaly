@@ -14,4 +14,11 @@ export async function register() {
   } catch (err) {
     console.error('[procurement] startup seed failed:', err)
   }
+
+  const { ensureFilesSeed } = await import('@/lib/files/ensureFilesSeed')
+  try {
+    await ensureFilesSeed()
+  } catch (err) {
+    console.error('[files] startup seed failed:', err)
+  }
 }
