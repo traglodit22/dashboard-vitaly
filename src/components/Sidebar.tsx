@@ -17,8 +17,15 @@ export function Sidebar() {
   const current = activeItem(section.items, pathname);
   const settingsActive = pathname === "/settings";
 
+  const isFilesSection = section.key === "files";
+
   return (
-    <aside className="flex w-56 shrink-0 flex-col border-r border-border bg-sidebar">
+    <aside
+      className={cn(
+        "flex shrink-0 flex-col border-r border-border bg-sidebar",
+        isFilesSection ? "w-72 xl:w-80" : "w-56",
+      )}
+    >
       <nav className="flex flex-1 flex-col gap-1 p-3">
         <div className="px-3 pb-1 pt-2 text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
           {section.label}

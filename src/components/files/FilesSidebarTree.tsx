@@ -256,7 +256,7 @@ export function FilesSidebarTree() {
           <Loader2 className="size-4 animate-spin text-muted-foreground" />
         </div>
       ) : (
-        <div className="max-h-[min(55vh,480px)] space-y-0.5 overflow-y-auto px-1">
+        <div className="max-h-[min(55vh,480px)] overflow-y-auto overflow-x-hidden px-1">
           {tree.map((node) => (
             <FolderTreeNode
               key={node.id}
@@ -384,10 +384,14 @@ function FolderTreeNode({
     })
 
   return (
-    <div>
+    <div className="min-w-0">
       <div
-        className={cn("group flex items-center gap-0.5", isDragging && "opacity-50")}
-        style={{ paddingLeft: `${depth * 10 + 4}px` }}
+        className={cn(
+          "group rounded-md py-0.5 pr-1",
+          isDragging && "opacity-50",
+          isActive && "bg-primary/10",
+        )}
+        style={{ marginLeft: `${Math.min(depth, 4) * 12}px` }}
         onDragOver={(e) => {
           if (!dragFolderId || dragFolderId === node.id) return
           e.preventDefault()
@@ -398,117 +402,114 @@ function FolderTreeNode({
           onDrop(node.id, node.parentId)
         }}
       >
-        {canDrag ? (
-          <span
-            draggable
-            title="Перетащить"
-            className="flex size-5 shrink-0 cursor-grab items-center justify-center rounded text-muted-foreground/50 hover:bg-accent hover:text-muted-foreground active:cursor-grabbing"
-            onDragStart={(e) => {
-              e.dataTransfer.effectAllowed = "move"
-              onDragStart(node.id)
-            }}
-            onDragEnd={onDragEnd}
-          >
-            <GripVertical className="size-3" />
-          </span>
-        ) : (
-          <span className="size-5 shrink-0" />
-        )}
-        <button
-          type="button"
-          aria-label={isOpen ? "Свернуть" : "Развернуть"}
-          className={cn(
-            "flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-accent",
-            !hasChildren && "opacity-30",
-          )}
-          onClick={() => onToggle(node.id)}
-        >
-          {isOpen ? <ChevronDown className="size-3" /> : <ChevronRight className="size-3" />}
-        </button>
-        <Link
-          href={filesCategoryPath(categorySlug, node.id)}
-          className={cn(
-            "flex min-w-0 flex-1 items-center gap-1.5 rounded-md py-1 pr-0.5 text-sm transition-colors",
-            isActive
-              ? "bg-primary/15 font-medium text-primary"
-              : isOnPath
-                ? "text-foreground"
-                : "text-muted-foreground hover:bg-accent hover:text-foreground",
-          )}
-          title={node.name}
-          onDoubleClick={(e) => {
-            e.preventDefault()
-            setDraft(node.name)
-            setEditing(true)
-          }}
-        >
-          <Folder
+        <div className="flex min-w-0 items-start gap-0.5">
+          {canDrag ? (
+            <span
+              draggable
+              title="Перетащить"
+              className="mt-0.5 flex size-4 shrink-0 cursor-grab items-center justify-center rounded text-muted-foreground/40 opacity-0 transition-opacity hover:bg-accent hover:text-muted-foreground active:cursor-grabbing group-hover:opacity-100"
+              onDragStart={(e) => {
+                e.dataTransfer.effectAllowed = "move"
+                onDragStart(node.id)
+              }}
+              onDragEnd={onDragEnd}
+            >
+              <GripVertical className="size-3" />
+            </span>
+          ) : null}
+          <button
+            type="button"
+            aria-label={isOpen ? "Свернуть" : "Развернуть"}
             className={cn(
-              "size-3.5 shrink-0",
-              isActive ? "text-primary" : "text-amber-500",
+              "mt-0.5 flex size-4 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-accent",
+              !hasChildren && "invisible",
             )}
-          />
-          {editing ? (
-            <Input
-              autoFocus
-              className="h-6 min-w-0 flex-1 px-1 text-xs"
-              value={draft}
-              onClick={(e) => e.preventDefault()}
-              onChange={(e) => setDraft(e.target.value)}
-              onBlur={() => {
-                setEditing(false)
-                void onRename(node, draft)
-              }}
-              onKeyDown={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                if (e.key === "Enter") (e.target as HTMLInputElement).blur()
-                if (e.key === "Escape") {
-                  setDraft(node.name)
+            onClick={() => onToggle(node.id)}
+          >
+            {isOpen ? <ChevronDown className="size-3" /> : <ChevronRight className="size-3" />}
+          </button>
+          <div className="min-w-0 flex-1">
+            {editing ? (
+              <Input
+                autoFocus
+                className="h-7 w-full text-xs"
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                onBlur={() => {
                   setEditing(false)
-                }
-              }}
-            />
-          ) : (
-            <span className="truncate">{node.name}</span>
-          )}
-        </Link>
-        <button
-          type="button"
-          aria-label={`Переименовать «${node.name}»`}
-          title="Переименовать"
-          className="flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground opacity-0 transition-opacity hover:bg-accent hover:text-foreground group-hover:opacity-100"
-          onClick={(e) => {
-            e.preventDefault()
-            setDraft(node.name)
-            setEditing(true)
-          }}
-        >
-          <Pencil className="size-3" />
-        </button>
-        <button
-          type="button"
-          aria-label={`Подпапка в «${node.name}»`}
-          title="Создать подпапку"
-          className="flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground opacity-0 transition-opacity hover:bg-accent hover:text-foreground group-hover:opacity-100"
-          onClick={(e) => {
-            e.preventDefault()
-            onCreateSubfolder(node.id)
-          }}
-        >
-          <FolderPlus className="size-3" />
-        </button>
-        <button
-          type="button"
-          aria-label={`Удалить ${node.name}`}
-          className="flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
-          onClick={(e) => {
-            e.preventDefault()
-            onDelete(node)
-          }}
-        >
-          <Trash2 className="size-3" />
-        </button>
+                  void onRename(node, draft)
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") (e.target as HTMLInputElement).blur()
+                  if (e.key === "Escape") {
+                    setDraft(node.name)
+                    setEditing(false)
+                  }
+                }}
+              />
+            ) : (
+              <Link
+                href={filesCategoryPath(categorySlug, node.id)}
+                className={cn(
+                  "flex min-w-0 items-start gap-1.5 rounded-md px-1 py-0.5 text-sm leading-snug transition-colors",
+                  isActive
+                    ? "font-medium text-primary"
+                    : isOnPath
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                )}
+                title={node.name}
+                onDoubleClick={(e) => {
+                  e.preventDefault()
+                  setDraft(node.name)
+                  setEditing(true)
+                }}
+              >
+                <Folder
+                  className={cn(
+                    "mt-0.5 size-3.5 shrink-0",
+                    isActive ? "text-primary" : "text-amber-500",
+                  )}
+                />
+                <span className="min-w-0 break-words [overflow-wrap:anywhere]">
+                  {node.name}
+                </span>
+              </Link>
+            )}
+            <div className="flex gap-0.5 pl-5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+              <button
+                type="button"
+                aria-label={`Переименовать «${node.name}»`}
+                title="Переименовать"
+                className="flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+                onClick={() => {
+                  setDraft(node.name)
+                  setEditing(true)
+                }}
+              >
+                <Pencil className="size-3" />
+              </button>
+              <button
+                type="button"
+                aria-label={`Подпапка в «${node.name}»`}
+                title="Создать подпапку"
+                className="flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+                onClick={() => onCreateSubfolder(node.id)}
+              >
+                <FolderPlus className="size-3" />
+              </button>
+              <button
+                type="button"
+                aria-label={`Удалить ${node.name}`}
+                title="Удалить"
+                className="flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                onClick={() => onDelete(node)}
+              >
+                <Trash2 className="size-3" />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
       {isOpen &&
         node.children.map((child) => (
