@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { query } from '@/lib/db/index'
 import { requireAuth } from '@/lib/auth/requireAuth'
-import { rowToItem } from '@/lib/procurement/mapRow'
+import { ITEM_FROM_SQL, ITEM_SELECT_SQL, rowToItem } from '@/lib/procurement/mapRow'
 import { ensureHotelProcurement } from '@/lib/procurement/ensureHotelSeed'
 
 export const runtime = 'nodejs'
@@ -22,9 +22,8 @@ export async function GET(req: Request) {
   const categoryId = searchParams.get('categoryId')
 
   const rows = await query<Record<string, unknown>>(
-    `SELECT i.*, c.name AS category_name
-     FROM procurement_items i
-     JOIN procurement_categories c ON c.id = i.category_id
+    `SELECT ${ITEM_SELECT_SQL}
+     ${ITEM_FROM_SQL}
      ${categoryId ? 'WHERE i.category_id = $1' : ''}
      ORDER BY i.sort_order ASC, i.name ASC`,
     categoryId ? [categoryId] : [],
@@ -58,7 +57,7 @@ export async function POST(req: Request) {
       (category_id, group_name, name, need_qty, have_qty, in_transit_qty, notes, link, link_label, row_type, sort_order)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
        COALESCE((SELECT MAX(sort_order) + 10 FROM procurement_items WHERE category_id = $1), 0))
-     RETURNING *, (SELECT name FROM procurement_categories WHERE id = $1) AS category_name`,
+     RETURNING id`,
     [
       categoryId,
       rowType === 'type' ? null : body.groupName ? String(body.groupName).trim() : null,
@@ -73,5 +72,11 @@ export async function POST(req: Request) {
     ],
   )
 
-  return NextResponse.json({ item: rowToItem(rows[0]) }, { status: 201 })
+  const inserted = rows[0]
+  const full = await query<Record<string, unknown>>(
+    `SELECT ${ITEM_SELECT_SQL} ${ITEM_FROM_SQL} WHERE i.id = $1`,
+    [inserted.id],
+  )
+
+  return NextResponse.json({ item: rowToItem(full[0]) }, { status: 201 })
 }

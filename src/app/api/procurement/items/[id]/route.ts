@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { query } from '@/lib/db/index'
 import { requireAuth } from '@/lib/auth/requireAuth'
-import { rowToItem } from '@/lib/procurement/mapRow'
+import { ITEM_FROM_SQL, ITEM_SELECT_SQL, rowToItem } from '@/lib/procurement/mapRow'
 import { ensureHotelProcurement } from '@/lib/procurement/ensureHotelSeed'
 import { deleteItemImageFiles } from '@/lib/procurement/itemImage'
 
@@ -61,21 +61,12 @@ export async function PATCH(
     setClauses.push(`link_label = $${idx++}`)
     values.push(body.linkLabel ? String(body.linkLabel).trim() : null)
   }
-  if (body.highlightColor !== undefined) {
-    const c = body.highlightColor
-    if (
-      c !== null &&
-      c !== 'red' &&
-      c !== 'yellow' &&
-      c !== 'green' &&
-      c !== 'gray' &&
-      c !== 'white' &&
-      c !== 'purple'
-    ) {
-      return NextResponse.json({ error: 'Недопустимый цвет' }, { status: 400 })
+  if (body.statusId !== undefined) {
+    if (body.statusId !== null && typeof body.statusId !== 'string') {
+      return NextResponse.json({ error: 'Недопустимый статус' }, { status: 400 })
     }
-    setClauses.push(`highlight_color = $${idx++}`)
-    values.push(c)
+    setClauses.push(`status_id = $${idx++}`)
+    values.push(body.statusId)
   }
 
   if (setClauses.length === 1) {
@@ -83,17 +74,21 @@ export async function PATCH(
   }
 
   values.push(id)
-  const rows = await query<Record<string, unknown>>(
+  const updated = await query<{ id: string }>(
     `UPDATE procurement_items SET ${setClauses.join(', ')}
      WHERE id = $${idx}
-     RETURNING *,
-       (SELECT name FROM procurement_categories c WHERE c.id = procurement_items.category_id) AS category_name`,
+     RETURNING id`,
     values,
   )
 
-  if (!rows.length) {
+  if (!updated.length) {
     return NextResponse.json({ error: 'Позиция не найдена' }, { status: 404 })
   }
+
+  const rows = await query<Record<string, unknown>>(
+    `SELECT ${ITEM_SELECT_SQL} ${ITEM_FROM_SQL} WHERE i.id = $1`,
+    [updated[0].id],
+  )
 
   return NextResponse.json({ item: rowToItem(rows[0]) })
 }

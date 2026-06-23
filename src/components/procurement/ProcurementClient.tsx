@@ -11,6 +11,8 @@ import {
   Pencil,
   ImageIcon,
   Copy,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -25,29 +27,68 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
 import { reorderById } from "@/lib/procurement/reorderList";
+import { STATUS_ROW_CLASS, STATUS_SWATCH_CLASS } from "@/lib/procurement/statusColors";
+import type { ProcurementCategory, ProcurementItem, ProcurementStatus } from "@/lib/procurement/mapRow";
 import {
-  effectiveRowHighlight,
-  ROW_HIGHLIGHT_CLASS,
-  HIGHLIGHT_COLORS,
-  highlightSwatchTitle,
-  type RowHighlight,
-} from "@/lib/procurement/rowHighlight";
-import type { ProcurementCategory, ProcurementItem } from "@/lib/procurement/mapRow";
-
-const ROW_SWATCH: Record<RowHighlight, string> = {
-  red: "bg-red-500 border-red-700",
-  yellow: "bg-amber-400 border-amber-600",
-  green: "bg-emerald-500 border-emerald-700",
-  gray: "bg-neutral-500 border-neutral-700",
-  white: "bg-white border-neutral-400 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]",
-  purple: "bg-violet-500 border-violet-700",
-};
+  NO_STATUS_FILTER,
+  ProcurementStatusBar,
+} from "@/components/procurement/ProcurementStatusBar";
 
 const QTY_INPUT =
   "h-8 w-[4.5rem] min-w-[4.5rem] shrink-0 px-1.5 text-right tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none";
+
+function QtyStepper({
+  value,
+  onChange,
+  onBlur,
+  onBump,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  onBlur: () => void;
+  onBump: (delta: number) => void;
+}) {
+  return (
+    <div className="flex items-center gap-0.5">
+      <Input
+        type="number"
+        min={0}
+        className={QTY_INPUT}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
+      />
+      <div className="flex shrink-0 flex-col gap-px">
+        <button
+          type="button"
+          aria-label="Увеличить на 1"
+          onClick={() => onBump(1)}
+          className="flex size-3.5 items-center justify-center rounded-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          <ChevronUp className="size-3" />
+        </button>
+        <button
+          type="button"
+          aria-label="Уменьшить на 1"
+          onClick={() => onBump(-1)}
+          className="flex size-3.5 items-center justify-center rounded-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          <ChevronDown className="size-3" />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function buildTypeByItemId(items: ProcurementItem[]): Map<string, string | null> {
   const sorted = [...items].sort(
@@ -68,7 +109,9 @@ function buildTypeByItemId(items: ProcurementItem[]): Map<string, string | null>
 export function ProcurementClient() {
   const [categories, setCategories] = useState<ProcurementCategory[]>([]);
   const [items, setItems] = useState<ProcurementItem[]>([]);
+  const [statuses, setStatuses] = useState<ProcurementStatus[]>([]);
   const [categoryId, setCategoryId] = useState<string>("");
+  const [statusFilterId, setStatusFilterId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showAdd, setShowAdd] = useState(false);
@@ -103,6 +146,18 @@ export function ProcurementClient() {
     return list;
   }, []);
 
+  const loadStatuses = useCallback(async (catId: string) => {
+    if (!catId) {
+      setStatuses([]);
+      return;
+    }
+    const res = await apiFetch(`/api/procurement/statuses?categoryId=${catId}`, {
+      cache: "no-store",
+    });
+    const data = await res.json();
+    setStatuses(data.statuses ?? []);
+  }, []);
+
   const loadItems = useCallback(async (catId: string) => {
     if (!catId) {
       setItems([]);
@@ -120,8 +175,12 @@ export function ProcurementClient() {
   }, [loadCategories]);
 
   useEffect(() => {
-    if (categoryId) loadItems(categoryId);
-  }, [categoryId, loadItems]);
+    if (categoryId) {
+      setStatusFilterId(null);
+      loadItems(categoryId);
+      loadStatuses(categoryId);
+    }
+  }, [categoryId, loadItems, loadStatuses]);
 
   const searchActive = search.trim().length > 0;
 
@@ -129,26 +188,64 @@ export function ProcurementClient() {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return items;
-    return items.filter((i) => {
-      if (i.rowType === "type") {
-        return i.name.toLowerCase().includes(q);
-      }
-      const typeName = typeByItemId.get(i.id);
-      return (
-        i.name.toLowerCase().includes(q) ||
-        (typeName?.toLowerCase().includes(q) ?? false) ||
-        (i.notes?.toLowerCase().includes(q) ?? false) ||
-        (i.link?.toLowerCase().includes(q) ?? false) ||
-        (i.linkLabel?.toLowerCase().includes(q) ?? false)
-      );
+    let list = items;
+    if (q) {
+      list = list.filter((i) => {
+        if (i.rowType === "type") {
+          return i.name.toLowerCase().includes(q);
+        }
+        const typeName = typeByItemId.get(i.id);
+        return (
+          i.name.toLowerCase().includes(q) ||
+          (typeName?.toLowerCase().includes(q) ?? false) ||
+          (i.notes?.toLowerCase().includes(q) ?? false) ||
+          (i.link?.toLowerCase().includes(q) ?? false) ||
+          (i.linkLabel?.toLowerCase().includes(q) ?? false) ||
+          (i.status?.name.toLowerCase().includes(q) ?? false)
+        );
+      });
+    }
+    if (statusFilterId === null) return list;
+    return list.filter((i) => {
+      if (i.rowType === "type") return false;
+      if (statusFilterId === NO_STATUS_FILTER) return !i.statusId;
+      return i.statusId === statusFilterId;
     });
-  }, [items, search, typeByItemId]);
+  }, [items, search, typeByItemId, statusFilterId]);
 
   const sortedItems = useMemo(
     () => [...filtered].sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, "ru")),
     [filtered],
   );
+
+  const statusCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const i of items) {
+      if (i.rowType === "type" || !i.statusId) continue;
+      counts.set(i.statusId, (counts.get(i.statusId) ?? 0) + 1);
+    }
+    return counts;
+  }, [items]);
+
+  const noStatusCount = useMemo(
+    () => items.filter((i) => i.rowType !== "type" && !i.statusId).length,
+    [items],
+  );
+
+  function handleStatusesChange(next: ProcurementStatus[]) {
+    setStatuses(next);
+    setItems((prev) =>
+      prev.map((i) => {
+        if (!i.statusId) return i;
+        const s = next.find((x) => x.id === i.statusId);
+        if (!s) return { ...i, statusId: null, status: null };
+        return {
+          ...i,
+          status: { id: s.id, name: s.name, colorKey: s.colorKey },
+        };
+      }),
+    );
+  }
 
   const stats = useMemo(() => {
     let need = 0;
@@ -558,7 +655,7 @@ export function ProcurementClient() {
       )}
 
       <Card className="min-w-0 overflow-visible">
-        <CardHeader>
+        <CardHeader className="space-y-4">
           <CardTitle className="flex items-center gap-2 text-lg">
             <ShoppingCart className="size-5 text-primary" />
             {categories.find((c) => c.id === categoryId)?.name ?? "Закупки"}
@@ -566,6 +663,17 @@ export function ProcurementClient() {
               {sortedItems.filter((i) => i.rowType !== "type").length}
             </span>
           </CardTitle>
+          {categoryId && (
+            <ProcurementStatusBar
+              categoryId={categoryId}
+              statuses={statuses}
+              statusFilterId={statusFilterId}
+              statusCounts={statusCounts}
+              noStatusCount={noStatusCount}
+              onFilterChange={setStatusFilterId}
+              onStatusesChange={handleStatusesChange}
+            />
+          )}
         </CardHeader>
         <CardContent className="min-w-0 overflow-x-auto p-0">
           {sortedItems.length === 0 ? (
@@ -581,13 +689,13 @@ export function ProcurementClient() {
                 <col className="w-14" />
                 <col />
                 <col className="w-[11%]" />
-                <col className="w-[4.75rem]" />
-                <col className="w-[4.75rem]" />
-                <col className="w-[4.75rem]" />
+                <col className="w-[5.5rem]" />
+                <col className="w-[5.5rem]" />
+                <col className="w-[5.5rem]" />
                 <col className="w-[4.75rem]" />
                 <col className="w-[5.5rem]" />
                 <col />
-                <col className="w-12" />
+                <col className="w-[7.5rem]" />
                 <col className="w-10" />
               </colgroup>
               <TableHeader>
@@ -602,7 +710,7 @@ export function ProcurementClient() {
                   <TableHead className="text-right">Осталось</TableHead>
                   <TableHead>Ссылка</TableHead>
                   <TableHead>Заметка</TableHead>
-                  <TableHead />
+                  <TableHead>Статус</TableHead>
                   <TableHead />
                 </TableRow>
               </TableHeader>
@@ -632,6 +740,7 @@ export function ProcurementClient() {
                     <ItemRow
                       key={item.id}
                       item={item}
+                      statuses={statuses}
                       typeName={typeByItemId.get(item.id) ?? null}
                       draggable={!searchActive}
                       dragging={dragItemId === item.id}
@@ -814,6 +923,7 @@ function TypeRow({
 
 function ItemRow({
   item,
+  statuses,
   typeName,
   draggable,
   dragging,
@@ -826,6 +936,7 @@ function ItemRow({
   onItemReplace,
 }: {
   item: ProcurementItem;
+  statuses: ProcurementStatus[];
   typeName: string | null;
   draggable: boolean;
   dragging: boolean;
@@ -879,6 +990,29 @@ function ItemRow({
     });
   }
 
+  async function bumpQty(
+    field: "need" | "have" | "transit",
+    delta: number,
+  ) {
+    const values = {
+      need: Number(need) || 0,
+      have: Number(have) || 0,
+      transit: Number(transit) || 0,
+    };
+    const next = Math.max(0, values[field] + delta);
+    if (next === values[field]) return;
+
+    values[field] = next;
+    setNeed(String(values.need));
+    setHave(String(values.have));
+    setTransit(String(values.transit));
+    await onPatch(item.id, {
+      needQty: values.need,
+      haveQty: values.have,
+      inTransitQty: values.transit,
+    });
+  }
+
   async function saveNotes() {
     if (notes === (item.notes ?? "")) return;
     await onPatch(item.id, { notes: notes || null });
@@ -888,18 +1022,13 @@ function ItemRow({
     await onPatch(item.id, { link, linkLabel });
   }
 
-  const liveHighlight = effectiveRowHighlight({
-    ...item,
-    needQty: Number(need) || 0,
-    haveQty: Number(have) || 0,
-    inTransitQty: Number(transit) || 0,
-    remaining,
-  });
-
-  async function setHighlight(color: RowHighlight) {
-    const next = item.highlightColor === color ? null : color;
-    await onPatch(item.id, { highlightColor: next });
+  async function saveStatus(value: string | null) {
+    const statusId = value && value !== "__none__" ? value : null;
+    if (statusId === item.statusId) return;
+    await onPatch(item.id, { statusId });
   }
+
+  const rowStatusColor = item.status?.colorKey;
 
   return (
     <TableRow
@@ -910,7 +1039,7 @@ function ItemRow({
       onDrop={draggable ? onDrop : undefined}
       className={cn(
         dragging && "opacity-50",
-        liveHighlight && ROW_HIGHLIGHT_CLASS[liveHighlight],
+        rowStatusColor && STATUS_ROW_CLASS[rowStatusColor],
       )}
     >
       <TableCell className="w-8 px-2">
@@ -967,33 +1096,27 @@ function ItemRow({
         )}
       </TableCell>
       <TableCell className="px-1">
-        <Input
-          type="number"
-          min={0}
-          className={QTY_INPUT}
+        <QtyStepper
           value={need}
-          onChange={(e) => setNeed(e.target.value)}
+          onChange={setNeed}
           onBlur={saveQty}
+          onBump={(d) => void bumpQty("need", d)}
         />
       </TableCell>
       <TableCell className="px-1">
-        <Input
-          type="number"
-          min={0}
-          className={QTY_INPUT}
+        <QtyStepper
           value={have}
-          onChange={(e) => setHave(e.target.value)}
+          onChange={setHave}
           onBlur={saveQty}
+          onBump={(d) => void bumpQty("have", d)}
         />
       </TableCell>
       <TableCell className="px-1">
-        <Input
-          type="number"
-          min={0}
-          className={QTY_INPUT}
+        <QtyStepper
           value={transit}
-          onChange={(e) => setTransit(e.target.value)}
+          onChange={setTransit}
           onBlur={saveQty}
+          onBump={(d) => void bumpQty("transit", d)}
         />
       </TableCell>
       <TableCell
@@ -1017,24 +1140,42 @@ function ItemRow({
         />
       </TableCell>
       <TableCell className="px-1">
-        <div className="grid grid-cols-2 place-items-center gap-1">
-          {HIGHLIGHT_COLORS.map((c) => (
-            <button
-              key={c}
-              type="button"
-              title={highlightSwatchTitle(c)}
-              onClick={() => setHighlight(c)}
-              className={cn(
-                "size-4 shrink-0 rounded-full border-2 transition-transform hover:scale-110",
-                ROW_SWATCH[c],
-                item.highlightColor === c && "ring-2 ring-foreground ring-offset-1",
-                item.highlightColor === null &&
-                  liveHighlight === c &&
-                  "ring-1 ring-muted-foreground",
+        <Select
+          value={item.statusId ?? "__none__"}
+          onValueChange={(v) => void saveStatus(v)}
+        >
+          <SelectTrigger size="sm" className="h-8 w-full max-w-[7rem] px-1.5">
+            <SelectValue placeholder="—">
+              {item.status ? (
+                <span className="flex min-w-0 items-center gap-1.5">
+                  <span
+                    className={cn(
+                      "size-2 shrink-0 rounded-full border",
+                      STATUS_SWATCH_CLASS[item.status.colorKey],
+                    )}
+                  />
+                  <span className="truncate">{item.status.name}</span>
+                </span>
+              ) : (
+                <span className="text-muted-foreground">—</span>
               )}
-            />
-          ))}
-        </div>
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__none__">—</SelectItem>
+            {statuses.map((s) => (
+              <SelectItem key={s.id} value={s.id}>
+                <span
+                  className={cn(
+                    "size-2 rounded-full border",
+                    STATUS_SWATCH_CLASS[s.colorKey],
+                  )}
+                />
+                {s.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </TableCell>
       <TableCell>
         <Button

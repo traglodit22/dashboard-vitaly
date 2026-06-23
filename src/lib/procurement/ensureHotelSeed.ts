@@ -134,8 +134,11 @@ WHERE c.name = 'Отель'
   );
 `
 
+import { ensureAllCategoryStatuses } from '@/lib/procurement/ensureProcurementStatuses'
+
 export async function ensureHotelProcurement(): Promise<void> {
   await ensureProcurementSchema()
+  await ensureAllCategoryStatuses()
   await ensureHotelSeedOnly()
   await ensureBesedkaProcurement()
 }
