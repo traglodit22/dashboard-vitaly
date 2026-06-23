@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { IMPORTANT_DOCS_SLUG, CLOUD_SLUG, MAX_FILE_MB, type FileFolder } from "@/lib/files/types";
 import { FILES_CHANGED_EVENT, filesCategoryPath, notifyFilesChanged } from "@/lib/files/routes";
 import { reorderById } from "@/lib/files/reorderList";
+import { uploadFileToGcsWithFallback } from "@/lib/files/gcsDirectUpload";
 import { CloudFolderView } from "@/components/files/CloudFolderView";
 import { FilesListToolbar } from "@/components/files/FilesListToolbar";
 import { FilesSubfolderGrid } from "@/components/files/FilesSubfolderGrid";
@@ -292,22 +293,12 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
       throw new Error(String(init.error ?? "Не удалось подготовить загрузку"));
     }
 
-    let putRes: Response;
-    try {
-      const fd = new FormData();
-      fd.append("uploadUrl", init.uploadUrl as string);
-      fd.append("mime", init.mime as string);
-      fd.append("fileName", file.name);
-      fd.append("file", file);
-      putRes = await apiFetch("/api/files/gcs-proxy-put", { method: "POST", body: fd }, 300_000);
-    } catch {
-      throw new Error("Таймаут загрузки в Google Cloud");
-    }
-
-    if (!putRes.ok) {
-      const putData = (await putRes.json().catch(() => ({}))) as { error?: string };
-      throw new Error(String(putData.error ?? "Google Cloud отклонил загрузку"));
-    }
+    await uploadFileToGcsWithFallback({
+      uploadUrl: init.uploadUrl as string,
+      file,
+      mime: init.mime as string,
+      fileName: file.name,
+    });
 
     const doneRes = await apiFetch(
       "/api/files/gcs-complete",
@@ -537,7 +528,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
             <p className="text-xs text-muted-foreground sm:text-sm">
               {category.storageType === "local"
                 ? `PDF и фото на сервере · до ${MAX_FILE_MB} МБ`
-                : `Файлы в Google Cloud Storage · до ${MAX_FILE_MB} МБ`}
+                : `Файлы в Google Cloud · до ${MAX_FILE_MB} МБ через сервер, крупные — напрямую`}
               {currentFolderId && " · вложенная папка"}
             </p>
           </div>

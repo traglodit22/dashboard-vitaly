@@ -38,7 +38,8 @@ function loadConfig() {
   }
 }
 
-const origins = (process.env.GCS_CORS_ORIGINS ?? 'http://135.106.161.215,https://plansolo.ru')
+const origins = (process.env.GCS_CORS_ORIGINS ??
+  'http://135.106.161.215,https://135.106.161.215,http://plansolo.ru,https://plansolo.ru,https://www.plansolo.ru')
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean)
