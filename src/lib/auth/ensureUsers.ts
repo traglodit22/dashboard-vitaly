@@ -11,22 +11,39 @@ CREATE TABLE IF NOT EXISTS dashboard_users (
 `
 
 const NADINA_EMAIL = 'nadina2s@gmail.com'
-// sha256 — пароль задан при деплое через seed
 const NADINA_PASSWORD_HASH =
   'c58b1394bd53504f6416453800e4f7c61e63a4a7f2a53fa9c827e35724fcc8c8'
 
+/** Создаёт таблицу и недостающих пользователей. Не перезаписывает пароли. */
 export async function ensureDashboardUsers(): Promise<void> {
   await pool.query(USERS_DDL)
 
   await pool.query(
     `INSERT INTO dashboard_users (email, password_hash)
      VALUES ($1, $2)
-     ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash`,
+     ON CONFLICT (email) DO NOTHING`,
     [NADINA_EMAIL, NADINA_PASSWORD_HASH],
   )
 
   const adminEmail = process.env.ADMIN_EMAIL?.trim()
   if (!adminEmail) return
+
+  const existing = await query<{ password_hash: string }>(
+    `SELECT password_hash FROM dashboard_users
+     WHERE lower(trim(email)) = lower(trim($1))
+     LIMIT 1`,
+    [adminEmail],
+  )
+
+  if (existing[0]) {
+    await pool.query(
+      `UPDATE system_settings
+       SET admin_password_hash = $1
+       WHERE id = 1 AND (admin_password_hash IS NULL OR admin_password_hash = '')`,
+      [existing[0].password_hash],
+    )
+    return
+  }
 
   const rows = await query<{ admin_password_hash: string | null }>(
     'SELECT admin_password_hash FROM system_settings WHERE id = 1',
@@ -38,8 +55,15 @@ export async function ensureDashboardUsers(): Promise<void> {
   await pool.query(
     `INSERT INTO dashboard_users (email, password_hash)
      VALUES ($1, $2)
-     ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash`,
+     ON CONFLICT (email) DO NOTHING`,
     [adminEmail, activeHash],
+  )
+
+  await pool.query(
+    `UPDATE system_settings
+     SET admin_password_hash = $1
+     WHERE id = 1 AND (admin_password_hash IS NULL OR admin_password_hash = '')`,
+    [activeHash],
   )
 }
 
@@ -57,4 +81,14 @@ export async function findUserByCredentials(
     [email, hash],
   )
   return rows[0] ?? null
+}
+
+export async function listDashboardUsers(): Promise<{ email: string; createdAt: string }[]> {
+  await ensureDashboardUsers()
+  const rows = await query<{ email: string; created_at: string }>(
+    `SELECT email, created_at::text AS created_at
+     FROM dashboard_users
+     ORDER BY created_at ASC`,
+  )
+  return rows.map((r) => ({ email: r.email, createdAt: r.created_at }))
 }
