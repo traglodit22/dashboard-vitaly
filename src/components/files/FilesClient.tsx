@@ -474,8 +474,10 @@ function FileCard({
   const [draft, setDraft] = useState(item.title);
   const [previewFailed, setPreviewFailed] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(true);
+  const [previewRetry, setPreviewRetry] = useState(0);
+  const previewRetryRef = useRef(0);
   const isPdf = item.mimeType === "application/pdf";
-  const previewUrl = `/api/files/${item.id}/preview?v=${encodeURIComponent(item.createdAt)}`;
+  const previewUrl = `/api/files/${item.id}/preview?v=${encodeURIComponent(item.createdAt)}&r=${previewRetry}`;
   const showPreview =
     !previewFailed && (item.hasPreview || item.mimeType.startsWith("image/") || isPdf);
 
@@ -483,6 +485,8 @@ function FileCard({
     setDraft(item.title);
     setPreviewFailed(false);
     setPreviewLoading(true);
+    setPreviewRetry(0);
+    previewRetryRef.current = 0;
   }, [item.id, item.title, item.createdAt]);
 
   return (
@@ -532,6 +536,18 @@ function FileCard({
               )}
               onLoad={() => setPreviewLoading(false)}
               onError={() => {
+                if (
+                  previewRetryRef.current < 2 &&
+                  (isPdf || item.mimeType.startsWith("image/"))
+                ) {
+                  previewRetryRef.current += 1;
+                  const attempt = previewRetryRef.current;
+                  window.setTimeout(() => {
+                    setPreviewRetry(attempt);
+                    setPreviewLoading(true);
+                  }, 1500 * attempt);
+                  return;
+                }
                 setPreviewFailed(true);
                 setPreviewLoading(false);
               }}

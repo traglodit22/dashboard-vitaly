@@ -57,12 +57,9 @@ export async function uploadFileItem(opts: {
   let storagePath: string
   let previewPath: string | null = null
 
-  // Превью PDF — тяжёлое; для GCS — лениво через GET /preview.
-  // Для локальных файлов — уменьшенное превью при загрузке.
+  // Превью PDF/картинок для локальных файлов при загрузке; для GCS — лениво через GET /preview.
   const previewBuffer =
-    opts.storageType !== 'gcs' && isImageMime(opts.mime)
-      ? await buildFilePreview(opts.mime, opts.buffer)
-      : null
+    opts.storageType !== 'gcs' ? await buildFilePreview(opts.mime, opts.buffer) : null
 
   if (opts.storageType === 'gcs') {
     if (!isGcsConfigured()) {

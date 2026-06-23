@@ -83,6 +83,8 @@ rsync -a .next/standalone/ "$RUNTIME_NEW/"
 # Drop stray copies from older broken deploys (must not land in runtime).
 rm -rf "$RUNTIME_NEW/src" "$RUNTIME_NEW/runtime"
 
+bash scripts/stage-pdfjs-assets.sh "$RUNTIME_NEW/node_modules/pdfjs-dist"
+
 if ! verify_bundle "$RUNTIME_NEW"; then
   echo "ERROR: incomplete standalone bundle"
   exit 1
