@@ -6,6 +6,7 @@ import {
   downloadFromGcs,
   gcsObjectKey,
   gcsPreviewKey,
+  getGcsUploadSignedUrl,
   isGcsConfigured,
   uploadToGcs,
 } from '@/lib/files/gcsStorage'
@@ -20,6 +21,7 @@ import {
 import { FILE_ITEM_FROM, FILE_ITEM_SELECT, rowToFileItem } from '@/lib/files/mapRow'
 import { isImageMime } from '@/lib/files/mimeDetect'
 import type { FileStorageType } from '@/lib/files/types'
+import { MAX_FILE_BYTES } from '@/lib/files/types'
 
 async function nextFileSortOrder(categoryId: string, folderId: string | null): Promise<number> {
   const rows = await query<{ next_order: string }>(
@@ -101,6 +103,66 @@ export async function uploadFileItem(opts: {
       opts.originalName,
       opts.mime,
       opts.buffer.length,
+      storagePath,
+      previewPath,
+      await nextFileSortOrder(opts.categoryId, opts.folderId),
+    ],
+  )
+
+  return fetchFileItem(rows[0].id as string)
+}
+
+export async function prepareGcsDirectUpload(opts: {
+  categorySlug: string
+  folderId: string | null
+  originalName: string
+  mime: string
+  sizeBytes: number
+}) {
+  if (!isGcsConfigured()) {
+    throw new Error('Google Cloud Storage не настроен на сервере')
+  }
+  if (opts.sizeBytes > MAX_FILE_BYTES) {
+    throw new Error('Максимальный размер файла — 20 МБ')
+  }
+
+  const fileId = randomUUID()
+  const ext = extForMime(opts.mime)
+  const folderPrefix = opts.folderId ? await getFolderStoragePrefix(opts.folderId) : ''
+  const storagePath = gcsObjectKey(opts.categorySlug, folderPrefix, fileId, ext)
+  const uploadUrl = await getGcsUploadSignedUrl(storagePath, opts.mime)
+
+  return { fileId, uploadUrl, storagePath, mime: opts.mime }
+}
+
+export async function completeGcsDirectUpload(opts: {
+  fileId: string
+  categoryId: string
+  categorySlug: string
+  folderId: string | null
+  title: string
+  originalName: string
+  mime: string
+  sizeBytes: number
+}) {
+  const ext = extForMime(opts.mime)
+  const folderPrefix = opts.folderId ? await getFolderStoragePrefix(opts.folderId) : ''
+  const storagePath = gcsObjectKey(opts.categorySlug, folderPrefix, opts.fileId, ext)
+  const previewPath = isImageMime(opts.mime) ? storagePath : null
+
+  const rows = await query<Record<string, unknown>>(
+    `INSERT INTO file_items
+      (id, category_id, folder_id, title, original_name, mime_type, size_bytes, storage_path, preview_path, sort_order)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+     RETURNING id`,
+    [
+      opts.fileId,
+      opts.categoryId,
+      opts.folderId,
+      opts.title,
+      opts.originalName,
+      opts.mime,
+      opts.sizeBytes,
       storagePath,
       previewPath,
       await nextFileSortOrder(opts.categoryId, opts.folderId),

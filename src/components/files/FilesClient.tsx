@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { apiFetch } from "@/lib/apiFetch";
+import { apiFetch, fetchWithTimeout } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
 import { IMPORTANT_DOCS_SLUG } from "@/lib/files/types";
 import { FILES_CHANGED_EVENT, filesCategoryPath, notifyFilesChanged } from "@/lib/files/routes";
@@ -155,6 +155,84 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     void persistFileOrder(next);
   }
 
+  async function uploadGcsFile(file: File): Promise<FileItem> {
+    const initRes = await apiFetch(
+      "/api/files/gcs-upload-url",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          categorySlug,
+          folderId: currentFolderId,
+          fileName: file.name,
+          size: file.size,
+          mime: file.type || "",
+        }),
+      },
+      20_000,
+    );
+    const init = await initRes.json();
+    if (!initRes.ok) {
+      throw new Error(String(init.error ?? "Не удалось подготовить загрузку"));
+    }
+
+    let putRes: Response;
+    try {
+      putRes = await fetchWithTimeout(
+        init.uploadUrl as string,
+        {
+          method: "PUT",
+          body: file,
+          headers: { "Content-Type": init.mime as string },
+        },
+        120_000,
+      );
+    } catch {
+      throw new Error("Таймаут загрузки в Google Cloud");
+    }
+
+    if (!putRes.ok) {
+      throw new Error(
+        "Google Cloud отклонил загрузку. На сервере выполните: node scripts/configure-gcs-cors.mjs",
+      );
+    }
+
+    const doneRes = await apiFetch(
+      "/api/files/gcs-complete",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fileId: init.fileId,
+          categorySlug,
+          folderId: currentFolderId,
+          fileName: file.name,
+          size: file.size,
+          mime: init.mime,
+        }),
+      },
+      20_000,
+    );
+    const done = await doneRes.json();
+    if (!doneRes.ok) {
+      throw new Error(String(done.error ?? "Не удалось сохранить файл"));
+    }
+    return done.item as FileItem;
+  }
+
+  async function uploadLocalFile(file: File): Promise<FileItem> {
+    const fd = new FormData();
+    fd.append("categorySlug", categorySlug);
+    if (currentFolderId) fd.append("folderId", currentFolderId);
+    fd.append("file", file);
+    const res = await apiFetch("/api/files", { method: "POST", body: fd }, 120_000);
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(String(data.error ?? "Ошибка загрузки"));
+    }
+    return data.item as FileItem;
+  }
+
   async function uploadFiles(fileList: FileList | File[]) {
     if (!category) return;
     if (category.storageType === "gcs" && !gcsConfigured) {
@@ -170,31 +248,22 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     try {
       for (const file of files) {
         setUploadLabel(file.name);
-        let uploaded = false;
-        for (let attempt = 0; attempt < 3 && !uploaded; attempt++) {
-          if (attempt > 0) await new Promise((r) => setTimeout(r, 2000 * attempt));
-          const fd = new FormData();
-          fd.append("categorySlug", categorySlug);
-          if (currentFolderId) fd.append("folderId", currentFolderId);
-          fd.append("file", file);
-          const res = await apiFetch("/api/files", { method: "POST", body: fd });
-          const data = await res.json();
-          if (res.ok) {
-            ok += 1;
-            setItems((prev) => [...prev, data.item]);
-            uploaded = true;
-          } else if (attempt === 2 || !String(data.error ?? "").includes("Google Cloud")) {
-            toast.error(`«${file.name}»`, { description: data.error });
-            break;
-          }
+        try {
+          const item =
+            category.storageType === "gcs"
+              ? await uploadGcsFile(file)
+              : await uploadLocalFile(file);
+          ok += 1;
+          setItems((prev) => [...prev, item]);
+        } catch (err) {
+          const message = err instanceof Error ? err.message : "Ошибка загрузки";
+          toast.error(`«${file.name}»`, { description: message });
         }
       }
       if (ok > 0) {
         notifyFilesChanged();
         toast.success(ok === 1 ? "Файл загружен" : `Загружено файлов: ${ok}`);
       }
-    } catch {
-      toast.error("Ошибка загрузки", { description: "Проверьте соединение и попробуйте снова" });
     } finally {
       setUploading(false);
       setUploadLabel(null);

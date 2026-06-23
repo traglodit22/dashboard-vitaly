@@ -56,23 +56,6 @@ function invalidateStorageClient(): void {
   storagePromise = null
 }
 
-async function warmAuthToken(auth: GoogleAuth): Promise<void> {
-  const attempts = 5
-  let lastError: unknown
-  for (let i = 0; i < attempts; i++) {
-    try {
-      const token = await auth.getAccessToken()
-      if (token) return
-      throw new Error('Пустой токен GCS')
-    } catch (err) {
-      lastError = err
-      console.error(`[gcs] auth token attempt ${i + 1}/${attempts} failed:`, err)
-      if (i < attempts - 1) await sleep(1200 * (i + 1))
-    }
-  }
-  throw lastError
-}
-
 async function buildStorageClient(): Promise<Storage> {
   if (!process.env.GCS_BUCKET?.trim()) {
     throw new Error('GCS_BUCKET не задан')
@@ -85,18 +68,37 @@ async function buildStorageClient(): Promise<Storage> {
     scopes: GCS_SCOPES,
     clientOptions: {
       transporterOptions: {
-        timeout: 90_000,
+        timeout: 30_000,
       },
     },
   })
-
-  await warmAuthToken(auth)
 
   return new Storage({
     authClient: auth,
     projectId,
     retryOptions: GCS_RETRY_OPTIONS,
   })
+}
+
+/** Подпись URL локально — без OAuth-запросов к Google. */
+function getSigningStorage(): Storage {
+  const { projectId, credentials } = loadCredentials()
+  return new Storage({ projectId, credentials })
+}
+
+/** Signed URL для прямой загрузки из браузера в GCS (обходит VPS→Google). */
+export async function getGcsUploadSignedUrl(
+  objectKey: string,
+  contentType: string,
+): Promise<string> {
+  const storage = getSigningStorage()
+  const [url] = await storage.bucket(gcsBucketName()).file(objectKey).getSignedUrl({
+    version: 'v4',
+    action: 'write',
+    expires: Date.now() + 20 * 60 * 1000,
+    contentType,
+  })
+  return url
 }
 
 async function getStorage(): Promise<Storage> {

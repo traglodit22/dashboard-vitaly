@@ -134,4 +134,15 @@ else
   echo "WARNING: CRON_SECRET not set, skip migrate-db"
 fi
 
+echo "==> GCS bucket CORS (direct browser upload)"
+if grep -qE '^GCS_BUCKET=' .env 2>/dev/null; then
+  set +e
+  node scripts/configure-gcs-cors.mjs
+  cors_rc=$?
+  set -e
+  if [[ $cors_rc -ne 0 ]]; then
+    echo "WARNING: GCS CORS setup exited with code $cors_rc"
+  fi
+fi
+
 echo "==> Deploy finished"
