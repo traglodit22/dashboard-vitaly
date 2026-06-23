@@ -19,7 +19,7 @@ import {
   saveLocalPreview,
 } from '@/lib/files/localStorage'
 import { FILE_ITEM_FROM, FILE_ITEM_SELECT, rowToFileItem } from '@/lib/files/mapRow'
-import { isImageMime } from '@/lib/files/mimeDetect'
+import { isImageMime, isPdfMime } from '@/lib/files/mimeDetect'
 import type { FileStorageType } from '@/lib/files/types'
 import { MAX_FILE_BYTES } from '@/lib/files/types'
 
@@ -57,9 +57,11 @@ export async function uploadFileItem(opts: {
   let storagePath: string
   let previewPath: string | null = null
 
-  // Превью PDF/картинок для локальных файлов при загрузке; для GCS — лениво через GET /preview.
+  // Превью картинок при загрузке; PDF — лениво через GET /preview (тяжёлая операция).
   const previewBuffer =
-    opts.storageType !== 'gcs' ? await buildFilePreview(opts.mime, opts.buffer) : null
+    opts.storageType !== 'gcs' && isImageMime(opts.mime)
+      ? await buildFilePreview(opts.mime, opts.buffer, opts.originalName)
+      : null
 
   if (opts.storageType === 'gcs') {
     if (!isGcsConfigured()) {
@@ -194,12 +196,13 @@ export async function ensureFilePreview(row: Record<string, unknown>): Promise<B
   if (existing) return existing
 
   const mime = row.mime_type as string
+  const originalName = row.original_name as string
   const storageType = row.category_storage_type as string
   const categorySlug = row.category_slug as string
   const fileId = row.id as string
   const folderId = (row.folder_id as string) ?? null
 
-  if (mime !== 'application/pdf' && !mime.startsWith('image/')) return null
+  if (!isPdfMime(mime, originalName) && !mime.startsWith('image/')) return null
 
   const content = await readFileContent(row)
   const folderPrefix = folderId ? await getFolderStoragePrefix(folderId) : ''
@@ -213,8 +216,14 @@ export async function ensureFilePreview(row: Record<string, unknown>): Promise<B
     return content
   }
 
-  const previewBuffer = await buildFilePreview(mime, content)
+  const previewBuffer = await buildFilePreview(mime, content, originalName)
   if (!previewBuffer) {
+    console.error('[files] preview generation returned null', {
+      fileId,
+      mime,
+      originalName,
+      storageType,
+    })
     return mime.startsWith('image/') ? content : null
   }
 

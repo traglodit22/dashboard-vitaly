@@ -30,8 +30,9 @@ export function resolveUploadMime(fileName: string, reportedType: string): strin
   throw new Error('Допустимы PDF и изображения (JPEG, PNG, WebP, GIF)')
 }
 
-export function isPdfMime(mime: string): boolean {
-  return mime === 'application/pdf'
+export function isPdfMime(mime: string, fileName?: string): boolean {
+  if (mime === 'application/pdf' || mime === 'application/x-pdf') return true
+  return fileName?.toLowerCase().endsWith('.pdf') ?? false
 }
 
 export function isImageMime(mime: string): boolean {

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth/requireAuth'
-import { fetchFileRow, ensureFilePreview, readFileContent } from '@/lib/files/fileService'
+import { fetchFileRow, ensureFilePreview, readFilePreview, readFileContent } from '@/lib/files/fileService'
 import { getGcsReadSignedUrl } from '@/lib/files/gcsStorage'
 
 export const runtime = 'nodejs'
@@ -30,6 +30,18 @@ export async function GET(
   ) {
     const url = await getGcsReadSignedUrl(previewPath)
     return NextResponse.redirect(url, 307)
+  }
+
+  if (storageType === 'local' && previewPath) {
+    const cached = await readFilePreview(row)
+    if (cached) {
+      return new NextResponse(new Uint8Array(cached), {
+        headers: {
+          'Content-Type': previewPath.endsWith('.webp') ? 'image/webp' : fileMime,
+          'Cache-Control': 'private, max-age=3600',
+        },
+      })
+    }
   }
 
   let buffer = await ensureFilePreview(row)

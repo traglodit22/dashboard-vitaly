@@ -487,6 +487,7 @@ function FileCard({
 
   useEffect(() => {
     if (!showPreview) return;
+    const waitMs = isPdf ? 60_000 : 30_000;
     const timer = window.setTimeout(() => {
       setPreviewLoading((loading) => {
         if (!loading) return loading;
@@ -498,9 +499,9 @@ function FileCard({
         setPreviewFailed(true);
         return false;
       });
-    }, 30_000);
+    }, waitMs);
     return () => window.clearTimeout(timer);
-  }, [previewUrl, showPreview]);
+  }, [previewUrl, showPreview, isPdf]);
 
   return (
     <Card

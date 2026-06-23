@@ -1,3 +1,4 @@
+import fs from 'fs'
 import path from 'path'
 import { pathToFileURL } from 'url'
 import { createRequire } from 'module'
@@ -5,14 +6,32 @@ import { createCanvas } from '@napi-rs/canvas'
 
 const require = createRequire(import.meta.url)
 
+let pdfjsConfigured = false
+
+function pdfjsPackageDir(): string {
+  return path.dirname(require.resolve('pdfjs-dist/package.json'))
+}
+
 function pdfjsAssetUrl(subdir: string): string {
-  const pkgDir = path.dirname(require.resolve('pdfjs-dist/package.json'))
-  return `${pathToFileURL(path.join(pkgDir, subdir)).href}/`
+  return `${pathToFileURL(path.join(pdfjsPackageDir(), subdir)).href}/`
+}
+
+async function configurePdfJs(): Promise<typeof import('pdfjs-dist/legacy/build/pdf.mjs')> {
+  const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs')
+  if (!pdfjsConfigured) {
+    const workerPath = path.join(pdfjsPackageDir(), 'legacy/build/pdf.worker.mjs')
+    if (!fs.existsSync(workerPath)) {
+      throw new Error(`pdf.worker.mjs не найден: ${workerPath}`)
+    }
+    pdfjs.GlobalWorkerOptions.workerSrc = pathToFileURL(workerPath).href
+    pdfjsConfigured = true
+  }
+  return pdfjs
 }
 
 /** Рендер первой страницы PDF в WebP-превью. */
 export async function renderPdfPreview(pdfBuffer: Buffer): Promise<Buffer | null> {
-  const timeoutMs = 25_000
+  const timeoutMs = 50_000
   try {
     return await Promise.race([
       renderPdfPreviewInner(pdfBuffer),
@@ -26,7 +45,7 @@ export async function renderPdfPreview(pdfBuffer: Buffer): Promise<Buffer | null
 
 async function renderPdfPreviewInner(pdfBuffer: Buffer): Promise<Buffer | null> {
   try {
-    const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs')
+    const pdfjs = await configurePdfJs()
     const loadingTask = pdfjs.getDocument({
       data: new Uint8Array(pdfBuffer),
       useSystemFonts: true,
@@ -77,8 +96,18 @@ export async function renderImagePreview(imageBuffer: Buffer): Promise<Buffer | 
 export async function buildFilePreview(
   mime: string,
   buffer: Buffer,
+  originalName?: string,
 ): Promise<Buffer | null> {
-  if (mime === 'application/pdf') return renderPdfPreview(buffer)
-  if (mime.startsWith('image/')) return renderImagePreview(buffer)
+  const effectiveMime = resolvePreviewMime(mime, originalName)
+  if (effectiveMime === 'application/pdf') return renderPdfPreview(buffer)
+  if (effectiveMime.startsWith('image/')) return renderImagePreview(buffer)
   return null
+}
+
+export function resolvePreviewMime(mime: string, originalName?: string): string {
+  if (mime === 'application/pdf' || mime === 'application/x-pdf') return 'application/pdf'
+  if (mime.startsWith('image/')) return mime
+  const ext = originalName?.split('.').pop()?.toLowerCase()
+  if (ext === 'pdf') return 'application/pdf'
+  return mime
 }
