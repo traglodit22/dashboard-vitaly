@@ -3,6 +3,7 @@ import { query } from '@/lib/db/index'
 import { getShipmentStatuses } from '@/lib/delivery/client'
 import { getStatusName } from '@/lib/delivery/statuses'
 import { sendMessage } from '@/lib/telegram/bot'
+import { fetchProviderBalance, mapWithConcurrency } from '@/lib/balances/fetchBalance'
 import type { ProductOrder, StoreType, OrderStatus } from '@/types'
 
 export const runtime = 'nodejs'
@@ -144,47 +145,29 @@ export async function GET(req: Request) {
 async function checkBalances(chatIds: string[], notifyEnabled: boolean) {
   try {
     const rows = await query<Record<string, unknown>>(
-      `SELECT id, name, api_url, api_key, threshold, currency, extra_params, response_type
+      `SELECT id, name, api_url, api_key, threshold, currency,
+              extra_params, response_type, response_path, request_method, key_param_name
        FROM balance_providers WHERE active = true ORDER BY name`,
     )
     if (rows.length === 0) return
 
     const low: { name: string; balance: number; threshold: number; currency: string }[] = []
 
-    await Promise.all(rows.map(async (row) => {
+    await mapWithConcurrency(rows, 4, async (row) => {
       try {
-        const extraParams = (row.extra_params as string) || ''
-        const reqBody = `key=${encodeURIComponent(row.api_key as string)}${extraParams ? '&' + extraParams : ''}`
-
-        const res = await fetch(row.api_url as string, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: reqBody,
-          signal: AbortSignal.timeout(10000),
-        })
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-
-        const responseType = (row.response_type as string) || 'json'
-        let balance: number | null = null
-
-        if (responseType === 'text') {
-          const text = (await res.text()).trim()
-          const num = parseFloat(text)
-          if (isNaN(num)) throw new Error(`Ответ не является числом: "${text.substring(0, 50)}"`)
-          balance = num
-        } else {
-          const data = await res.json() as Record<string, unknown>
-          if (data.error) throw new Error(String(data.error))
-          balance = data.balance != null ? Number(data.balance) : null
-          if (balance === null) throw new Error('Поле balance отсутствует в ответе')
-        }
+        const balance = await fetchProviderBalance(row)
 
         await query(
           `UPDATE balance_providers SET last_balance = $1, last_checked_at = NOW(), last_error = NULL WHERE id = $2`,
           [balance, row.id],
         )
         if (balance < Number(row.threshold)) {
-          low.push({ name: row.name as string, balance, threshold: Number(row.threshold), currency: (row.currency as string) ?? 'USD' })
+          low.push({
+            name: row.name as string,
+            balance,
+            threshold: Number(row.threshold),
+            currency: (row.currency as string) ?? 'USD',
+          })
         }
       } catch (e) {
         const errMsg = e instanceof Error ? e.message : String(e)
@@ -193,7 +176,7 @@ async function checkBalances(chatIds: string[], notifyEnabled: boolean) {
           [errMsg, row.id],
         )
       }
-    }))
+    })
 
     if (notifyEnabled && chatIds.length > 0 && low.length > 0) {
       const dateStr = new Date().toLocaleString('ru-RU', {

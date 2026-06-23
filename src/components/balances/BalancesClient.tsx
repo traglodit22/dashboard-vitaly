@@ -119,10 +119,13 @@ export function BalancesClient() {
         return;
       }
       await load();
+      const failed = (data.results ?? []).filter((r: { error?: string }) => r.error).length;
       if (data.low?.length > 0) {
         toast.warning(
-          `Проверено: ${data.checked}. Низкий баланс у ${data.low.length} сервисов.`,
+          `Проверено: ${data.checked}. Низкий баланс у ${data.low.length} сервисов${failed ? `, ошибок: ${failed}` : ""}.`,
         );
+      } else if (failed > 0) {
+        toast.warning(`Проверено: ${data.checked}. Ошибок: ${failed} (баланс сохранён с прошлой проверки).`);
       } else {
         toast.success(`Проверено: ${data.checked}. Всё в норме.`);
       }
@@ -220,18 +223,24 @@ export function BalancesClient() {
                         ) : p.name}
                       </TableCell>
                       <TableCell className="text-right font-mono tabular-nums">
-                        {p.lastError ? (
-                          <span className="flex items-center justify-end gap-1 text-destructive" title={p.lastError}>
-                            <AlertCircle className="size-3.5 shrink-0" />
-                            <span className="max-w-[140px] truncate text-xs">{p.lastError}</span>
-                          </span>
-                        ) : p.lastBalance !== null ? (
-                          <span className={cn(isLow && "font-semibold text-red-500")}>
-                            {numFmt.format(p.lastBalance)}
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground">—</span>
-                        )}
+                        <div className="flex flex-col items-end gap-0.5">
+                          {p.lastBalance !== null ? (
+                            <span className={cn(isLow && "font-semibold text-red-500")}>
+                              {numFmt.format(p.lastBalance)}
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                          {p.lastError && (
+                            <span
+                              className="flex max-w-[180px] items-center justify-end gap-1 text-xs text-destructive"
+                              title={p.lastError}
+                            >
+                              <AlertCircle className="size-3 shrink-0" />
+                              <span className="truncate">{p.lastError}</span>
+                            </span>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="text-right font-mono tabular-nums text-muted-foreground">
                         {numFmt.format(p.threshold)}
