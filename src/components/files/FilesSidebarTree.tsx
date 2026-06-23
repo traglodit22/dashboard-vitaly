@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChevronDown, ChevronRight, Folder, FolderPlus, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Folder, FolderPlus, Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -128,6 +128,21 @@ export function FilesSidebarTree() {
     }
   }
 
+  async function deleteFolder(folder: FileFolder) {
+    if (!confirm(`Удалить папку «${folder.name}»?`)) return
+    const res = await apiFetch(`/api/files/folders/${folder.id}`, { method: "DELETE" })
+    const data = await res.json()
+    if (res.ok) {
+      notifyFilesChanged()
+      if (currentFolderId === folder.id) {
+        router.push(filesCategoryPath(categorySlug!))
+      }
+      toast.success("Папка удалена")
+    } else {
+      toast.error("Не удалось удалить", { description: data.error })
+    }
+  }
+
   function toggleExpand(id: string) {
     setExpanded((prev) => {
       const next = new Set(prev)
@@ -171,6 +186,7 @@ export function FilesSidebarTree() {
               currentFolderId={currentFolderId}
               expanded={expanded}
               onToggle={toggleExpand}
+              onDelete={deleteFolder}
             />
           ))}
           {!loading && tree.length === 0 && (
@@ -234,6 +250,7 @@ function FolderTreeNode({
   currentFolderId,
   expanded,
   onToggle,
+  onDelete,
 }: {
   node: FolderNode
   depth: number
@@ -241,6 +258,7 @@ function FolderTreeNode({
   currentFolderId: string | null
   expanded: Set<string>
   onToggle: (id: string) => void
+  onDelete: (folder: FileFolder) => void
 }) {
   const hasChildren = node.children.length > 0
   const isOpen = expanded.has(node.id)
@@ -249,7 +267,7 @@ function FolderTreeNode({
   return (
     <div>
       <div
-        className="flex items-center gap-0.5"
+        className="group flex items-center gap-0.5"
         style={{ paddingLeft: `${depth * 12 + 4}px` }}
       >
         {hasChildren ? (
@@ -267,7 +285,7 @@ function FolderTreeNode({
         <Link
           href={filesCategoryPath(categorySlug, node.id)}
           className={cn(
-            "flex min-w-0 flex-1 items-center gap-1.5 rounded-md py-1 pr-2 text-sm transition-colors",
+            "flex min-w-0 flex-1 items-center gap-1.5 rounded-md py-1 pr-1 text-sm transition-colors",
             isActive
               ? "bg-primary/15 font-medium text-primary"
               : "text-muted-foreground hover:bg-accent hover:text-foreground",
@@ -277,6 +295,17 @@ function FolderTreeNode({
           <Folder className="size-3.5 shrink-0 text-amber-500" />
           <span className="truncate">{node.name}</span>
         </Link>
+        <button
+          type="button"
+          aria-label={`Удалить ${node.name}`}
+          className="flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
+          onClick={(e) => {
+            e.preventDefault()
+            onDelete(node)
+          }}
+        >
+          <Trash2 className="size-3" />
+        </button>
       </div>
       {hasChildren && isOpen &&
         node.children.map((child) => (
@@ -288,6 +317,7 @@ function FolderTreeNode({
             currentFolderId={currentFolderId}
             expanded={expanded}
             onToggle={onToggle}
+            onDelete={onDelete}
           />
         ))}
     </div>

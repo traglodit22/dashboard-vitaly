@@ -3,11 +3,6 @@ import { query } from '@/lib/db/index'
 import type { FileStorageType } from '@/lib/files/types'
 import { FOLDER_KEEP_NAME } from '@/lib/files/types'
 import { rowToFileFolder } from '@/lib/files/mapRow'
-import {
-  deleteFromGcs,
-  gcsFolderKeepKey,
-  uploadToGcs,
-} from '@/lib/files/gcsStorage'
 import { ensureLocalFolder, removeLocalFolderKeep } from '@/lib/files/localStorage'
 
 export async function getFolderStoragePrefix(folderId: string): Promise<string> {
@@ -74,11 +69,10 @@ export async function createFolder(opts: {
     [id, opts.categoryId, opts.parentId, trimmed],
   )
 
-  const prefix = await getFolderStoragePrefix(id)
+  const prefix =
+    opts.storageType !== 'gcs' ? await getFolderStoragePrefix(id) : ''
 
-  if (opts.storageType === 'gcs') {
-    await uploadToGcs(gcsFolderKeepKey(opts.categorySlug, prefix), Buffer.alloc(0), 'text/plain')
-  } else {
+  if (opts.storageType !== 'gcs') {
     await ensureLocalFolder(opts.categorySlug, prefix)
   }
 
@@ -117,13 +111,10 @@ export async function deleteFolder(folderId: string): Promise<void> {
   const cat = catRows[0]
   if (!cat) throw new Error('Категория не найдена')
 
-  const prefix = await getFolderStoragePrefix(folderId)
-
   await query('DELETE FROM file_folders WHERE id = $1', [folderId])
 
-  if (cat.storage_type === 'gcs') {
-    await deleteFromGcs(gcsFolderKeepKey(cat.slug, prefix))
-  } else {
+  if (cat.storage_type !== 'gcs') {
+    const prefix = await getFolderStoragePrefix(folderId)
     await removeLocalFolderKeep(cat.slug, prefix)
   }
 }
