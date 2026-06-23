@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChevronDown, ChevronRight, Folder, FolderPlus, GripVertical, Loader2, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Folder, FolderPlus, GripVertical, Loader2, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -185,6 +185,26 @@ export function FilesSidebarTree() {
     void persistFolderOrder(parentId, next)
   }
 
+  async function renameFolderItem(folder: FileFolder, name: string) {
+    const trimmed = name.trim()
+    if (!trimmed || trimmed === folder.name) return
+
+    const res = await apiFetch(`/api/files/folders/${folder.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: trimmed }),
+    })
+    const data = await res.json()
+    if (res.ok && data.folder) {
+      setFolders((prev) =>
+        prev.map((f) => (f.id === folder.id ? { ...f, name: data.folder.name } : f)),
+      )
+      notifyFilesChanged()
+    } else {
+      toast.error("Не удалось переименовать", { description: data.error })
+    }
+  }
+
   async function deleteFolder(folder: FileFolder) {
     if (!confirm(`Удалить папку «${folder.name}»?`)) return
     const res = await apiFetch(`/api/files/folders/${folder.id}`, { method: "DELETE" })
@@ -249,6 +269,7 @@ export function FilesSidebarTree() {
               dragFolderId={dragFolderId}
               onToggle={toggleExpand}
               onDelete={deleteFolder}
+              onRename={renameFolderItem}
               onCreateSubfolder={startCreate}
               onDragStart={setDragFolderId}
               onDragEnd={() => setDragFolderId(null)}
@@ -322,6 +343,7 @@ function FolderTreeNode({
   dragFolderId,
   onToggle,
   onDelete,
+  onRename,
   onCreateSubfolder,
   onDragStart,
   onDragEnd,
@@ -336,6 +358,7 @@ function FolderTreeNode({
   dragFolderId: string | null
   onToggle: (id: string) => void
   onDelete: (folder: FileFolder) => void
+  onRename: (folder: FileFolder, name: string) => void
   onCreateSubfolder: (parentId: string) => void
   onDragStart: (id: string) => void
   onDragEnd: () => void
@@ -346,6 +369,13 @@ function FolderTreeNode({
   const isActive = currentFolderId === node.id
   const isDragging = dragFolderId === node.id
   const canDrag = siblingCount > 1
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(node.name)
+
+  useEffect(() => {
+    setDraft(node.name)
+  }, [node.name])
+
   const isOnPath =
     isActive ||
     node.children.some(function walk(n: FolderNode): boolean {
@@ -406,6 +436,11 @@ function FolderTreeNode({
                 : "text-muted-foreground hover:bg-accent hover:text-foreground",
           )}
           title={node.name}
+          onDoubleClick={(e) => {
+            e.preventDefault()
+            setDraft(node.name)
+            setEditing(true)
+          }}
         >
           <Folder
             className={cn(
@@ -413,8 +448,44 @@ function FolderTreeNode({
               isActive ? "text-primary" : "text-amber-500",
             )}
           />
-          <span className="truncate">{node.name}</span>
+          {editing ? (
+            <Input
+              autoFocus
+              className="h-6 min-w-0 flex-1 px-1 text-xs"
+              value={draft}
+              onClick={(e) => e.preventDefault()}
+              onChange={(e) => setDraft(e.target.value)}
+              onBlur={() => {
+                setEditing(false)
+                void onRename(node, draft)
+              }}
+              onKeyDown={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                if (e.key === "Enter") (e.target as HTMLInputElement).blur()
+                if (e.key === "Escape") {
+                  setDraft(node.name)
+                  setEditing(false)
+                }
+              }}
+            />
+          ) : (
+            <span className="truncate">{node.name}</span>
+          )}
         </Link>
+        <button
+          type="button"
+          aria-label={`Переименовать «${node.name}»`}
+          title="Переименовать"
+          className="flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground opacity-0 transition-opacity hover:bg-accent hover:text-foreground group-hover:opacity-100"
+          onClick={(e) => {
+            e.preventDefault()
+            setDraft(node.name)
+            setEditing(true)
+          }}
+        >
+          <Pencil className="size-3" />
+        </button>
         <button
           type="button"
           aria-label={`Подпапка в «${node.name}»`}
@@ -452,6 +523,7 @@ function FolderTreeNode({
             dragFolderId={dragFolderId}
             onToggle={onToggle}
             onDelete={onDelete}
+            onRename={onRename}
             onCreateSubfolder={onCreateSubfolder}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}

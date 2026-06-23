@@ -129,12 +129,27 @@ export async function deleteFolder(folderId: string): Promise<void> {
 export async function renameFolder(folderId: string, name: string) {
   const trimmed = name.trim()
   if (!trimmed) throw new Error('Укажите название папки')
+  if (trimmed.length > 120) throw new Error('Слишком длинное название')
+
+  const existing = await query<{ id: string; category_id: string; parent_id: string | null }>(
+    'SELECT id, category_id, parent_id FROM file_folders WHERE id = $1',
+    [folderId],
+  )
+  const folder = existing[0]
+  if (!folder) throw new Error('Папка не найдена')
+
+  const dup = await query<{ id: string }>(
+    `SELECT id FROM file_folders
+     WHERE category_id = $1 AND parent_id IS NOT DISTINCT FROM $2
+       AND lower(name) = lower($3) AND id <> $4`,
+    [folder.category_id, folder.parent_id, trimmed, folderId],
+  )
+  if (dup.length) throw new Error('Папка с таким названием уже есть')
 
   const rows = await query<Record<string, unknown>>(
     `UPDATE file_folders SET name = $1 WHERE id = $2 RETURNING *`,
     [trimmed, folderId],
   )
-  if (!rows.length) throw new Error('Папка не найдена')
   return rowToFileFolder(rows[0])
 }
 
