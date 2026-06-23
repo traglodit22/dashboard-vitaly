@@ -341,6 +341,51 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
   const locationTitle =
     breadcrumb.length > 0 ? breadcrumb[breadcrumb.length - 1]!.name : (category?.name ?? "Файлы");
 
+  const uploadZone = (
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed px-4 py-10 text-center transition-colors",
+        uploading ? "opacity-60" : "cursor-pointer hover:border-primary/50 hover:bg-muted/30",
+      )}
+      onClick={() => !uploading && inputRef.current?.click()}
+      onDragOver={(e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "copy";
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        if (!uploading && e.dataTransfer.files.length) void uploadFiles(e.dataTransfer.files);
+      }}
+    >
+      <input
+        ref={inputRef}
+        type="file"
+        className="hidden"
+        multiple
+        accept={categorySlug === IMPORTANT_DOCS_SLUG ? "application/pdf,image/*,.pdf" : undefined}
+        onChange={(e) => {
+          if (e.target.files?.length) void uploadFiles(e.target.files);
+          e.target.value = "";
+        }}
+      />
+      {uploading ? (
+        <Loader2 className="size-8 animate-spin text-muted-foreground" />
+      ) : (
+        <Upload className="size-8 text-muted-foreground" />
+      )}
+      <p className="text-sm font-medium">
+        {uploading
+          ? uploadLabel
+            ? `Загрузка «${uploadLabel}»…`
+            : "Загрузка…"
+          : "Перетащите файлы сюда или нажмите «Загрузить»"}
+      </p>
+      {!uploading && listItems.length > 1 && !isCloudFolder && (
+        <p className="text-xs text-muted-foreground">Порядок карточек — перетаскиванием</p>
+      )}
+    </div>
+  );
+
   if (loading) {
     return (
       <div className="flex justify-center py-16">
@@ -415,48 +460,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
         </Card>
       )}
 
-      <div
-        className={cn(
-          "mb-6 flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed px-4 py-10 text-center transition-colors",
-          uploading ? "opacity-60" : "cursor-pointer hover:border-primary/50 hover:bg-muted/30",
-        )}
-        onClick={() => !uploading && inputRef.current?.click()}
-        onDragOver={(e) => {
-          e.preventDefault();
-          e.dataTransfer.dropEffect = "copy";
-        }}
-        onDrop={(e) => {
-          e.preventDefault();
-          if (!uploading && e.dataTransfer.files.length) void uploadFiles(e.dataTransfer.files);
-        }}
-      >
-        <input
-          ref={inputRef}
-          type="file"
-          className="hidden"
-          multiple
-          accept={categorySlug === IMPORTANT_DOCS_SLUG ? "application/pdf,image/*,.pdf" : undefined}
-          onChange={(e) => {
-            if (e.target.files?.length) void uploadFiles(e.target.files);
-            e.target.value = "";
-          }}
-        />
-        {uploading ? (
-          <Loader2 className="size-8 animate-spin text-muted-foreground" />
-        ) : (
-          <Upload className="size-8 text-muted-foreground" />
-        )}
-        <p className="text-sm font-medium">
-          {uploading
-            ? uploadLabel
-              ? `Загрузка «${uploadLabel}»…`
-              : "Загрузка…"
-            : "Перетащите файлы сюда или нажмите «Загрузить»"}
-        </p>
-        {!uploading && listItems.length > 1 && (
-          <p className="text-xs text-muted-foreground">Порядок карточек — перетаскиванием</p>
-        )}
-      </div>
+      {!isCloudFolder && uploadZone}
 
       {isCloudFolder ? (
         <CloudFolderView
@@ -499,6 +503,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
             );
             void persistFileOrder(ordered, "files");
           }}
+          uploadSlot={uploadZone}
           renderFileCard={(item, opts) => (
             <FileCard
               key={item.id}

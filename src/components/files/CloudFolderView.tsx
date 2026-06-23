@@ -34,6 +34,7 @@ interface CloudFolderViewProps {
   onDragEnd: () => void;
   onGalleryReorder: (ordered: CloudFileItem[]) => void;
   onListReorder: (ordered: CloudFileItem[]) => void;
+  uploadSlot?: React.ReactNode;
   renderFileCard: (
     item: CloudFileItem,
     opts: {
@@ -62,6 +63,7 @@ export function CloudFolderView({
   onDragEnd,
   onGalleryReorder,
   onListReorder,
+  uploadSlot,
   renderFileCard,
 }: CloudFolderViewProps) {
   const [textDraft, setTextDraft] = useState(folder.folderText);
@@ -219,22 +221,17 @@ export function CloudFolderView({
       </div>
 
       {folder.moduleTextEnabled && (
-        <div className="flex justify-end">
-          <div className="relative w-full max-w-2xl">
-            <textarea
-              className="min-h-[120px] w-full resize-y rounded-xl border border-border bg-card px-4 py-3 text-sm leading-relaxed shadow-sm outline-none ring-primary/20 transition-shadow focus:ring-2"
-              placeholder="Текст для этой папки — отображается сверху справа"
-              value={textDraft}
-              onChange={(e) => {
-                setTextDraft(e.target.value);
-                scheduleTextSave(e.target.value);
-              }}
-            />
-            {savingText && (
-              <Loader2 className="absolute right-3 top-3 size-4 animate-spin text-muted-foreground" />
-            )}
-          </div>
-        </div>
+        <section className="space-y-2">
+          <h2 className="text-sm font-medium">Текст</h2>
+          <FolderTextArea
+            value={textDraft}
+            saving={savingText}
+            onChange={(value) => {
+              setTextDraft(value);
+              scheduleTextSave(value);
+            }}
+          />
+        </section>
       )}
 
       {folder.moduleGalleryEnabled && (
@@ -285,6 +282,8 @@ export function CloudFolderView({
           </div>
         </section>
       )}
+
+      {uploadSlot}
 
       <section
         className="space-y-3"
@@ -339,6 +338,41 @@ export function CloudFolderView({
           </div>
         )}
       </section>
+    </div>
+  );
+}
+
+function FolderTextArea({
+  value,
+  saving,
+  onChange,
+}: {
+  value: string;
+  saving: boolean;
+  onChange: (value: string) => void;
+}) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }, [value]);
+
+  return (
+    <div className="relative w-full">
+      <textarea
+        ref={ref}
+        className="min-h-[4rem] w-full resize-none overflow-hidden rounded-xl border border-border bg-card px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap shadow-sm outline-none ring-primary/20 transition-shadow focus:ring-2"
+        placeholder="Текст для этой папки"
+        value={value}
+        rows={1}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      {saving && (
+        <Loader2 className="absolute right-3 top-3 size-4 animate-spin text-muted-foreground" />
+      )}
     </div>
   );
 }
