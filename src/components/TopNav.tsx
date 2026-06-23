@@ -11,18 +11,18 @@ export function TopNav() {
   const active = sectionForPath(pathname);
 
   return (
-    <header className="flex h-14 shrink-0 items-center gap-6 border-b border-border bg-sidebar px-5">
+    <header className="flex h-14 shrink-0 items-center gap-3 overflow-hidden border-b border-border bg-sidebar px-3 sm:gap-6 sm:px-5">
       <Link
         href={SECTIONS[0].basePath}
-        className="flex items-center gap-2 shrink-0"
+        className="flex shrink-0 items-center gap-2"
       >
         <div className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-md shadow-primary/25">
           <Truck className="size-4" />
         </div>
-        <span className="font-semibold tracking-tight">Dashboard</span>
+        <span className="hidden font-semibold tracking-tight sm:inline">Dashboard</span>
       </Link>
 
-      <nav className="flex h-full items-center">
+      <nav className="flex h-full min-w-0 flex-1 items-center overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {SECTIONS.map((section) => {
           const isActive = section.key === active.key;
           return (
@@ -30,7 +30,7 @@ export function TopNav() {
               key={section.key}
               href={section.basePath}
               className={cn(
-                "relative flex h-full items-center px-4 text-sm font-medium transition-colors",
+                "relative flex h-full shrink-0 items-center px-3 text-sm font-medium transition-colors sm:px-4",
                 isActive
                   ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground",

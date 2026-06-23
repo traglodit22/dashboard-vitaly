@@ -205,13 +205,14 @@ export function CloudFolderView({
           onClose={() => setLightboxId(null)}
         />
       )}
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
         <span className="text-xs text-muted-foreground">Модули папки:</span>
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
         <Button
           type="button"
           size="sm"
           variant={folder.moduleTextEnabled ? "default" : "outline"}
-          className="h-8 gap-1.5 text-xs"
+          className="h-9 gap-1.5 text-xs sm:h-8"
           onClick={() => void patchFolder({ moduleTextEnabled: !folder.moduleTextEnabled })}
         >
           <Type className="size-3.5" />
@@ -221,15 +222,16 @@ export function CloudFolderView({
           type="button"
           size="sm"
           variant={folder.moduleGalleryEnabled ? "default" : "outline"}
-          className="h-8 gap-1.5 text-xs"
+          className="h-9 gap-1.5 text-xs sm:h-8"
           onClick={() => void patchFolder({ moduleGalleryEnabled: !folder.moduleGalleryEnabled })}
         >
           <Images className="size-3.5" />
           Галерея
         </Button>
+        </div>
       </div>
 
-      {filesToolbar && <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-2.5">{filesToolbar}</div>}
+      {filesToolbar && <div className="rounded-xl border border-border/60 bg-muted/20 px-2.5 py-2 sm:px-3 sm:py-2.5">{filesToolbar}</div>}
 
       {folder.moduleTextEnabled && (
         <section className="space-y-2">
@@ -250,7 +252,7 @@ export function CloudFolderView({
           <div className="flex items-center justify-between gap-2">
             <h2 className="text-sm font-medium">Галерея</h2>
             {manualSort && (
-              <p className="text-xs text-muted-foreground">Перетащите фото сюда</p>
+              <p className="hidden text-xs text-muted-foreground sm:block">Перетащите фото сюда</p>
             )}
           </div>
           <div
@@ -271,7 +273,7 @@ export function CloudFolderView({
                   : "Пока пусто — перетащите фото из списка ниже"}
               </p>
             ) : (
-              <div className="columns-2 gap-3 sm:columns-3 lg:columns-4">
+              <div className="columns-2 gap-2 sm:columns-3 sm:gap-3 lg:columns-4">
                 {galleryItems.map((item) => (
                   <GalleryTile
                     key={item.id}
@@ -324,7 +326,7 @@ export function CloudFolderView({
                 : "В этой папке пока нет файлов"}
           </p>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {listItems.map((item) =>
               renderFileCard(item, {
                 draggable: manualSort && listItems.length > 1,
@@ -439,7 +441,7 @@ function GalleryTile({
             onDragStart();
           }}
           onDragEnd={onDragEnd}
-          className="absolute left-2 top-2 z-10 flex size-7 cursor-grab items-center justify-center rounded-md bg-black/40 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100 active:cursor-grabbing"
+          className="absolute left-2 top-2 z-10 hidden size-7 cursor-grab items-center justify-center rounded-md bg-black/40 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100 active:cursor-grabbing sm:flex"
           title="Перетащить"
         >
           <GripVertical className="size-4" />
@@ -449,7 +451,7 @@ function GalleryTile({
         type="button"
         title="Убрать из галереи"
         onClick={onRemoveFromGallery}
-        className="absolute right-2 top-2 z-10 flex size-7 items-center justify-center rounded-md bg-black/40 text-white opacity-0 backdrop-blur-sm transition-opacity hover:bg-black/55 group-hover:opacity-100"
+        className="absolute right-2 top-2 z-10 flex size-8 items-center justify-center rounded-md bg-black/40 text-white opacity-100 backdrop-blur-sm transition-opacity hover:bg-black/55 sm:size-7 sm:opacity-0 sm:group-hover:opacity-100"
       >
         <X className="size-4" />
       </button>

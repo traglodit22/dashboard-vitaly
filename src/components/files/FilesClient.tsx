@@ -3,7 +3,7 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ChevronRight, FileText, GripVertical, Loader2, Pencil, Trash2, Upload } from "lucide-react";
+import { ChevronRight, FileText, FolderTree, GripVertical, Loader2, Pencil, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ import { reorderById } from "@/lib/files/reorderList";
 import { CloudFolderView } from "@/components/files/CloudFolderView";
 import { FilesListToolbar } from "@/components/files/FilesListToolbar";
 import { FilesSubfolderGrid } from "@/components/files/FilesSubfolderGrid";
+import { FilesMobileFolderDrawer } from "@/components/files/FilesMobileFolderDrawer";
 import {
   collectExtensionOptions,
   filterByExtension,
@@ -95,6 +96,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
   const [childFolders, setChildFolders] = useState<ChildFolder[]>([]);
   const [sortBy, setSortBy] = useState<FileSortKey>("manual");
   const [extFilter, setExtFilter] = useState("all");
+  const [foldersDrawerOpen, setFoldersDrawerOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const isCloudFolder = categorySlug === CLOUD_SLUG && Boolean(currentFolderId);
@@ -419,8 +421,8 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
   const uploadZone = (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed px-4 py-10 text-center transition-colors",
-        uploading ? "opacity-60" : "cursor-pointer hover:border-primary/50 hover:bg-muted/30",
+        "flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed px-3 py-6 text-center transition-colors sm:px-4 sm:py-10",
+        uploading ? "opacity-60" : "cursor-pointer hover:border-primary/50 hover:bg-muted/30 active:bg-muted/40",
       )}
       onClick={() => !uploading && inputRef.current?.click()}
       onDragOver={(e) => {
@@ -453,7 +455,12 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
           ? uploadLabel
             ? `Загрузка «${uploadLabel}»…`
             : "Загрузка…"
-          : "Перетащите файлы сюда или нажмите «Загрузить»"}
+          : (
+            <>
+              <span className="sm:hidden">Нажмите, чтобы загрузить</span>
+              <span className="hidden sm:inline">Перетащите файлы сюда или нажмите «Загрузить»</span>
+            </>
+          )}
       </p>
       {!uploading && manualSort && listItems.length > 1 && !isCloudFolder && (
         <p className="text-xs text-muted-foreground">Порядок карточек — перетаскиванием</p>
@@ -474,9 +481,37 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
   }
 
   return (
-    <div className="w-full min-w-0 p-4 sm:p-6 lg:p-8">
-      <header className="mb-6 space-y-3">
-        <nav className="flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
+    <div className="w-full min-w-0 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-6 lg:p-8">
+      <FilesMobileFolderDrawer
+        open={foldersDrawerOpen}
+        onClose={() => setFoldersDrawerOpen(false)}
+      />
+
+      <header className="mb-4 space-y-3 sm:mb-6">
+        <div className="flex items-center gap-2 md:hidden">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-9 flex-1 gap-1.5"
+            onClick={() => setFoldersDrawerOpen(true)}
+          >
+            <FolderTree className="size-4 shrink-0" />
+            <span className="truncate">Папки</span>
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            className="h-9 shrink-0 gap-1.5"
+            disabled={uploading}
+            onClick={() => inputRef.current?.click()}
+          >
+            {uploading ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
+            <span className="sr-only">Загрузить</span>
+          </Button>
+        </div>
+
+        <nav className="-mx-1 flex items-center gap-1 overflow-x-auto px-1 text-sm text-muted-foreground [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <Link
             href={filesCategoryPath(categorySlug)}
             className={cn(
@@ -492,7 +527,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
               <Link
                 href={filesCategoryPath(categorySlug, crumb.id)}
                 className={cn(
-                  "max-w-[180px] truncate rounded px-1 transition-colors hover:text-foreground",
+                  "max-w-[42vw] shrink-0 truncate rounded px-1 transition-colors hover:text-foreground sm:max-w-[180px]",
                   index === breadcrumb.length - 1 && "font-medium text-foreground",
                 )}
                 title={crumb.name}
@@ -503,10 +538,10 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
           ))}
         </nav>
 
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">{locationTitle}</h1>
-            <p className="text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-start justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">{locationTitle}</h1>
+            <p className="text-xs text-muted-foreground sm:text-sm">
               {category.storageType === "local"
                 ? `PDF и фото на сервере · до ${MAX_FILE_MB} МБ`
                 : `Файлы в Google Cloud Storage · до ${MAX_FILE_MB} МБ`}
@@ -517,7 +552,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
             type="button"
             variant="outline"
             size="sm"
-            className="gap-1.5"
+            className="hidden gap-1.5 sm:inline-flex"
             disabled={uploading}
             onClick={() => inputRef.current?.click()}
           >
@@ -627,7 +662,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
               Нет файлов с выбранным типом
             </p>
           ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {listItems.map((item) => (
             <FileCard
               key={item.id}
@@ -741,7 +776,7 @@ function FileCard({
             onDragStart();
           }}
           onDragEnd={onDragEnd}
-          className="flex cursor-grab items-center gap-1 border-b border-border/50 bg-muted/30 px-2 py-1 text-muted-foreground active:cursor-grabbing"
+          className="hidden cursor-grab items-center gap-1 border-b border-border/50 bg-muted/30 px-2 py-1 text-muted-foreground active:cursor-grabbing sm:flex"
         >
           <GripVertical className="size-3.5 shrink-0" />
           <span className="text-[10px]">перетащить</span>

@@ -24,7 +24,7 @@ export function FilesSubfolderGrid({
   return (
     <section className="mb-6">
       <h2 className="mb-3 text-sm font-medium">{currentFolderId ? "Подпапки" : "Папки"}</h2>
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {folders.map((folder) => (
           <Link
             key={folder.id}
@@ -39,7 +39,7 @@ export function FilesSubfolderGrid({
             <span className="min-w-0 flex-1 break-words text-sm font-medium leading-snug [overflow-wrap:anywhere]">
               {folder.name}
             </span>
-            <ChevronRight className="size-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+            <ChevronRight className="size-4 shrink-0 text-muted-foreground opacity-60 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100" />
           </Link>
         ))}
       </div>

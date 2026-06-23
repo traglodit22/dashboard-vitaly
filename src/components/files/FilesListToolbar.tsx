@@ -33,8 +33,8 @@ export function FilesListToolbar({
   if (totalCount === 0) return null;
 
   return (
-    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+      <div className="flex w-full flex-col gap-1.5 sm:min-w-0 sm:flex-1 sm:flex-row sm:items-center sm:gap-2">
         <span className="text-xs text-muted-foreground">Сортировка</span>
         <Select
           value={sortBy}
@@ -42,7 +42,7 @@ export function FilesListToolbar({
             if (v) onSortChange(v as FileSortKey);
           }}
         >
-          <SelectTrigger size="sm" className="h-8 w-full min-w-[10rem] max-w-[16rem]">
+          <SelectTrigger size="sm" className="h-9 w-full sm:h-8 sm:max-w-[16rem]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -56,10 +56,10 @@ export function FilesListToolbar({
       </div>
 
       {extensions.length > 0 && (
-        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+        <div className="flex w-full flex-col gap-1.5 sm:min-w-0 sm:flex-1 sm:flex-row sm:items-center sm:gap-2">
           <span className="text-xs text-muted-foreground">Тип</span>
           <Select value={extFilter} onValueChange={(v) => onExtFilterChange(v ?? "all")}>
-            <SelectTrigger size="sm" className="h-8 w-full min-w-[8rem] max-w-[14rem]">
+            <SelectTrigger size="sm" className="h-9 w-full sm:h-8 sm:max-w-[14rem]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

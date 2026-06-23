@@ -64,7 +64,15 @@ function collectAncestorIds(folders: FileFolder[], folderId: string | null): Set
   return expanded
 }
 
-export function FilesSidebarTree() {
+export function FilesSidebarTree({
+  onNavigate,
+  embedded = false,
+  className,
+}: {
+  onNavigate?: () => void;
+  embedded?: boolean;
+  className?: string;
+} = {}) {
   const pathname = usePathname()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -230,13 +238,16 @@ export function FilesSidebarTree() {
   }
 
   return (
-    <div className="mt-2 space-y-1 border-t border-border pt-2">
+    <div className={cn("mt-2 space-y-1 border-t border-border pt-2", className)}>
+      {!embedded && (
       <div className="px-3 pb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
         Папки
       </div>
+      )}
 
       <Link
         href={filesCategoryPath(categorySlug)}
+        onClick={onNavigate}
         className={cn(
           "flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors",
           !currentFolderId
@@ -253,7 +264,10 @@ export function FilesSidebarTree() {
           <Loader2 className="size-4 animate-spin text-muted-foreground" />
         </div>
       ) : (
-        <div className="max-h-[min(55vh,480px)] overflow-y-auto overflow-x-hidden px-1">
+        <div className={cn(
+          "overflow-y-auto overflow-x-hidden px-1",
+          embedded ? "max-h-none" : "max-h-[min(55vh,480px)]",
+        )}>
           {tree.map((node) => (
             <FolderTreeNode
               key={node.id}
@@ -264,6 +278,7 @@ export function FilesSidebarTree() {
               expanded={expanded}
               siblingCount={tree.length}
               dragFolderId={dragFolderId}
+              onNavigate={onNavigate}
               onToggle={toggleExpand}
               onDelete={deleteFolder}
               onRename={renameFolderItem}
@@ -271,6 +286,7 @@ export function FilesSidebarTree() {
               onDragStart={setDragFolderId}
               onDragEnd={() => setDragFolderId(null)}
               onDrop={onFolderDrop}
+              compactActions={embedded}
             />
           ))}
           {!loading && tree.length === 0 && (
@@ -345,6 +361,8 @@ function FolderTreeNode({
   onDragStart,
   onDragEnd,
   onDrop,
+  onNavigate,
+  compactActions = false,
 }: {
   node: FolderNode
   depth: number
@@ -360,6 +378,8 @@ function FolderTreeNode({
   onDragStart: (id: string) => void
   onDragEnd: () => void
   onDrop: (targetId: string, parentId: string | null) => void
+  onNavigate?: () => void
+  compactActions?: boolean
 }) {
   const hasChildren = node.children.length > 0
   const isOpen = expanded.has(node.id)
@@ -404,7 +424,7 @@ function FolderTreeNode({
             <span
               draggable
               title="Перетащить"
-              className="mt-0.5 flex size-4 shrink-0 cursor-grab items-center justify-center rounded text-muted-foreground/40 opacity-0 transition-opacity hover:bg-accent hover:text-muted-foreground active:cursor-grabbing group-hover:opacity-100"
+              className="mt-0.5 hidden size-4 shrink-0 cursor-grab items-center justify-center rounded text-muted-foreground/40 opacity-0 transition-opacity hover:bg-accent hover:text-muted-foreground active:cursor-grabbing group-hover:opacity-100 sm:flex"
               onDragStart={(e) => {
                 e.dataTransfer.effectAllowed = "move"
                 onDragStart(node.id)
@@ -447,6 +467,7 @@ function FolderTreeNode({
             <>
               <Link
                 href={filesCategoryPath(categorySlug, node.id)}
+                onClick={onNavigate}
                 className={cn(
                   "flex min-w-0 flex-1 items-start gap-1.5 rounded-md px-1 py-0.5 text-sm leading-snug transition-colors",
                   isActive
@@ -472,7 +493,14 @@ function FolderTreeNode({
                   {node.name}
                 </span>
               </Link>
-              <div className="mt-0.5 flex shrink-0 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+              <div
+                className={cn(
+                  "mt-0.5 flex shrink-0 gap-0.5",
+                  compactActions
+                    ? "opacity-100"
+                    : "opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100",
+                )}
+              >
                 <button
                   type="button"
                   aria-label={`Переименовать «${node.name}»`}
@@ -526,6 +554,8 @@ function FolderTreeNode({
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             onDrop={onDrop}
+            onNavigate={onNavigate}
+            compactActions={compactActions}
           />
         ))}
     </div>
