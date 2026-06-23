@@ -170,17 +170,23 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     try {
       for (const file of files) {
         setUploadLabel(file.name);
-        const fd = new FormData();
-        fd.append("categorySlug", categorySlug);
-        if (currentFolderId) fd.append("folderId", currentFolderId);
-        fd.append("file", file);
-        const res = await apiFetch("/api/files", { method: "POST", body: fd });
-        const data = await res.json();
-        if (res.ok) {
-          ok += 1;
-          setItems((prev) => [...prev, data.item]);
-        } else {
-          toast.error(`«${file.name}»`, { description: data.error });
+        let uploaded = false;
+        for (let attempt = 0; attempt < 3 && !uploaded; attempt++) {
+          if (attempt > 0) await new Promise((r) => setTimeout(r, 2000 * attempt));
+          const fd = new FormData();
+          fd.append("categorySlug", categorySlug);
+          if (currentFolderId) fd.append("folderId", currentFolderId);
+          fd.append("file", file);
+          const res = await apiFetch("/api/files", { method: "POST", body: fd });
+          const data = await res.json();
+          if (res.ok) {
+            ok += 1;
+            setItems((prev) => [...prev, data.item]);
+            uploaded = true;
+          } else if (attempt === 2 || !String(data.error ?? "").includes("Google Cloud")) {
+            toast.error(`«${file.name}»`, { description: data.error });
+            break;
+          }
         }
       }
       if (ok > 0) {

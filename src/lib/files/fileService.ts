@@ -55,9 +55,12 @@ export async function uploadFileItem(opts: {
   let storagePath: string
   let previewPath: string | null = null
 
-  // Превью PDF — тяжёлое; генерируется лениво через GET /preview (не блокируем загрузку).
+  // Превью PDF — тяжёлое; для GCS — лениво через GET /preview.
+  // Для локальных файлов — уменьшенное превью при загрузке.
   const previewBuffer =
-    isImageMime(opts.mime) ? await buildFilePreview(opts.mime, opts.buffer) : null
+    opts.storageType !== 'gcs' && isImageMime(opts.mime)
+      ? await buildFilePreview(opts.mime, opts.buffer)
+      : null
 
   if (opts.storageType === 'gcs') {
     if (!isGcsConfigured()) {
@@ -65,9 +68,9 @@ export async function uploadFileItem(opts: {
     }
     storagePath = gcsObjectKey(opts.categorySlug, folderPrefix, id, ext)
     await uploadToGcs(storagePath, opts.buffer, opts.mime)
-    if (previewBuffer) {
-      previewPath = gcsPreviewKey(opts.categorySlug, folderPrefix, id)
-      await uploadToGcs(previewPath, previewBuffer, 'image/webp')
+    // Превью для картинок в облаке — оригинал (lazy через /preview).
+    if (isImageMime(opts.mime)) {
+      previewPath = storagePath
     }
   } else {
     const saved = await saveLocalFile(
@@ -140,12 +143,22 @@ export async function ensureFilePreview(row: Record<string, unknown>): Promise<B
   if (mime !== 'application/pdf' && !mime.startsWith('image/')) return null
 
   const content = await readFileContent(row)
+  const folderPrefix = folderId ? await getFolderStoragePrefix(folderId) : ''
+  const fileStoragePath = row.storage_path as string
+
+  if (storageType === 'gcs' && mime.startsWith('image/')) {
+    await query(
+      'UPDATE file_items SET preview_path = $1, updated_at = NOW() WHERE id = $2',
+      [fileStoragePath, fileId],
+    )
+    return content
+  }
+
   const previewBuffer = await buildFilePreview(mime, content)
   if (!previewBuffer) {
     return mime.startsWith('image/') ? content : null
   }
 
-  const folderPrefix = folderId ? await getFolderStoragePrefix(folderId) : ''
   let previewPath: string
 
   if (storageType === 'gcs') {
