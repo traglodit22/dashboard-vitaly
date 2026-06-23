@@ -6,9 +6,16 @@ export interface BalanceProviderRow {
   extra_params?: string | null
   response_type?: string | null
   response_path?: string | null
+  last_balance?: number | string | null
 }
 
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+const RETRY_DELAYS_MS = [400, 1200, 2500]
+const BETWEEN_PROVIDERS_MS = 400
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
 
 function getNestedValue(obj: unknown, path: string): number | null {
   const parts = path.split('.')
@@ -110,48 +117,55 @@ async function requestBalance(row: BalanceProviderRow): Promise<number> {
   return parseBalanceFromText(text, responseType, responsePath)
 }
 
-function isRetryable(err: unknown): boolean {
+export function isSoftBalanceError(err: unknown): boolean {
   const msg = err instanceof Error ? err.message : String(err)
   return (
     msg.includes('Пустой ответ') ||
     msg.includes('Unexpected end of JSON') ||
     msg.includes('Некорректный JSON') ||
     msg.includes('fetch failed') ||
-    msg.includes('network')
+    msg.includes('network') ||
+    msg.includes('ECONNRESET') ||
+    msg.includes('ETIMEDOUT')
   )
 }
 
-/** Запрос баланса с одной повторной попыткой при пустом/битом ответе. */
-export async function fetchProviderBalance(row: BalanceProviderRow | Record<string, unknown>): Promise<number> {
-  const r = row as BalanceProviderRow
-  try {
-    return await requestBalance(r)
-  } catch (e) {
-    if (!isRetryable(e)) throw e
-    await new Promise((r) => setTimeout(r, 400))
-    return await requestBalance(r)
-  }
+function isRetryable(err: unknown): boolean {
+  return isSoftBalanceError(err)
 }
 
-/** Ограниченный параллелизм — иначе панели режут пачку запросов с одного IP. */
-export async function mapWithConcurrency<T, R>(
-  items: T[],
-  limit: number,
-  fn: (item: T) => Promise<R>,
-): Promise<R[]> {
-  if (items.length === 0) return []
-  const results = new Array<R>(items.length)
-  let next = 0
+/** Запрос баланса с повторами при пустом/битом ответе. */
+export async function fetchProviderBalance(row: BalanceProviderRow | Record<string, unknown>): Promise<number> {
+  const r = row as BalanceProviderRow
+  let lastErr: unknown
 
-  async function worker() {
-    while (next < items.length) {
-      const idx = next++
-      results[idx] = await fn(items[idx])
+  for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt++) {
+    try {
+      return await requestBalance(r)
+    } catch (e) {
+      lastErr = e
+      if (!isRetryable(e) || attempt === RETRY_DELAYS_MS.length) break
+      await sleep(RETRY_DELAYS_MS[attempt])
     }
   }
 
-  await Promise.all(
-    Array.from({ length: Math.min(limit, items.length) }, () => worker()),
-  )
-  return results
+  throw lastErr
+}
+
+/** Панели SMM часто отдают пустой ответ при пачке запросов — идём по одной. */
+export async function forEachProviderSequentially<T>(
+  items: T[],
+  fn: (item: T) => Promise<void>,
+): Promise<void> {
+  for (let i = 0; i < items.length; i++) {
+    await fn(items[i])
+    if (i < items.length - 1) await sleep(BETWEEN_PROVIDERS_MS)
+  }
+}
+
+export function priorBalanceOf(row: Record<string, unknown>): number | null {
+  const v = row.last_balance
+  if (v == null || v === '') return null
+  const num = Number(v)
+  return Number.isFinite(num) ? num : null
 }

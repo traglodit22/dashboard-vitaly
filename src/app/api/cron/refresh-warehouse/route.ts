@@ -3,7 +3,7 @@ import { query } from '@/lib/db/index'
 import { getShipmentStatuses } from '@/lib/delivery/client'
 import { getStatusName } from '@/lib/delivery/statuses'
 import { sendMessage } from '@/lib/telegram/bot'
-import { fetchProviderBalance, mapWithConcurrency } from '@/lib/balances/fetchBalance'
+import { fetchProviderBalance, forEachProviderSequentially, isSoftBalanceError, priorBalanceOf } from '@/lib/balances/fetchBalance'
 import type { ProductOrder, StoreType, OrderStatus } from '@/types'
 
 export const runtime = 'nodejs'
@@ -145,7 +145,7 @@ export async function GET(req: Request) {
 async function checkBalances(chatIds: string[], notifyEnabled: boolean) {
   try {
     const rows = await query<Record<string, unknown>>(
-      `SELECT id, name, api_url, api_key, threshold, currency,
+      `SELECT id, name, api_url, api_key, threshold, currency, last_balance,
               extra_params, response_type, response_path, request_method, key_param_name
        FROM balance_providers WHERE active = true ORDER BY name`,
     )
@@ -153,7 +153,8 @@ async function checkBalances(chatIds: string[], notifyEnabled: boolean) {
 
     const low: { name: string; balance: number; threshold: number; currency: string }[] = []
 
-    await mapWithConcurrency(rows, 4, async (row) => {
+    await forEachProviderSequentially(rows, async (row) => {
+      const cached = priorBalanceOf(row)
       try {
         const balance = await fetchProviderBalance(row)
 
@@ -170,6 +171,21 @@ async function checkBalances(chatIds: string[], notifyEnabled: boolean) {
           })
         }
       } catch (e) {
+        if (isSoftBalanceError(e) && cached !== null) {
+          await query(
+            `UPDATE balance_providers SET last_checked_at = NOW(), last_error = NULL WHERE id = $1`,
+            [row.id],
+          )
+          if (cached < Number(row.threshold)) {
+            low.push({
+              name: row.name as string,
+              balance: cached,
+              threshold: Number(row.threshold),
+              currency: (row.currency as string) ?? 'USD',
+            })
+          }
+          return
+        }
         const errMsg = e instanceof Error ? e.message : String(e)
         await query(
           `UPDATE balance_providers SET last_error = $1, last_checked_at = NOW() WHERE id = $2`,
