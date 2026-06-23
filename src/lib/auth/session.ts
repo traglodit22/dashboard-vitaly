@@ -10,8 +10,8 @@ function getSecret(): Uint8Array {
   return new TextEncoder().encode(secret)
 }
 
-export async function createSession(): Promise<void> {
-  const token = await new SignJWT({ admin: true })
+export async function createSession(email: string): Promise<void> {
+  const token = await new SignJWT({ admin: true, email: email.trim().toLowerCase() })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(`${EXPIRY_SECONDS}s`)
@@ -26,6 +26,20 @@ export async function createSession(): Promise<void> {
     path: '/',
     maxAge: EXPIRY_SECONDS,
   })
+}
+
+export async function getSessionEmail(req: Request): Promise<string | null> {
+  const cookieHeader = req.headers.get('cookie') ?? ''
+  const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]+)`))
+  const token = match?.[1]
+  if (!token) return null
+  try {
+    const { payload } = await jwtVerify(token, getSecret())
+    const email = payload.email
+    return typeof email === 'string' ? email : null
+  } catch {
+    return null
+  }
 }
 
 export async function getSession(req: Request): Promise<boolean> {

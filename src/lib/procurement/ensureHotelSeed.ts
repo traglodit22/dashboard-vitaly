@@ -1,5 +1,6 @@
 import { pool, query } from '@/lib/db/index'
 import { ensureBesedkaProcurement } from '@/lib/procurement/ensureBesedkaSeed'
+import { ensurePhotoHubProcurement } from '@/lib/procurement/ensurePhotoHubSeed'
 
 const PROCUREMENT_DDL = `
 CREATE TABLE IF NOT EXISTS procurement_categories (
@@ -143,6 +144,7 @@ export async function ensureHotelProcurement(): Promise<void> {
   await backfillProcurementStores()
   await ensureHotelSeedOnly()
   await ensureBesedkaProcurement()
+  await ensurePhotoHubProcurement()
 }
 
 async function ensureProcurementSchema(): Promise<void> {

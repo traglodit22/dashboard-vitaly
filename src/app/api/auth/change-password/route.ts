@@ -1,11 +1,16 @@
-import { createHash } from 'crypto'
-import { getSession } from '@/lib/auth/session'
+import { getSession, getSessionEmail } from '@/lib/auth/session'
+import { hashPassword } from '@/lib/auth/password'
 import { query } from '@/lib/db/index'
 
 export const runtime = 'nodejs'
 
 export async function POST(req: Request): Promise<Response> {
   if (!(await getSession(req))) {
+    return Response.json({ error: 'Не авторизован' }, { status: 401 })
+  }
+
+  const email = await getSessionEmail(req)
+  if (!email) {
     return Response.json({ error: 'Не авторизован' }, { status: 401 })
   }
 
@@ -21,21 +26,41 @@ export async function POST(req: Request): Promise<Response> {
     return Response.json({ error: 'Новый пароль — минимум 8 символов' }, { status: 400 })
   }
 
-  // Current hash: check DB first, fall back to env
-  const rows = await query<{ admin_password_hash: string | null }>(
-    'SELECT admin_password_hash FROM system_settings WHERE id = 1',
+  const rows = await query<{ password_hash: string }>(
+    `SELECT password_hash FROM dashboard_users
+     WHERE lower(trim(email)) = lower(trim($1)) LIMIT 1`,
+    [email],
   )
-  const dbHash = rows[0]?.admin_password_hash ?? null
-  const envHash = process.env.ADMIN_PASSWORD_HASH ?? ''
-  const activeHash = dbHash ?? envHash
 
-  const currentHash = createHash('sha256').update(currentPassword).digest('hex')
+  let activeHash: string | null = rows[0]?.password_hash ?? null
+
+  if (!activeHash && email === (process.env.ADMIN_EMAIL ?? '').trim().toLowerCase()) {
+    const settings = await query<{ admin_password_hash: string | null }>(
+      'SELECT admin_password_hash FROM system_settings WHERE id = 1',
+    )
+    activeHash = settings[0]?.admin_password_hash ?? process.env.ADMIN_PASSWORD_HASH ?? null
+  }
+
+  if (!activeHash) {
+    return Response.json({ error: 'Пользователь не найден' }, { status: 404 })
+  }
+
+  const currentHash = hashPassword(currentPassword)
   if (currentHash !== activeHash) {
     return Response.json({ error: 'Неверный текущий пароль' }, { status: 401 })
   }
 
-  const newHash = createHash('sha256').update(newPassword).digest('hex')
-  await query('UPDATE system_settings SET admin_password_hash = $1 WHERE id = 1', [newHash])
+  const newHash = hashPassword(newPassword)
+  await query(
+    `INSERT INTO dashboard_users (email, password_hash)
+     VALUES ($1, $2)
+     ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash`,
+    [email, newHash],
+  )
+
+  if (email === (process.env.ADMIN_EMAIL ?? '').trim().toLowerCase()) {
+    await query('UPDATE system_settings SET admin_password_hash = $1 WHERE id = 1', [newHash])
+  }
 
   return Response.json({ ok: true })
 }

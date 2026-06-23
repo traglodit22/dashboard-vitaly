@@ -1,5 +1,6 @@
 import { createHash } from 'crypto'
 import { createSession } from '@/lib/auth/session'
+import { findUserByCredentials } from '@/lib/auth/ensureUsers'
 import { query } from '@/lib/db/index'
 
 export const runtime = 'nodejs'
@@ -11,30 +12,31 @@ export async function POST(req: Request): Promise<Response> {
     return Response.json({ error: 'Email и пароль обязательны' }, { status: 400 })
   }
 
-  const adminEmail = process.env.ADMIN_EMAIL
-  if (!adminEmail) {
-    return Response.json({ error: 'Сервер не настроен' }, { status: 500 })
+  const user = await findUserByCredentials(email, password)
+  if (user) {
+    await createSession(user.email)
+    return Response.json({ ok: true })
   }
 
-  // DB hash takes priority over env (allows password change without touching .env)
+  const adminEmail = process.env.ADMIN_EMAIL
+  if (!adminEmail) {
+    return Response.json({ error: 'Неверный email или пароль' }, { status: 401 })
+  }
+
   const rows = await query<{ admin_password_hash: string | null }>(
     'SELECT admin_password_hash FROM system_settings WHERE id = 1',
   )
   const dbHash = rows[0]?.admin_password_hash ?? null
   const activeHash = dbHash ?? (process.env.ADMIN_PASSWORD_HASH ?? '')
 
-  if (!activeHash) {
-    return Response.json({ error: 'Сервер не настроен' }, { status: 500 })
-  }
-
   const emailMatch = email.trim().toLowerCase() === adminEmail.trim().toLowerCase()
   const passwordHash = createHash('sha256').update(password).digest('hex')
-  const passwordMatch = passwordHash === activeHash
+  const passwordMatch = Boolean(activeHash) && passwordHash === activeHash
 
   if (!emailMatch || !passwordMatch) {
     return Response.json({ error: 'Неверный email или пароль' }, { status: 401 })
   }
 
-  await createSession()
+  await createSession(adminEmail)
   return Response.json({ ok: true })
 }
