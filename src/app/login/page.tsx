@@ -39,7 +39,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-background p-4">
+    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-background p-4 [@media(display-mode:standalone)]:px-[max(1rem,env(safe-area-inset-left))] [@media(display-mode:standalone)]:pb-[max(1rem,env(safe-area-inset-bottom))] [@media(display-mode:standalone)]:pt-[max(1rem,env(safe-area-inset-top))]">
       {/* Мягкое свечение бренда на фоне */}
       <div
         aria-hidden
