@@ -46,6 +46,12 @@ export const LOCAL_ALLOWED_MIMES = new Set([
   'image/png',
   'image/webp',
   'image/gif',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'text/plain',
+  'application/zip',
 ])
 
 export const MAX_FILE_MB = 50

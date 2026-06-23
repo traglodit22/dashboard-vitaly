@@ -1,6 +1,7 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { LOCAL_ALLOWED_MIMES, MAX_FILE_BYTES, MAX_FILE_SIZE_ERROR, FOLDER_KEEP_NAME } from '@/lib/files/types'
+import { mimeToExtension } from '@/lib/files/mimeDetect'
 
 export function filesUploadRoot(): string {
   const base = process.env.UPLOAD_DIR ?? path.join(/* turbopackIgnore: true */ process.cwd(), 'uploads')
@@ -42,25 +43,12 @@ export function localRelativePath(
 }
 
 export function extForMime(mime: string): string {
-  switch (mime) {
-    case 'application/pdf':
-      return 'pdf'
-    case 'image/jpeg':
-      return 'jpg'
-    case 'image/png':
-      return 'png'
-    case 'image/webp':
-      return 'webp'
-    case 'image/gif':
-      return 'gif'
-    default:
-      return 'bin'
-  }
+  return mimeToExtension(mime) ?? 'bin'
 }
 
 export function validateLocalUpload(mime: string, size: number): void {
   if (!LOCAL_ALLOWED_MIMES.has(mime)) {
-    throw new Error('Допустимы PDF и изображения (JPEG, PNG, WebP, GIF)')
+    throw new Error('Допустимы PDF, изображения, DOC/DOCX, XLS/XLSX, TXT и ZIP')
   }
   if (size > MAX_FILE_BYTES) {
     throw new Error(MAX_FILE_SIZE_ERROR)

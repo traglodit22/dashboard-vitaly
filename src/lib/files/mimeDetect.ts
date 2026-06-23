@@ -1,13 +1,21 @@
 import { LOCAL_ALLOWED_MIMES } from '@/lib/files/types'
 
-const EXT_TO_MIME: Record<string, string> = {
+export const EXT_TO_MIME: Record<string, string> = {
   pdf: 'application/pdf',
   jpg: 'image/jpeg',
   jpeg: 'image/jpeg',
   png: 'image/png',
   webp: 'image/webp',
   gif: 'image/gif',
+  doc: 'application/msword',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  xls: 'application/vnd.ms-excel',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  txt: 'text/plain',
+  zip: 'application/zip',
 }
+
+const GENERIC_BINARY = new Set(['application/octet-stream', 'application/zip'])
 
 export function mimeFromFileName(fileName: string): string | null {
   const ext = fileName.split('.').pop()?.toLowerCase()
@@ -15,19 +23,26 @@ export function mimeFromFileName(fileName: string): string | null {
   return EXT_TO_MIME[ext] ?? null
 }
 
-/** Браузер часто отдаёт пустой type или octet-stream для PDF — определяем по имени. */
+/** Браузер часто отдаёт пустой type или octet-stream — определяем по расширению. */
 export function resolveUploadMime(fileName: string, reportedType: string): string {
   const trimmed = reportedType.trim().toLowerCase()
+  const fromName = mimeFromFileName(fileName)
+
+  if (fromName && (!trimmed || GENERIC_BINARY.has(trimmed))) {
+    return fromName
+  }
+
   if (trimmed && LOCAL_ALLOWED_MIMES.has(trimmed)) return trimmed
 
-  const fromName = mimeFromFileName(fileName)
   if (fromName) return fromName
 
-  if (trimmed && trimmed !== 'application/octet-stream') {
+  if (trimmed && !GENERIC_BINARY.has(trimmed)) {
     throw new Error(`Неподдерживаемый тип файла: ${trimmed}`)
   }
 
-  throw new Error('Допустимы PDF и изображения (JPEG, PNG, WebP, GIF)')
+  throw new Error(
+    'Допустимы PDF, изображения, DOC/DOCX, XLS/XLSX, TXT и ZIP',
+  )
 }
 
 export function isPdfMime(mime: string, fileName?: string): boolean {
@@ -37,4 +52,11 @@ export function isPdfMime(mime: string, fileName?: string): boolean {
 
 export function isImageMime(mime: string): boolean {
   return mime.startsWith('image/')
+}
+
+export function mimeToExtension(mime: string): string | null {
+  for (const [ext, type] of Object.entries(EXT_TO_MIME)) {
+    if (type === mime) return ext
+  }
+  return null
 }

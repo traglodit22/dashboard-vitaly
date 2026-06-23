@@ -904,8 +904,12 @@ function FileCard({
                 {item.title}
               </p>
               <p className="truncate text-xs text-muted-foreground" title={item.originalName}>
-                {isPdf ? "PDF" : item.mimeType.startsWith("image/") ? "Фото" : "Файл"} ·{" "}
-                {formatBytes(item.sizeBytes)}
+                {isPdf
+                  ? "PDF"
+                  : item.mimeType.startsWith("image/")
+                    ? "Фото"
+                    : item.originalName.split(".").pop()?.toUpperCase() ?? "Файл"}{" "}
+                · {formatBytes(item.sizeBytes)}
               </p>
             </div>
             <div className="flex shrink-0 gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100">

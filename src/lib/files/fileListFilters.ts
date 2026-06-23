@@ -57,6 +57,21 @@ export function fileExtension(item: Pick<FileListRow, "originalName" | "mimeType
     return fromName;
   }
   if (item.mimeType === "application/pdf") return "pdf";
+  if (item.mimeType === "application/msword") return "doc";
+  if (
+    item.mimeType ===
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  ) {
+    return "docx";
+  }
+  if (item.mimeType === "application/vnd.ms-excel") return "xls";
+  if (
+    item.mimeType === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  ) {
+    return "xlsx";
+  }
+  if (item.mimeType === "text/plain") return "txt";
+  if (item.mimeType === "application/zip") return "zip";
   if (item.mimeType === "image/jpeg") return "jpg";
   if (item.mimeType === "image/png") return "png";
   if (item.mimeType === "image/webp") return "webp";
