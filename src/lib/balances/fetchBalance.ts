@@ -54,8 +54,14 @@ function parseBalanceFromText(
     throw new Error(`Некорректный JSON: "${trimmed.substring(0, 80)}"`)
   }
 
-  if (data && typeof data === 'object' && 'error' in data && (data as Record<string, unknown>).error) {
-    throw new Error(String((data as Record<string, unknown>).error))
+  if (data && typeof data === 'object') {
+    const rec = data as Record<string, unknown>
+    if ('errorcode' in rec && Number(rec.errorcode) !== 0) {
+      throw new Error(String(rec.errormessage ?? `API error ${rec.errorcode}`))
+    }
+    if ('error' in rec && rec.error) {
+      throw new Error(String(rec.error))
+    }
   }
 
   const balance = getNestedValue(data, responsePath)
