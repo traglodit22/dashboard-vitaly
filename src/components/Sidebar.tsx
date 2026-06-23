@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense } from "react";
 import { usePathname } from "next/navigation";
 import { LogOut, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { sectionForPath, activeItem } from "@/components/navigation";
+import { FilesSidebarTree } from "@/components/files/FilesSidebarTree";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -35,10 +37,15 @@ export function Sidebar() {
               )}
             >
               <Icon className="size-4 shrink-0" />
-              {label}
+              <span className="truncate">{label}</span>
             </Link>
           );
         })}
+        {section.key === "files" && (
+          <Suspense fallback={null}>
+            <FilesSidebarTree />
+          </Suspense>
+        )}
       </nav>
 
       <div className="space-y-1 border-t border-border p-3">

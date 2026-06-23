@@ -1,4 +1,5 @@
-import { Package, Boxes, Users, Wallet, UserSquare, LayoutDashboard, ShoppingCart, FolderArchive } from "lucide-react";
+import { Package, Boxes, Users, Wallet, UserSquare, LayoutDashboard, ShoppingCart, FolderOpen, Cloud } from "lucide-react";
+import { IMPORTANT_DOCS_SLUG } from "@/lib/files/types";
 
 export interface NavItem {
   href: string;
@@ -38,8 +39,11 @@ export const SECTIONS: NavSection[] = [
   {
     key: "files",
     label: "Файлы",
-    basePath: "/files",
-    items: [{ href: "/files", label: "Файлы", icon: FolderArchive }],
+    basePath: `/files/${IMPORTANT_DOCS_SLUG}`,
+    items: [
+      { href: `/files/${IMPORTANT_DOCS_SLUG}`, label: "Важные документы", icon: FolderOpen },
+      { href: "/files/cloud", label: "Облако (Google Cloud)", icon: Cloud },
+    ],
   },
   {
     key: "smmlaba",

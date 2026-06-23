@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth/requireAuth'
-import { fetchFileRow, readFilePreview, readFileContent } from '@/lib/files/fileService'
+import { fetchFileRow, ensureFilePreview, readFileContent } from '@/lib/files/fileService'
 
 export const runtime = 'nodejs'
 
@@ -17,7 +17,7 @@ export async function GET(
     return NextResponse.json({ error: 'Файл не найден' }, { status: 404 })
   }
 
-  let buffer = await readFilePreview(row)
+  let buffer = await ensureFilePreview(row)
   let mime = 'image/webp'
 
   if (!buffer) {

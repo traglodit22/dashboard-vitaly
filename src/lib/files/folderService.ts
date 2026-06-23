@@ -38,6 +38,16 @@ export async function listFolders(categoryId: string, parentId: string | null) {
   return rows.map(rowToFileFolder)
 }
 
+export async function listAllFolders(categoryId: string) {
+  const rows = await query<Record<string, unknown>>(
+    `SELECT * FROM file_folders
+     WHERE category_id = $1
+     ORDER BY name ASC`,
+    [categoryId],
+  )
+  return rows.map(rowToFileFolder)
+}
+
 export async function createFolder(opts: {
   categoryId: string
   categorySlug: string

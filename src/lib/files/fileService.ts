@@ -104,8 +104,50 @@ export async function readFilePreview(row: Record<string, unknown>): Promise<Buf
   const previewPath = row.preview_path as string | null
   if (!previewPath) return null
   const storageType = row.category_storage_type as string
-  if (storageType === 'gcs') return downloadFromGcs(previewPath)
-  return readLocalRelative(previewPath)
+  try {
+    if (storageType === 'gcs') return await downloadFromGcs(previewPath)
+    return await readLocalRelative(previewPath)
+  } catch {
+    return null
+  }
+}
+
+/** Сгенерировать и сохранить превью, если его ещё нет (в т.ч. для уже загруженных PDF). */
+export async function ensureFilePreview(row: Record<string, unknown>): Promise<Buffer | null> {
+  const existing = await readFilePreview(row)
+  if (existing) return existing
+
+  const mime = row.mime_type as string
+  const storageType = row.category_storage_type as string
+  const categorySlug = row.category_slug as string
+  const fileId = row.id as string
+  const folderId = (row.folder_id as string) ?? null
+
+  if (mime !== 'application/pdf' && !mime.startsWith('image/')) return null
+
+  const content = await readFileContent(row)
+  const previewBuffer = await buildFilePreview(mime, content)
+  if (!previewBuffer) {
+    return mime.startsWith('image/') ? content : null
+  }
+
+  const folderPrefix = folderId ? await getFolderStoragePrefix(folderId) : ''
+  let previewPath: string
+
+  if (storageType === 'gcs') {
+    if (!isGcsConfigured()) return previewBuffer
+    previewPath = gcsPreviewKey(categorySlug, folderPrefix, fileId)
+    await uploadToGcs(previewPath, previewBuffer, 'image/webp')
+  } else {
+    previewPath = await saveLocalPreview(categorySlug, folderPrefix, fileId, previewBuffer)
+  }
+
+  await query(
+    'UPDATE file_items SET preview_path = $1, updated_at = NOW() WHERE id = $2',
+    [previewPath, fileId],
+  )
+
+  return previewBuffer
 }
 
 export async function deleteFileItem(row: Record<string, unknown>): Promise<void> {

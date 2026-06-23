@@ -5,6 +5,7 @@ import { rowToFileCategory } from '@/lib/files/mapRow'
 import {
   createFolder,
   getFolderBreadcrumb,
+  listAllFolders,
   listFolders,
 } from '@/lib/files/folderService'
 import type { FileStorageType } from '@/lib/files/types'
@@ -33,9 +34,16 @@ export async function GET(req: Request) {
 
   const category = rowToFileCategory(categoryRow)
 
+  const all = searchParams.get('all') === 'true'
+
   if (breadcrumbFolderId) {
     const breadcrumb = await getFolderBreadcrumb(breadcrumbFolderId)
     return NextResponse.json({ breadcrumb })
+  }
+
+  if (all) {
+    const folders = await listAllFolders(category.id)
+    return NextResponse.json({ folders })
   }
 
   const folders = await listFolders(category.id, parentId || null)

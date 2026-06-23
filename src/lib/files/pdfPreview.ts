@@ -1,4 +1,14 @@
+import path from 'path'
+import { pathToFileURL } from 'url'
+import { createRequire } from 'module'
 import { createCanvas } from '@napi-rs/canvas'
+
+const require = createRequire(import.meta.url)
+
+function pdfjsAssetUrl(subdir: string): string {
+  const pkgDir = path.dirname(require.resolve('pdfjs-dist/package.json'))
+  return `${pathToFileURL(path.join(pkgDir, subdir)).href}/`
+}
 
 /** Рендер первой страницы PDF в WebP-превью. */
 export async function renderPdfPreview(pdfBuffer: Buffer): Promise<Buffer | null> {
@@ -8,6 +18,9 @@ export async function renderPdfPreview(pdfBuffer: Buffer): Promise<Buffer | null
       data: new Uint8Array(pdfBuffer),
       useSystemFonts: true,
       disableFontFace: true,
+      standardFontDataUrl: pdfjsAssetUrl('standard_fonts'),
+      cMapUrl: pdfjsAssetUrl('cmaps'),
+      cMapPacked: true,
     })
     const pdf = await loadingTask.promise
     const page = await pdf.getPage(1)
@@ -32,7 +45,7 @@ export async function renderPdfPreview(pdfBuffer: Buffer): Promise<Buffer | null
 /** Превью для изображения — уменьшенная копия в WebP. */
 export async function renderImagePreview(imageBuffer: Buffer): Promise<Buffer | null> {
   try {
-    const { createCanvas, loadImage } = await import('@napi-rs/canvas')
+    const { loadImage } = await import('@napi-rs/canvas')
     const img = await loadImage(imageBuffer)
     const maxW = 480
     const scale = Math.min(maxW / img.width, maxW / img.height, 1)
