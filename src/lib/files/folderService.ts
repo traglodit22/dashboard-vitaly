@@ -172,3 +172,77 @@ export async function getFolderBreadcrumb(folderId: string | null) {
 
   return trail
 }
+
+export async function fetchFolder(folderId: string) {
+  const rows = await query<Record<string, unknown>>(
+    `SELECT f.*, c.storage_type AS category_storage_type, c.slug AS category_slug
+     FROM file_folders f
+     JOIN file_categories c ON c.id = f.category_id
+     WHERE f.id = $1`,
+    [folderId],
+  )
+  return rows[0] ?? null
+}
+
+export async function updateFolderSettings(
+  folderId: string,
+  opts: {
+    name?: string
+    moduleTextEnabled?: boolean
+    moduleGalleryEnabled?: boolean
+    folderText?: string
+  },
+) {
+  const row = await fetchFolder(folderId)
+  if (!row) throw new Error('Папка не найдена')
+  const isCloud = row.category_storage_type === 'gcs'
+  if (
+    !isCloud &&
+    (opts.moduleTextEnabled !== undefined ||
+      opts.moduleGalleryEnabled !== undefined ||
+      opts.folderText !== undefined)
+  ) {
+    throw new Error('Модули доступны только в облачных папках')
+  }
+
+  const updates: string[] = []
+  const values: unknown[] = []
+  let idx = 1
+
+  if (opts.name !== undefined) {
+    const trimmed = opts.name.trim()
+    if (!trimmed) throw new Error('Укажите название папки')
+    if (trimmed.length > 120) throw new Error('Слишком длинное название')
+    const dup = await query<{ id: string }>(
+      `SELECT id FROM file_folders
+       WHERE category_id = $1 AND parent_id IS NOT DISTINCT FROM $2
+         AND lower(name) = lower($3) AND id <> $4`,
+      [row.category_id, row.parent_id, trimmed, folderId],
+    )
+    if (dup.length) throw new Error('Папка с таким названием уже есть')
+    updates.push(`name = $${idx++}`)
+    values.push(trimmed)
+  }
+
+  if (opts.moduleTextEnabled !== undefined) {
+    updates.push(`module_text_enabled = $${idx++}`)
+    values.push(opts.moduleTextEnabled)
+  }
+  if (opts.moduleGalleryEnabled !== undefined) {
+    updates.push(`module_gallery_enabled = $${idx++}`)
+    values.push(opts.moduleGalleryEnabled)
+  }
+  if (opts.folderText !== undefined) {
+    updates.push(`folder_text = $${idx++}`)
+    values.push(opts.folderText)
+  }
+
+  if (!updates.length) return rowToFileFolder(row)
+
+  values.push(folderId)
+  const rows = await query<Record<string, unknown>>(
+    `UPDATE file_folders SET ${updates.join(', ')} WHERE id = $${idx} RETURNING *`,
+    values,
+  )
+  return rowToFileFolder(rows[0])
+}

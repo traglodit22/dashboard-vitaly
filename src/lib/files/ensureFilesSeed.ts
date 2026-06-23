@@ -45,6 +45,21 @@ async function ensureSortOrderColumns(): Promise<void> {
   await pool.query(
     'ALTER TABLE file_folders ADD COLUMN IF NOT EXISTS sort_order INTEGER NOT NULL DEFAULT 0',
   )
+  await pool.query(
+    'ALTER TABLE file_folders ADD COLUMN IF NOT EXISTS module_text_enabled BOOLEAN NOT NULL DEFAULT false',
+  )
+  await pool.query(
+    'ALTER TABLE file_folders ADD COLUMN IF NOT EXISTS module_gallery_enabled BOOLEAN NOT NULL DEFAULT false',
+  )
+  await pool.query(
+    "ALTER TABLE file_folders ADD COLUMN IF NOT EXISTS folder_text TEXT NOT NULL DEFAULT ''",
+  )
+  await pool.query(
+    'ALTER TABLE file_items ADD COLUMN IF NOT EXISTS in_gallery BOOLEAN NOT NULL DEFAULT false',
+  )
+  await pool.query(
+    'ALTER TABLE file_items ADD COLUMN IF NOT EXISTS gallery_sort_order INTEGER NOT NULL DEFAULT 0',
+  )
 }
 
 const DEFAULT_CATEGORIES = [

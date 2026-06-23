@@ -15,6 +15,9 @@ export interface FileFolder {
   name: string
   sortOrder: number
   createdAt: string
+  moduleTextEnabled: boolean
+  moduleGalleryEnabled: boolean
+  folderText: string
 }
 
 export interface FileItem {
@@ -29,10 +32,13 @@ export interface FileItem {
   sizeBytes: number
   hasPreview: boolean
   sortOrder: number
+  inGallery: boolean
+  gallerySortOrder: number
   createdAt: string
 }
 
 export const IMPORTANT_DOCS_SLUG = 'important-documents'
+export const CLOUD_SLUG = 'cloud'
 
 export const LOCAL_ALLOWED_MIMES = new Set([
   'application/pdf',

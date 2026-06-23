@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { query } from '@/lib/db/index'
 import { requireAuth } from '@/lib/auth/requireAuth'
 import { deleteFileItem, fetchFileRow } from '@/lib/files/fileService'
+import { setItemInGallery } from '@/lib/files/galleryService'
 import { FILE_ITEM_FROM, FILE_ITEM_SELECT, rowToFileItem } from '@/lib/files/mapRow'
 
 export const runtime = 'nodejs'
@@ -15,6 +16,17 @@ export async function PATCH(
 
   const { id } = await params
   const body = await req.json()
+
+  if (body.inGallery !== undefined) {
+    try {
+      const item = await setItemInGallery(id, Boolean(body.inGallery))
+      return NextResponse.json({ item })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err)
+      return NextResponse.json({ error: message }, { status: 400 })
+    }
+  }
+
   if (typeof body.title !== 'string' || !body.title.trim()) {
     return NextResponse.json({ error: 'Укажите название' }, { status: 400 })
   }

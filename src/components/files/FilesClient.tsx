@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ChevronRight, FileText, GripVertical, Loader2, Pencil, Trash2, Upload } from "lucide-react";
@@ -10,9 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
-import { IMPORTANT_DOCS_SLUG } from "@/lib/files/types";
+import { IMPORTANT_DOCS_SLUG, CLOUD_SLUG, type FileFolder } from "@/lib/files/types";
 import { FILES_CHANGED_EVENT, filesCategoryPath, notifyFilesChanged } from "@/lib/files/routes";
 import { reorderById } from "@/lib/files/reorderList";
+import { CloudFolderView } from "@/components/files/CloudFolderView";
 
 interface FileCategory {
   id: string;
@@ -34,6 +35,8 @@ interface FileItem {
   sizeBytes: number;
   hasPreview: boolean;
   sortOrder: number;
+  inGallery: boolean;
+  gallerySortOrder: number;
   createdAt: string;
 }
 
@@ -74,7 +77,20 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
   const [uploading, setUploading] = useState(false);
   const [uploadLabel, setUploadLabel] = useState<string | null>(null);
   const [dragItemId, setDragItemId] = useState<string | null>(null);
+  const [folder, setFolder] = useState<FileFolder | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const isCloudFolder = categorySlug === CLOUD_SLUG && Boolean(currentFolderId);
+
+  const loadFolder = useCallback(async () => {
+    if (!currentFolderId || categorySlug !== CLOUD_SLUG) {
+      setFolder(null);
+      return;
+    }
+    const res = await apiFetch(`/api/files/folders/${currentFolderId}`, { cache: "no-store" });
+    const data = await res.json();
+    setFolder(res.ok ? (data.folder ?? null) : null);
+  }, [categorySlug, currentFolderId]);
 
   const loadMeta = useCallback(async () => {
     const res = await apiFetch("/api/files/categories", { cache: "no-store" });
@@ -107,15 +123,35 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
   }, [categorySlug, currentFolderId]);
 
   const refresh = useCallback(async () => {
-    await Promise.all([loadItems(), loadBreadcrumb()]);
-  }, [loadItems, loadBreadcrumb]);
+    await Promise.all([loadItems(), loadBreadcrumb(), loadFolder()]);
+  }, [loadItems, loadBreadcrumb, loadFolder]);
+
+  const galleryItems = useMemo(
+    () =>
+      [...items]
+        .filter((i) => i.inGallery)
+        .sort(
+          (a, b) =>
+            a.gallerySortOrder - b.gallerySortOrder ||
+            a.title.localeCompare(b.title, "ru"),
+        ),
+    [items],
+  );
+
+  const listItems = useMemo(
+    () =>
+      [...items]
+        .filter((i) => !i.inGallery)
+        .sort((a, b) => a.sortOrder - b.sortOrder || a.title.localeCompare(b.title, "ru")),
+    [items],
+  );
 
   useEffect(() => {
     setLoading(true);
     loadMeta()
-      .then(() => Promise.all([loadItems(), loadBreadcrumb()]))
+      .then(() => Promise.all([loadItems(), loadBreadcrumb(), loadFolder()]))
       .finally(() => setLoading(false));
-  }, [loadMeta, loadItems, loadBreadcrumb]);
+  }, [loadMeta, loadItems, loadBreadcrumb, loadFolder]);
 
   useEffect(() => {
     const onChange = () => void refresh();
@@ -123,7 +159,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     return () => window.removeEventListener(FILES_CHANGED_EVENT, onChange);
   }, [refresh]);
 
-  async function persistFileOrder(ordered: FileItem[]) {
+  async function persistFileOrder(ordered: { id: string }[], scope: "files" | "gallery" = "files") {
     const res = await apiFetch("/api/files/reorder", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -131,6 +167,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
         categorySlug,
         folderId: currentFolderId,
         ids: ordered.map((i) => i.id),
+        scope,
       }),
     });
     if (!res.ok) {
@@ -141,18 +178,27 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     }
     const sortMap = new Map(ordered.map((item, i) => [item.id, (i + 1) * 10]));
     setItems((prev) =>
-      prev.map((item) =>
-        sortMap.has(item.id) ? { ...item, sortOrder: sortMap.get(item.id)! } : item,
-      ),
+      prev.map((item) => {
+        if (!sortMap.has(item.id)) return item;
+        const order = sortMap.get(item.id)!;
+        return scope === "gallery"
+          ? { ...item, gallerySortOrder: order }
+          : { ...item, sortOrder: order };
+      }),
     );
   }
 
   function onFileDrop(targetId: string) {
-    if (!dragItemId || dragItemId === targetId || items.length < 2) return;
-    const next = reorderById(items, dragItemId, targetId);
+    if (!dragItemId || dragItemId === targetId) return;
+    const pool = listItems.length ? listItems : items.filter((i) => !i.inGallery);
+    if (pool.length < 2) return;
+    const next = reorderById(pool, dragItemId, targetId);
     setDragItemId(null);
-    setItems(next);
-    void persistFileOrder(next);
+    setItems((prev) => {
+      const orderMap = new Map(next.map((i) => [i.id, i]));
+      return prev.map((i) => orderMap.get(i.id) ?? i);
+    });
+    void persistFileOrder(next, "files");
   }
 
   async function uploadGcsFile(file: File): Promise<FileItem> {
@@ -407,22 +453,84 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
               : "Загрузка…"
             : "Перетащите файлы сюда или нажмите «Загрузить»"}
         </p>
-        {!uploading && items.length > 1 && (
+        {!uploading && listItems.length > 1 && (
           <p className="text-xs text-muted-foreground">Порядок карточек — перетаскиванием</p>
         )}
       </div>
 
-      {items.length === 0 ? (
+      {isCloudFolder ? (
+        <CloudFolderView
+          folderId={currentFolderId!}
+          folder={
+            folder ?? {
+              id: currentFolderId!,
+              categoryId: category.id,
+              parentId: null,
+              name: locationTitle,
+              sortOrder: 0,
+              createdAt: "",
+              moduleTextEnabled: false,
+              moduleGalleryEnabled: false,
+              folderText: "",
+            }
+          }
+          galleryItems={galleryItems}
+          listItems={listItems}
+          dragItemId={dragItemId}
+          onFolderChange={setFolder}
+          onItemChange={(item) => {
+            setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, ...item } : i)));
+          }}
+          onDragStart={setDragItemId}
+          onDragEnd={() => setDragItemId(null)}
+          onGalleryReorder={(ordered) => {
+            const sortMap = new Map(ordered.map((item, i) => [item.id, (i + 1) * 10]));
+            setItems((prev) =>
+              prev.map((i) =>
+                sortMap.has(i.id) ? { ...i, gallerySortOrder: sortMap.get(i.id)! } : i,
+              ),
+            );
+            void persistFileOrder(ordered, "gallery");
+          }}
+          onListReorder={(ordered) => {
+            const sortMap = new Map(ordered.map((item, i) => [item.id, (i + 1) * 10]));
+            setItems((prev) =>
+              prev.map((i) => (sortMap.has(i.id) ? { ...i, sortOrder: sortMap.get(i.id)! } : i)),
+            );
+            void persistFileOrder(ordered, "files");
+          }}
+          renderFileCard={(item, opts) => (
+            <FileCard
+              key={item.id}
+              item={item}
+              draggable={opts.draggable}
+              dragging={opts.dragging}
+              onDragStart={opts.onDragStart}
+              onDragEnd={opts.onDragEnd}
+              onDragOver={opts.onDragOver}
+              onDrop={opts.onDrop}
+              onRemove={() => {
+                const full = items.find((i) => i.id === item.id);
+                if (full) void removeItem(full);
+              }}
+              onRename={(t) => {
+                const full = items.find((i) => i.id === item.id);
+                if (full) void renameItem(full, t);
+              }}
+            />
+          )}
+        />
+      ) : items.length === 0 ? (
         <p className="py-12 text-center text-sm text-muted-foreground">
           {currentFolderId ? "В этой папке пока нет файлов" : "Пока нет файлов"}
         </p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {items.map((item) => (
+          {listItems.map((item) => (
             <FileCard
               key={item.id}
               item={item}
-              draggable={items.length > 1}
+              draggable={listItems.length > 1}
               dragging={dragItemId === item.id}
               onDragStart={() => setDragItemId(item.id)}
               onDragEnd={() => setDragItemId(null)}
@@ -456,7 +564,10 @@ function FileCard({
   onRemove,
   onRename,
 }: {
-  item: FileItem;
+  item: Pick<
+    FileItem,
+    "id" | "title" | "originalName" | "mimeType" | "sizeBytes" | "hasPreview" | "createdAt"
+  >;
   draggable: boolean;
   dragging: boolean;
   onDragStart: () => void;

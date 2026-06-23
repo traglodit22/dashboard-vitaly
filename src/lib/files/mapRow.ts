@@ -18,6 +18,9 @@ export function rowToFileFolder(row: Record<string, unknown>): FileFolder {
     name: row.name as string,
     sortOrder: Number(row.sort_order ?? 0),
     createdAt: (row.created_at as string) ?? '',
+    moduleTextEnabled: Boolean(row.module_text_enabled),
+    moduleGalleryEnabled: Boolean(row.module_gallery_enabled),
+    folderText: String(row.folder_text ?? ''),
   }
 }
 
@@ -34,6 +37,8 @@ export function rowToFileItem(row: Record<string, unknown>): FileItem {
     sizeBytes: Number(row.size_bytes ?? 0),
     hasPreview: Boolean(row.preview_path),
     sortOrder: Number(row.sort_order ?? 0),
+    inGallery: Boolean(row.in_gallery),
+    gallerySortOrder: Number(row.gallery_sort_order ?? 0),
     createdAt: (row.created_at as string) ?? '',
   }
 }
