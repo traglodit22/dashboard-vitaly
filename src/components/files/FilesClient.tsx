@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { apiFetch, fetchWithTimeout } from "@/lib/apiFetch";
+import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
 import { IMPORTANT_DOCS_SLUG } from "@/lib/files/types";
 import { FILES_CHANGED_EVENT, filesCategoryPath, notifyFilesChanged } from "@/lib/files/routes";
@@ -178,23 +178,19 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
 
     let putRes: Response;
     try {
-      putRes = await fetchWithTimeout(
-        init.uploadUrl as string,
-        {
-          method: "PUT",
-          body: file,
-          headers: { "Content-Type": init.mime as string },
-        },
-        120_000,
-      );
+      const fd = new FormData();
+      fd.append("uploadUrl", init.uploadUrl as string);
+      fd.append("mime", init.mime as string);
+      fd.append("fileName", file.name);
+      fd.append("file", file);
+      putRes = await apiFetch("/api/files/gcs-proxy-put", { method: "POST", body: fd }, 120_000);
     } catch {
       throw new Error("Таймаут загрузки в Google Cloud");
     }
 
     if (!putRes.ok) {
-      throw new Error(
-        "Google Cloud отклонил загрузку. На сервере выполните: node scripts/configure-gcs-cors.mjs",
-      );
+      const putData = await putRes.json().catch(() => ({}));
+      throw new Error(String(putData.error ?? "Google Cloud отклонил загрузку"));
     }
 
     const doneRes = await apiFetch(

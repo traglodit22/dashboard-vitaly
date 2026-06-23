@@ -234,9 +234,6 @@ export function FilesSidebarTree() {
       <div className="px-3 pb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
         Папки
       </div>
-      <p className="px-3 pb-1 text-[10px] leading-tight text-muted-foreground/70">
-        За ⋮⋮ — перетащить среди соседних
-      </p>
 
       <Link
         href={filesCategoryPath(categorySlug)}
@@ -428,30 +425,30 @@ function FolderTreeNode({
           >
             {isOpen ? <ChevronDown className="size-3" /> : <ChevronRight className="size-3" />}
           </button>
-          <div className="min-w-0 flex-1">
-            {editing ? (
-              <Input
-                autoFocus
-                className="h-7 w-full text-xs"
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                onBlur={() => {
+          {editing ? (
+            <Input
+              autoFocus
+              className="h-7 min-w-0 flex-1 text-xs"
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onBlur={() => {
+                setEditing(false)
+                void onRename(node, draft)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") (e.target as HTMLInputElement).blur()
+                if (e.key === "Escape") {
+                  setDraft(node.name)
                   setEditing(false)
-                  void onRename(node, draft)
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") (e.target as HTMLInputElement).blur()
-                  if (e.key === "Escape") {
-                    setDraft(node.name)
-                    setEditing(false)
-                  }
-                }}
-              />
-            ) : (
+                }
+              }}
+            />
+          ) : (
+            <>
               <Link
                 href={filesCategoryPath(categorySlug, node.id)}
                 className={cn(
-                  "flex min-w-0 items-start gap-1.5 rounded-md px-1 py-0.5 text-sm leading-snug transition-colors",
+                  "flex min-w-0 flex-1 items-start gap-1.5 rounded-md px-1 py-0.5 text-sm leading-snug transition-colors",
                   isActive
                     ? "font-medium text-primary"
                     : isOnPath
@@ -475,40 +472,40 @@ function FolderTreeNode({
                   {node.name}
                 </span>
               </Link>
-            )}
-            <div className="flex gap-0.5 pl-5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
-              <button
-                type="button"
-                aria-label={`Переименовать «${node.name}»`}
-                title="Переименовать"
-                className="flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
-                onClick={() => {
-                  setDraft(node.name)
-                  setEditing(true)
-                }}
-              >
-                <Pencil className="size-3" />
-              </button>
-              <button
-                type="button"
-                aria-label={`Подпапка в «${node.name}»`}
-                title="Создать подпапку"
-                className="flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
-                onClick={() => onCreateSubfolder(node.id)}
-              >
-                <FolderPlus className="size-3" />
-              </button>
-              <button
-                type="button"
-                aria-label={`Удалить ${node.name}`}
-                title="Удалить"
-                className="flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                onClick={() => onDelete(node)}
-              >
-                <Trash2 className="size-3" />
-              </button>
-            </div>
-          </div>
+              <div className="mt-0.5 flex shrink-0 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+                <button
+                  type="button"
+                  aria-label={`Переименовать «${node.name}»`}
+                  title="Переименовать"
+                  className="flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+                  onClick={() => {
+                    setDraft(node.name)
+                    setEditing(true)
+                  }}
+                >
+                  <Pencil className="size-3" />
+                </button>
+                <button
+                  type="button"
+                  aria-label={`Подпапка в «${node.name}»`}
+                  title="Создать подпапку"
+                  className="flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+                  onClick={() => onCreateSubfolder(node.id)}
+                >
+                  <FolderPlus className="size-3" />
+                </button>
+                <button
+                  type="button"
+                  aria-label={`Удалить ${node.name}`}
+                  title="Удалить"
+                  className="flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                  onClick={() => onDelete(node)}
+                >
+                  <Trash2 className="size-3" />
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
       {isOpen &&

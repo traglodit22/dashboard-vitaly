@@ -101,6 +101,54 @@ export async function getGcsUploadSignedUrl(
   return url
 }
 
+export function assertGcsSignedUploadUrl(uploadUrl: string): void {
+  const u = new URL(uploadUrl)
+  if (u.hostname !== 'storage.googleapis.com') {
+    throw new Error('Некорректный URL загрузки')
+  }
+  const bucket = gcsBucketName()
+  const prefix = `/${bucket}/`
+  if (!decodeURIComponent(u.pathname).startsWith(prefix)) {
+    throw new Error('Некорректный URL загрузки')
+  }
+}
+
+/** PUT через signed URL с сервера (обходит CORS браузера). */
+export async function putBufferToSignedUrl(
+  uploadUrl: string,
+  buffer: Buffer,
+  contentType: string,
+): Promise<void> {
+  assertGcsSignedUploadUrl(uploadUrl)
+  if (buffer.length > MAX_FILE_BYTES) {
+    throw new Error('Максимальный размер файла — 20 МБ')
+  }
+
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 120_000)
+  try {
+    const res = await fetch(uploadUrl, {
+      method: 'PUT',
+      body: new Uint8Array(buffer),
+      headers: { 'Content-Type': contentType },
+      signal: controller.signal,
+    })
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      throw new Error(
+        `Google Cloud отклонил загрузку (${res.status})${text ? `: ${text.slice(0, 160)}` : ''}`,
+      )
+    }
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new Error('Таймаут загрузки в Google Cloud')
+    }
+    throw err
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
 async function getStorage(): Promise<Storage> {
   if (!storagePromise) {
     storagePromise = buildStorageClient().catch((err) => {
