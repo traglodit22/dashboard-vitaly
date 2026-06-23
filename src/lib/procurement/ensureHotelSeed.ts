@@ -135,10 +135,12 @@ WHERE c.name = 'Отель'
 `
 
 import { ensureAllCategoryStatuses } from '@/lib/procurement/ensureProcurementStatuses'
+import { backfillProcurementStores } from '@/lib/procurement/ensureProcurementStore'
 
 export async function ensureHotelProcurement(): Promise<void> {
   await ensureProcurementSchema()
   await ensureAllCategoryStatuses()
+  await backfillProcurementStores()
   await ensureHotelSeedOnly()
   await ensureBesedkaProcurement()
 }
@@ -163,6 +165,7 @@ async function ensureProcurementSchema(): Promise<void> {
   await pool.query(
     'ALTER TABLE procurement_items ADD COLUMN IF NOT EXISTS image_updated_at TIMESTAMPTZ',
   )
+  await pool.query('ALTER TABLE procurement_items ADD COLUMN IF NOT EXISTS store TEXT')
 }
 
 async function ensureHotelSeedOnly(): Promise<void> {

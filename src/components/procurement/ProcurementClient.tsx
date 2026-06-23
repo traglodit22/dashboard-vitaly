@@ -39,6 +39,8 @@ import { cn } from "@/lib/utils";
 import { reorderById } from "@/lib/procurement/reorderList";
 import { STATUS_ROW_CLASS, STATUS_SWATCH_CLASS } from "@/lib/procurement/statusColors";
 import type { ProcurementCategory, ProcurementItem, ProcurementStatus } from "@/lib/procurement/mapRow";
+import { STORES, type StoreType } from "@/types";
+import { detectStoreFromUrl } from "@/lib/stores/detectStoreFromUrl";
 import {
   NO_STATUS_FILTER,
   ProcurementStatusBar,
@@ -127,7 +129,7 @@ export function ProcurementClient() {
     inTransitQty: "0",
     notes: "",
     link: "",
-    linkLabel: "",
+    store: "" as StoreType | "",
   });
 
   const loadCategories = useCallback(async () => {
@@ -200,7 +202,7 @@ export function ProcurementClient() {
           (typeName?.toLowerCase().includes(q) ?? false) ||
           (i.notes?.toLowerCase().includes(q) ?? false) ||
           (i.link?.toLowerCase().includes(q) ?? false) ||
-          (i.linkLabel?.toLowerCase().includes(q) ?? false) ||
+          (i.store?.toLowerCase().includes(q) ?? false) ||
           (i.status?.name.toLowerCase().includes(q) ?? false)
         );
       });
@@ -377,7 +379,7 @@ export function ProcurementClient() {
         inTransitQty: Number(draft.inTransitQty) || 0,
         notes: draft.notes.trim() || null,
         link: draft.link.trim() || null,
-        linkLabel: draft.linkLabel.trim() || null,
+        store: draft.store || null,
       }),
     });
     if (!res.ok) {
@@ -393,7 +395,7 @@ export function ProcurementClient() {
       inTransitQty: "0",
       notes: "",
       link: "",
-      linkLabel: "",
+      store: "",
     });
     setShowAdd(false);
     toast.success("Позиция добавлена");
@@ -624,17 +626,35 @@ export function ProcurementClient() {
                 <Label>Ссылка (URL)</Label>
                 <Input
                   value={draft.link}
-                  onChange={(e) => setDraft((d) => ({ ...d, link: e.target.value }))}
+                  onChange={(e) => {
+                    const link = e.target.value;
+                    const detected = detectStoreFromUrl(link);
+                    setDraft((d) => ({
+                      ...d,
+                      link,
+                      store: detected ?? d.store,
+                    }));
+                  }}
                   placeholder="https://…"
                 />
               </div>
               <div>
-                <Label>Текст ссылки</Label>
-                <Input
-                  value={draft.linkLabel}
-                  onChange={(e) => setDraft((d) => ({ ...d, linkLabel: e.target.value }))}
-                  placeholder="Купить"
-                />
+                <Label>Магазин</Label>
+                <Select
+                  value={draft.store}
+                  onValueChange={(v) => setDraft((d) => ({ ...d, store: (v ?? "") as StoreType | "" }))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Выберите магазин" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STORES.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="sm:col-span-2">
                 <Label>Заметка</Label>
@@ -1018,8 +1038,8 @@ function ItemRow({
     await onPatch(item.id, { notes: notes || null });
   }
 
-  async function saveLink(link: string | null, linkLabel: string | null) {
-    await onPatch(item.id, { link, linkLabel });
+  async function saveLink(link: string | null, store: StoreType | null) {
+    await onPatch(item.id, { link, store });
   }
 
   async function saveStatus(value: string | null) {
@@ -1128,7 +1148,7 @@ function ItemRow({
         {remaining}
       </TableCell>
       <TableCell className="whitespace-normal px-1">
-        <LinkCell link={item.link} linkLabel={item.linkLabel} onSave={saveLink} />
+        <LinkCell link={item.link} store={item.store} onSave={saveLink} />
       </TableCell>
       <TableCell className="whitespace-normal">
         <Input
@@ -1323,22 +1343,22 @@ function ItemImageCell({
 
 function LinkCell({
   link,
-  linkLabel,
+  store,
   onSave,
 }: {
   link: string | null;
-  linkLabel: string | null;
-  onSave: (link: string | null, linkLabel: string | null) => Promise<void>;
+  store: StoreType | null;
+  onSave: (link: string | null, store: StoreType | null) => Promise<void>;
 }) {
   const [open, setOpen] = useState(false);
   const [url, setUrl] = useState(link ?? "");
-  const [label, setLabel] = useState(linkLabel ?? "");
+  const [shop, setShop] = useState(store ?? "");
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setUrl(link ?? "");
-    setLabel(linkLabel ?? "");
-  }, [link, linkLabel]);
+    setShop(store ?? "");
+  }, [link, store]);
 
   useEffect(() => {
     if (!open) return;
@@ -1351,23 +1371,31 @@ function LinkCell({
 
   const href = link?.trim() ?? "";
   const valid = Boolean(href && /^https?:\/\//i.test(href));
-  const display = linkLabel?.trim() || (valid ? "ссылка" : "");
+  const display = store || (valid ? "ссылка" : "");
+
+  function onUrlChange(next: string) {
+    setUrl(next);
+    const detected = detectStoreFromUrl(next);
+    if (detected) setShop(detected);
+  }
 
   async function save() {
     const u = url.trim();
-    const l = label.trim();
+    const s = shop.trim();
     if (u && !/^https?:\/\//i.test(u)) {
       toast.error("URL должен начинаться с http:// или https://");
       return;
     }
-    await onSave(u || null, l || null);
+    const storeValue =
+      s && (STORES as readonly string[]).includes(s) ? (s as StoreType) : null;
+    await onSave(u || null, storeValue);
     setOpen(false);
   }
 
   async function clear() {
     await onSave(null, null);
     setUrl("");
-    setLabel("");
+    setShop("");
     setOpen(false);
   }
 
@@ -1411,7 +1439,7 @@ function LinkCell({
                 autoFocus
                 className="h-8 text-xs"
                 value={url}
-                onChange={(e) => setUrl(e.target.value)}
+                onChange={(e) => onUrlChange(e.target.value)}
                 placeholder="https://…"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
@@ -1422,19 +1450,19 @@ function LinkCell({
               />
             </div>
             <div>
-              <Label className="text-xs">Текст ссылки</Label>
-              <Input
-                className="h-8 text-xs"
-                value={label}
-                onChange={(e) => setLabel(e.target.value)}
-                placeholder="Купить"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    void save();
-                  }
-                }}
-              />
+              <Label className="text-xs">Магазин</Label>
+              <Select value={shop} onValueChange={(v) => setShop(v ?? "")}>
+                <SelectTrigger className="h-8 w-full text-xs">
+                  <SelectValue placeholder="Выберите магазин" />
+                </SelectTrigger>
+                <SelectContent>
+                  {STORES.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex flex-wrap gap-1">
               <Button type="button" size="sm" className="h-7 text-xs" onClick={() => void save()}>

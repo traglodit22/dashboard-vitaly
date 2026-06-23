@@ -1,3 +1,5 @@
+import type { StoreType } from '@/types'
+import { STORES } from '@/types'
 import type { StatusColorKey } from '@/lib/procurement/statusColors'
 import { parseStatusColorKey } from '@/lib/procurement/statusColors'
 
@@ -35,7 +37,7 @@ export interface ProcurementItem {
   remaining: number
   notes: string | null
   link: string | null
-  linkLabel: string | null
+  store: StoreType | null
   imageMime: string | null
   imageUpdatedAt: string | null
   sortOrder: number
@@ -80,7 +82,7 @@ export function rowToItem(row: Record<string, unknown>): ProcurementItem {
     remaining: need - have - transit,
     notes: (row.notes as string) ?? null,
     link: (row.link as string) ?? null,
-    linkLabel: (row.link_label as string) ?? null,
+    store: parseStore(row.store),
     imageMime: (row.image_mime as string) ?? null,
     imageUpdatedAt: (row.image_updated_at as string) ?? null,
     sortOrder: Number(row.sort_order ?? 0),
@@ -98,6 +100,13 @@ export function rowToItem(row: Record<string, unknown>): ProcurementItem {
 
 function parseRowType(value: unknown): ProcurementRowType {
   return value === 'type' ? 'type' : 'item'
+}
+
+function parseStore(value: unknown): StoreType | null {
+  if (typeof value === 'string' && (STORES as readonly string[]).includes(value)) {
+    return value as StoreType
+  }
+  return null
 }
 
 export const ITEM_SELECT_SQL = `

@@ -3,6 +3,7 @@ import { query } from '@/lib/db/index'
 import { requireAuth } from '@/lib/auth/requireAuth'
 import { ITEM_FROM_SQL, ITEM_SELECT_SQL, rowToItem } from '@/lib/procurement/mapRow'
 import { ensureHotelProcurement } from '@/lib/procurement/ensureHotelSeed'
+import { STORES } from '@/types'
 import { deleteItemImageFiles } from '@/lib/procurement/itemImage'
 
 export const runtime = 'nodejs'
@@ -57,9 +58,12 @@ export async function PATCH(
     setClauses.push(`link = $${idx++}`)
     values.push(body.link ? String(body.link).trim() : null)
   }
-  if (body.linkLabel !== undefined) {
-    setClauses.push(`link_label = $${idx++}`)
-    values.push(body.linkLabel ? String(body.linkLabel).trim() : null)
+  if (body.store !== undefined) {
+    if (body.store !== null && !(STORES as readonly string[]).includes(String(body.store))) {
+      return NextResponse.json({ error: 'Недопустимый магазин' }, { status: 400 })
+    }
+    setClauses.push(`store = $${idx++}`)
+    values.push(body.store)
   }
   if (body.statusId !== undefined) {
     if (body.statusId !== null && typeof body.statusId !== 'string') {

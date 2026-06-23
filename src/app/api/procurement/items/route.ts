@@ -3,6 +3,7 @@ import { query } from '@/lib/db/index'
 import { requireAuth } from '@/lib/auth/requireAuth'
 import { ITEM_FROM_SQL, ITEM_SELECT_SQL, rowToItem } from '@/lib/procurement/mapRow'
 import { ensureHotelProcurement } from '@/lib/procurement/ensureHotelSeed'
+import { STORES } from '@/types'
 
 export const runtime = 'nodejs'
 
@@ -52,9 +53,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Укажите категорию и название' }, { status: 400 })
   }
 
+  const store =
+    rowType === 'type' || !body.store
+      ? null
+      : (STORES as readonly string[]).includes(String(body.store))
+        ? String(body.store)
+        : null
+
   const rows = await query<Record<string, unknown>>(
     `INSERT INTO procurement_items
-      (category_id, group_name, name, need_qty, have_qty, in_transit_qty, notes, link, link_label, row_type, sort_order)
+      (category_id, group_name, name, need_qty, have_qty, in_transit_qty, notes, link, store, row_type, sort_order)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
        COALESCE((SELECT MAX(sort_order) + 10 FROM procurement_items WHERE category_id = $1), 0))
      RETURNING id`,
@@ -67,7 +75,7 @@ export async function POST(req: Request) {
       rowType === 'type' ? 0 : Math.max(0, Number(body.inTransitQty ?? 0)),
       rowType === 'type' ? null : body.notes ? String(body.notes).trim() : null,
       rowType === 'type' ? null : body.link ? String(body.link).trim() : null,
-      rowType === 'type' ? null : body.linkLabel ? String(body.linkLabel).trim() : null,
+      store,
       rowType,
     ],
   )
