@@ -485,6 +485,23 @@ function FileCard({
     previewRetryRef.current = 0;
   }, [item.id, item.title, item.createdAt]);
 
+  useEffect(() => {
+    if (!showPreview) return;
+    const timer = window.setTimeout(() => {
+      setPreviewLoading((loading) => {
+        if (!loading) return loading;
+        if (previewRetryRef.current < 2) {
+          previewRetryRef.current += 1;
+          setPreviewRetry(previewRetryRef.current);
+          return true;
+        }
+        setPreviewFailed(true);
+        return false;
+      });
+    }, 30_000);
+    return () => window.clearTimeout(timer);
+  }, [previewUrl, showPreview]);
+
   return (
     <Card
       onDragOver={onDragOver}

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth/requireAuth'
 import { fetchFileRow, readFileContent } from '@/lib/files/fileService'
+import { getGcsReadSignedUrl } from '@/lib/files/gcsStorage'
 
 export const runtime = 'nodejs'
 
@@ -17,9 +18,16 @@ export async function GET(
     return NextResponse.json({ error: 'Файл не найден' }, { status: 404 })
   }
 
-  const buffer = await readFileContent(row)
+  const storageType = row.category_storage_type as string
   const mime = row.mime_type as string
   const name = row.original_name as string
+
+  if (storageType === 'gcs') {
+    const url = await getGcsReadSignedUrl(row.storage_path as string)
+    return NextResponse.redirect(url, 307)
+  }
+
+  const buffer = await readFileContent(row)
 
   return new NextResponse(new Uint8Array(buffer), {
     headers: {

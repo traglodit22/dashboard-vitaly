@@ -101,6 +101,16 @@ export async function getGcsUploadSignedUrl(
   return url
 }
 
+export async function getGcsReadSignedUrl(objectKey: string): Promise<string> {
+  const storage = getSigningStorage()
+  const [url] = await storage.bucket(gcsBucketName()).file(objectKey).getSignedUrl({
+    version: 'v4',
+    action: 'read',
+    expires: Date.now() + 60 * 60 * 1000,
+  })
+  return url
+}
+
 export function assertGcsSignedUploadUrl(uploadUrl: string): void {
   const u = new URL(uploadUrl)
   if (u.hostname !== 'storage.googleapis.com') {
@@ -269,10 +279,23 @@ export async function uploadToGcs(
 }
 
 export async function downloadFromGcs(objectKey: string): Promise<Buffer> {
-  return withGcsRetry(`download ${objectKey}`, async (client) => {
-    const [buf] = await client.bucket(gcsBucketName()).file(objectKey).download()
-    return buf
-  })
+  const url = await getGcsReadSignedUrl(objectKey)
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 60_000)
+  try {
+    const res = await fetch(url, { signal: controller.signal })
+    if (!res.ok) {
+      throw new Error(`Не удалось скачать из Google Cloud (${res.status})`)
+    }
+    return Buffer.from(await res.arrayBuffer())
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new Error('Таймаут чтения из Google Cloud')
+    }
+    throw err
+  } finally {
+    clearTimeout(timer)
+  }
 }
 
 export async function deleteFromGcs(objectKey: string): Promise<void> {
