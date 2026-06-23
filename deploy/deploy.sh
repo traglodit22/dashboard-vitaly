@@ -147,16 +147,9 @@ if grep -qE '^GCS_BUCKET=' .env 2>/dev/null; then
   fi
 fi
 
-if [[ -f /etc/nginx/sites-available/dashboard ]] && [[ -f deploy/nginx.conf ]]; then
-  echo "==> Sync nginx config (upload size limits)"
-  DOMAIN="$(grep -oE 'server_name[[:space:]]+[^;]+' /etc/nginx/sites-available/dashboard | awk '{print $2}' | head -1)"
-  if [[ -n "${DOMAIN:-}" && "$DOMAIN" != "__DOMAIN__" ]]; then
-    sed "s/__DOMAIN__/$DOMAIN/g" deploy/nginx.conf > /tmp/dashboard-nginx.conf
-    if ! cmp -s /tmp/dashboard-nginx.conf /etc/nginx/sites-available/dashboard; then
-      cp /tmp/dashboard-nginx.conf /etc/nginx/sites-available/dashboard
-      nginx -t && systemctl reload nginx
-    fi
-  fi
+if [[ -f /etc/nginx/sites-available/dashboard ]] && [[ -f deploy/sync-nginx-upload-limits.sh ]]; then
+  echo "==> Sync nginx upload limits"
+  bash deploy/sync-nginx-upload-limits.sh /etc/nginx/sites-available/dashboard 50M
 fi
 
 echo "==> Deploy finished"
