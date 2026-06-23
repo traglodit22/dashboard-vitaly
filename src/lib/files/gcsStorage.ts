@@ -55,12 +55,27 @@ export function isGcsConfigured(): boolean {
   )
 }
 
-export function gcsObjectKey(categorySlug: string, fileId: string, ext: string): string {
-  return `dashboard/${categorySlug}/${fileId}.${ext}`
+export function gcsObjectKey(
+  categorySlug: string,
+  folderPrefix: string,
+  fileId: string,
+  ext: string,
+): string {
+  const mid = folderPrefix ? `${folderPrefix}/` : ''
+  return `dashboard/${categorySlug}/${mid}${fileId}.${ext}`
 }
 
-export function gcsPreviewKey(categorySlug: string, fileId: string): string {
-  return `dashboard/${categorySlug}/${fileId}-preview.webp`
+export function gcsPreviewKey(
+  categorySlug: string,
+  folderPrefix: string,
+  fileId: string,
+): string {
+  const mid = folderPrefix ? `${folderPrefix}/` : ''
+  return `dashboard/${categorySlug}/${mid}${fileId}-preview.webp`
+}
+
+export function gcsFolderKeepKey(categorySlug: string, folderPrefix: string): string {
+  return `dashboard/${categorySlug}/${folderPrefix}/.keep`
 }
 
 export async function uploadToGcs(

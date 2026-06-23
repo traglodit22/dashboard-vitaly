@@ -1,22 +1,44 @@
 import fs from 'fs/promises'
 import path from 'path'
-import { LOCAL_ALLOWED_MIMES, MAX_FILE_BYTES } from '@/lib/files/types'
+import { LOCAL_ALLOWED_MIMES, MAX_FILE_BYTES, FOLDER_KEEP_NAME } from '@/lib/files/types'
 
 export function filesUploadRoot(): string {
-  const base = process.env.UPLOAD_DIR ?? path.join(/* turbopackIgnore: true */ process.cwd(), "uploads")
-  return path.join(base, "files")
+  const base = process.env.UPLOAD_DIR ?? path.join(/* turbopackIgnore: true */ process.cwd(), 'uploads')
+  return path.join(base, 'files')
 }
 
 export function localCategoryDir(categorySlug: string): string {
   return path.join(filesUploadRoot(), categorySlug)
 }
 
-export function localFilePath(categorySlug: string, fileId: string, ext: string): string {
-  return path.join(localCategoryDir(categorySlug), `${fileId}.${ext}`)
+export function localFolderDir(categorySlug: string, folderPrefix: string): string {
+  if (!folderPrefix) return localCategoryDir(categorySlug)
+  return path.join(localCategoryDir(categorySlug), ...folderPrefix.split('/'))
 }
 
-export function localPreviewPath(categorySlug: string, fileId: string): string {
-  return path.join(localCategoryDir(categorySlug), `${fileId}-preview.webp`)
+export function localFilePath(
+  categorySlug: string,
+  folderPrefix: string,
+  fileId: string,
+  ext: string,
+): string {
+  return path.join(localFolderDir(categorySlug, folderPrefix), `${fileId}.${ext}`)
+}
+
+export function localPreviewPath(
+  categorySlug: string,
+  folderPrefix: string,
+  fileId: string,
+): string {
+  return path.join(localFolderDir(categorySlug, folderPrefix), `${fileId}-preview.webp`)
+}
+
+export function localRelativePath(
+  categorySlug: string,
+  folderPrefix: string,
+  fileName: string,
+): string {
+  return path.join('files', categorySlug, folderPrefix ? `${folderPrefix}/${fileName}` : fileName)
 }
 
 export function extForMime(mime: string): string {
@@ -36,24 +58,6 @@ export function extForMime(mime: string): string {
   }
 }
 
-export function mimeForExt(ext: string): string {
-  switch (ext) {
-    case 'pdf':
-      return 'application/pdf'
-    case 'jpg':
-    case 'jpeg':
-      return 'image/jpeg'
-    case 'png':
-      return 'image/png'
-    case 'webp':
-      return 'image/webp'
-    case 'gif':
-      return 'image/gif'
-    default:
-      return 'application/octet-stream'
-  }
-}
-
 export function validateLocalUpload(mime: string, size: number): void {
   if (!LOCAL_ALLOWED_MIMES.has(mime)) {
     throw new Error('Допустимы PDF и изображения (JPEG, PNG, WebP, GIF)')
@@ -63,37 +67,53 @@ export function validateLocalUpload(mime: string, size: number): void {
   }
 }
 
-export async function ensureCategoryDir(categorySlug: string): Promise<void> {
-  await fs.mkdir(localCategoryDir(categorySlug), { recursive: true })
+export async function ensureLocalFolder(categorySlug: string, folderPrefix: string): Promise<void> {
+  const dir = localFolderDir(categorySlug, folderPrefix)
+  await fs.mkdir(dir, { recursive: true })
+  await fs.writeFile(path.join(dir, FOLDER_KEEP_NAME), '')
+}
+
+export async function removeLocalFolderKeep(
+  categorySlug: string,
+  folderPrefix: string,
+): Promise<void> {
+  try {
+    await fs.unlink(path.join(localFolderDir(categorySlug, folderPrefix), FOLDER_KEEP_NAME))
+  } catch {
+    /* missing */
+  }
 }
 
 export async function saveLocalFile(
   categorySlug: string,
+  folderPrefix: string,
   fileId: string,
   buffer: Buffer,
   mime: string,
 ): Promise<{ storagePath: string; ext: string }> {
   validateLocalUpload(mime, buffer.length)
-  await ensureCategoryDir(categorySlug)
   const ext = extForMime(mime)
-  const rel = path.join('files', categorySlug, `${fileId}.${ext}`)
-  await fs.writeFile(localFilePath(categorySlug, fileId, ext), buffer)
-  return { storagePath: rel, ext }
+  const dir = localFolderDir(categorySlug, folderPrefix)
+  await fs.mkdir(dir, { recursive: true })
+  await fs.writeFile(path.join(dir, `${fileId}.${ext}`), buffer)
+  return { storagePath: localRelativePath(categorySlug, folderPrefix, `${fileId}.${ext}`), ext }
 }
 
 export async function saveLocalPreview(
   categorySlug: string,
+  folderPrefix: string,
   fileId: string,
   buffer: Buffer,
 ): Promise<string> {
-  await ensureCategoryDir(categorySlug)
-  const rel = path.join('files', categorySlug, `${fileId}-preview.webp`)
-  await fs.writeFile(localPreviewPath(categorySlug, fileId), buffer)
+  const dir = localFolderDir(categorySlug, folderPrefix)
+  await fs.mkdir(dir, { recursive: true })
+  const rel = localRelativePath(categorySlug, folderPrefix, `${fileId}-preview.webp`)
+  await fs.writeFile(path.join(dir, `${fileId}-preview.webp`), buffer)
   return rel
 }
 
 export async function readLocalRelative(relPath: string): Promise<Buffer> {
-  const root = process.env.UPLOAD_DIR ?? path.join(/* turbopackIgnore: true */ process.cwd(), "uploads")
+  const root = process.env.UPLOAD_DIR ?? path.join(/* turbopackIgnore: true */ process.cwd(), 'uploads')
   const full = path.normalize(path.join(root, relPath))
   const rootNorm = path.normalize(root + path.sep)
   if (!full.startsWith(rootNorm) && full !== path.normalize(root)) {
@@ -102,21 +122,11 @@ export async function readLocalRelative(relPath: string): Promise<Buffer> {
   return fs.readFile(full)
 }
 
-export async function deleteLocalFiles(
-  categorySlug: string,
-  fileId: string,
-  ext: string,
-  hasPreview: boolean,
-): Promise<void> {
-  const targets = [localFilePath(categorySlug, fileId, ext)]
-  if (hasPreview) targets.push(localPreviewPath(categorySlug, fileId))
-  await Promise.all(
-    targets.map(async (p) => {
-      try {
-        await fs.unlink(p)
-      } catch {
-        /* missing */
-      }
-    }),
-  )
+export async function deleteLocalRelative(relPath: string): Promise<void> {
+  try {
+    const root = process.env.UPLOAD_DIR ?? path.join(/* turbopackIgnore: true */ process.cwd(), 'uploads')
+    await fs.unlink(path.normalize(path.join(root, relPath)))
+  } catch {
+    /* missing */
+  }
 }

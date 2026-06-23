@@ -1,4 +1,4 @@
-import type { FileCategory, FileItem, FileStorageType } from '@/lib/files/types'
+import type { FileCategory, FileFolder, FileItem, FileStorageType } from '@/lib/files/types'
 
 export function rowToFileCategory(row: Record<string, unknown>): FileCategory {
   return {
@@ -10,12 +10,23 @@ export function rowToFileCategory(row: Record<string, unknown>): FileCategory {
   }
 }
 
+export function rowToFileFolder(row: Record<string, unknown>): FileFolder {
+  return {
+    id: row.id as string,
+    categoryId: row.category_id as string,
+    parentId: (row.parent_id as string) ?? null,
+    name: row.name as string,
+    createdAt: (row.created_at as string) ?? '',
+  }
+}
+
 export function rowToFileItem(row: Record<string, unknown>): FileItem {
   return {
     id: row.id as string,
     categoryId: row.category_id as string,
     categorySlug: (row.category_slug as string) ?? '',
     categoryName: (row.category_name as string) ?? '',
+    folderId: (row.folder_id as string) ?? null,
     title: row.title as string,
     originalName: row.original_name as string,
     mimeType: row.mime_type as string,

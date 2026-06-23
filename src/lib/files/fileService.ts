@@ -9,8 +9,9 @@ import {
   isGcsConfigured,
   uploadToGcs,
 } from '@/lib/files/gcsStorage'
+import { getFolderStoragePrefix } from '@/lib/files/folderService'
 import {
-  deleteLocalFiles,
+  deleteLocalRelative,
   extForMime,
   readLocalRelative,
   saveLocalFile,
@@ -31,6 +32,7 @@ export async function uploadFileItem(opts: {
   categoryId: string
   categorySlug: string
   storageType: FileStorageType
+  folderId: string | null
   title: string
   originalName: string
   mime: string
@@ -38,6 +40,7 @@ export async function uploadFileItem(opts: {
 }) {
   const id = randomUUID()
   const ext = extForMime(opts.mime)
+  const folderPrefix = opts.folderId ? await getFolderStoragePrefix(opts.folderId) : ''
   let storagePath: string
   let previewPath: string | null = null
 
@@ -47,17 +50,23 @@ export async function uploadFileItem(opts: {
     if (!isGcsConfigured()) {
       throw new Error('Google Cloud Storage не настроен на сервере')
     }
-    storagePath = gcsObjectKey(opts.categorySlug, id, ext)
+    storagePath = gcsObjectKey(opts.categorySlug, folderPrefix, id, ext)
     await uploadToGcs(storagePath, opts.buffer, opts.mime)
     if (previewBuffer) {
-      previewPath = gcsPreviewKey(opts.categorySlug, id)
+      previewPath = gcsPreviewKey(opts.categorySlug, folderPrefix, id)
       await uploadToGcs(previewPath, previewBuffer, 'image/webp')
     }
   } else {
-    const saved = await saveLocalFile(opts.categorySlug, id, opts.buffer, opts.mime)
+    const saved = await saveLocalFile(
+      opts.categorySlug,
+      folderPrefix,
+      id,
+      opts.buffer,
+      opts.mime,
+    )
     storagePath = saved.storagePath
     if (previewBuffer) {
-      previewPath = await saveLocalPreview(opts.categorySlug, id, previewBuffer)
+      previewPath = await saveLocalPreview(opts.categorySlug, folderPrefix, id, previewBuffer)
     } else if (opts.mime.startsWith('image/')) {
       previewPath = storagePath
     }
@@ -65,12 +74,13 @@ export async function uploadFileItem(opts: {
 
   const rows = await query<Record<string, unknown>>(
     `INSERT INTO file_items
-      (id, category_id, title, original_name, mime_type, size_bytes, storage_path, preview_path)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      (id, category_id, folder_id, title, original_name, mime_type, size_bytes, storage_path, preview_path)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
      RETURNING id`,
     [
       id,
       opts.categoryId,
+      opts.folderId,
       opts.title,
       opts.originalName,
       opts.mime,
@@ -99,13 +109,9 @@ export async function readFilePreview(row: Record<string, unknown>): Promise<Buf
 }
 
 export async function deleteFileItem(row: Record<string, unknown>): Promise<void> {
-  const id = row.id as string
   const storageType = row.category_storage_type as string
-  const categorySlug = row.category_slug as string
   const storagePath = row.storage_path as string
   const previewPath = row.preview_path as string | null
-  const mime = row.mime_type as string
-  const ext = extForMime(mime)
 
   if (storageType === 'gcs') {
     await deleteFromGcs(storagePath)
@@ -113,10 +119,13 @@ export async function deleteFileItem(row: Record<string, unknown>): Promise<void
       await deleteFromGcs(previewPath)
     }
   } else {
-    await deleteLocalFiles(categorySlug, id, ext, Boolean(previewPath && previewPath !== storagePath))
+    await deleteLocalRelative(storagePath)
+    if (previewPath && previewPath !== storagePath) {
+      await deleteLocalRelative(previewPath)
+    }
   }
 
-  await query('DELETE FROM file_items WHERE id = $1', [id])
+  await query('DELETE FROM file_items WHERE id = $1', [row.id as string])
 }
 
 export async function fetchFileRow(id: string) {

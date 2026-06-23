@@ -2,9 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  ChevronRight,
   Cloud,
   FileText,
+  Folder,
   FolderOpen,
+  FolderPlus,
   Loader2,
   Pencil,
   Trash2,
@@ -26,17 +29,31 @@ interface FileCategory {
   sortOrder: number;
 }
 
+interface FileFolder {
+  id: string;
+  categoryId: string;
+  parentId: string | null;
+  name: string;
+  createdAt: string;
+}
+
 interface FileItem {
   id: string;
   categoryId: string;
   categorySlug: string;
   categoryName: string;
+  folderId: string | null;
   title: string;
   originalName: string;
   mimeType: string;
   sizeBytes: number;
   hasPreview: boolean;
   createdAt: string;
+}
+
+interface BreadcrumbItem {
+  id: string;
+  name: string;
 }
 
 function formatBytes(n: number): string {
@@ -47,11 +64,16 @@ function formatBytes(n: number): string {
 
 export function FilesClient() {
   const [categories, setCategories] = useState<FileCategory[]>([]);
+  const [folders, setFolders] = useState<FileFolder[]>([]);
   const [items, setItems] = useState<FileItem[]>([]);
+  const [breadcrumb, setBreadcrumb] = useState<BreadcrumbItem[]>([]);
   const [activeSlug, setActiveSlug] = useState(IMPORTANT_DOCS_SLUG);
+  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [gcsConfigured, setGcsConfigured] = useState(false);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [creatingFolder, setCreatingFolder] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const activeCategory = categories.find((c) => c.slug === activeSlug);
@@ -73,25 +95,61 @@ export function FilesClient() {
     });
   }, []);
 
-  const loadItems = useCallback(async (slug: string) => {
+  const loadBreadcrumb = useCallback(async (folderId: string | null) => {
+    if (!folderId) {
+      setBreadcrumb([]);
+      return;
+    }
+    const res = await apiFetch(
+      `/api/files/folders?categorySlug=${encodeURIComponent(activeSlug)}&breadcrumbFor=${encodeURIComponent(folderId)}`,
+      { cache: "no-store" },
+    );
+    const data = await res.json();
+    setBreadcrumb(data.breadcrumb ?? []);
+  }, [activeSlug]);
+
+  const loadFolders = useCallback(async (slug: string, folderId: string | null) => {
+    if (!slug) {
+      setFolders([]);
+      return;
+    }
+    const params = new URLSearchParams({ categorySlug: slug });
+    if (folderId) params.set("parentId", folderId);
+    const res = await apiFetch(`/api/files/folders?${params}`, { cache: "no-store" });
+    const data = await res.json();
+    setFolders(data.folders ?? []);
+  }, []);
+
+  const loadItems = useCallback(async (slug: string, folderId: string | null) => {
     if (!slug) {
       setItems([]);
       return;
     }
-    const res = await apiFetch(`/api/files?categorySlug=${encodeURIComponent(slug)}`, {
-      cache: "no-store",
-    });
+    const params = new URLSearchParams({ categorySlug: slug });
+    if (folderId) params.set("folderId", folderId);
+    const res = await apiFetch(`/api/files?${params}`, { cache: "no-store" });
     const data = await res.json();
     setItems(data.items ?? []);
   }, []);
+
 
   useEffect(() => {
     loadCategories().finally(() => setLoading(false));
   }, [loadCategories]);
 
   useEffect(() => {
-    if (activeSlug) loadItems(activeSlug);
-  }, [activeSlug, loadItems]);
+    setCurrentFolderId(null);
+    setBreadcrumb([]);
+    setNewFolderName("");
+    setCreatingFolder(false);
+  }, [activeSlug]);
+
+  useEffect(() => {
+    if (!activeSlug) return;
+    void loadFolders(activeSlug, currentFolderId);
+    void loadItems(activeSlug, currentFolderId);
+    void loadBreadcrumb(currentFolderId);
+  }, [activeSlug, currentFolderId, loadBreadcrumb, loadFolders, loadItems]);
 
   async function uploadFiles(fileList: FileList | File[]) {
     if (!activeSlug || !activeCategory) return;
@@ -110,6 +168,7 @@ export function FilesClient() {
     for (const file of files) {
       const fd = new FormData();
       fd.append("categorySlug", activeSlug);
+      if (currentFolderId) fd.append("folderId", currentFolderId);
       fd.append("file", file);
       const res = await apiFetch("/api/files", { method: "POST", body: fd });
       const data = await res.json();
@@ -123,6 +182,67 @@ export function FilesClient() {
     setUploading(false);
     if (ok > 0) {
       toast.success(ok === 1 ? "Файл загружен" : `Загружено файлов: ${ok}`);
+    }
+  }
+
+  async function createFolder() {
+    const name = newFolderName.trim();
+    if (!name || !activeSlug) return;
+
+    const res = await apiFetch("/api/files/folders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        categorySlug: activeSlug,
+        parentId: currentFolderId,
+        name,
+      }),
+    });
+    const data = await res.json();
+    if (res.ok && data.folder) {
+      setFolders((prev) =>
+        [...prev, data.folder].sort((a, b) => a.name.localeCompare(b.name, "ru")),
+      );
+      setNewFolderName("");
+      setCreatingFolder(false);
+      toast.success("Папка создана");
+    } else {
+      toast.error("Не удалось создать папку", { description: data.error });
+    }
+  }
+
+  async function removeFolder(folder: FileFolder) {
+    if (!confirm(`Удалить папку «${folder.name}»?`)) return;
+    const res = await apiFetch(`/api/files/folders/${folder.id}`, { method: "DELETE" });
+    const data = await res.json();
+    if (res.ok) {
+      setFolders((prev) => prev.filter((f) => f.id !== folder.id));
+      toast.success("Папка удалена");
+    } else {
+      toast.error("Не удалось удалить", { description: data.error });
+    }
+  }
+
+  async function renameFolder(folder: FileFolder, name: string) {
+    const trimmed = name.trim();
+    if (!trimmed || trimmed === folder.name) return;
+    const res = await apiFetch(`/api/files/folders/${folder.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: trimmed }),
+    });
+    const data = await res.json();
+    if (res.ok && data.folder) {
+      setFolders((prev) =>
+        prev
+          .map((f) => (f.id === folder.id ? data.folder : f))
+          .sort((a, b) => a.name.localeCompare(b.name, "ru")),
+      );
+      if (currentFolderId === folder.id) {
+        void loadBreadcrumb(folder.id);
+      }
+    } else {
+      toast.error("Не удалось переименовать", { description: data.error });
     }
   }
 
@@ -150,6 +270,22 @@ export function FilesClient() {
       setItems((prev) => prev.map((i) => (i.id === item.id ? data.item : i)));
     }
   }
+
+  function openFolder(folderId: string) {
+    setCurrentFolderId(folderId);
+    setCreatingFolder(false);
+    setNewFolderName("");
+  }
+
+  function goToRoot() {
+    setCurrentFolderId(null);
+  }
+
+  function goToBreadcrumb(id: string) {
+    setCurrentFolderId(id);
+  }
+
+  const isEmpty = folders.length === 0 && items.length === 0;
 
   if (loading) {
     return (
@@ -199,9 +335,94 @@ export function FilesClient() {
           </Card>
         )}
 
+        <div className="flex flex-wrap items-center gap-2">
+          <nav className="flex min-w-0 flex-1 flex-wrap items-center gap-1 text-sm">
+            <button
+              type="button"
+              onClick={goToRoot}
+              className={cn(
+                "rounded px-1.5 py-0.5 transition-colors hover:bg-muted",
+                !currentFolderId ? "font-medium text-foreground" : "text-muted-foreground",
+              )}
+            >
+              {activeCategory?.name ?? "Файлы"}
+            </button>
+            {breadcrumb.map((crumb) => (
+              <span key={crumb.id} className="flex items-center gap-1">
+                <ChevronRight className="size-3.5 shrink-0 text-muted-foreground" />
+                <button
+                  type="button"
+                  onClick={() => goToBreadcrumb(crumb.id)}
+                  className={cn(
+                    "max-w-[160px] truncate rounded px-1.5 py-0.5 transition-colors hover:bg-muted",
+                    currentFolderId === crumb.id
+                      ? "font-medium text-foreground"
+                      : "text-muted-foreground",
+                  )}
+                  title={crumb.name}
+                >
+                  {crumb.name}
+                </button>
+              </span>
+            ))}
+          </nav>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="shrink-0 gap-1.5"
+            onClick={() => {
+              setCreatingFolder((v) => !v);
+              setNewFolderName("");
+            }}
+          >
+            <FolderPlus className="size-4" />
+            Создать папку
+          </Button>
+        </div>
+
+        {creatingFolder && (
+          <Card>
+            <CardContent className="flex flex-wrap items-center gap-2 py-3">
+              <Input
+                autoFocus
+                className="max-w-xs"
+                placeholder="Название папки"
+                value={newFolderName}
+                onChange={(e) => setNewFolderName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void createFolder();
+                  if (e.key === "Escape") {
+                    setCreatingFolder(false);
+                    setNewFolderName("");
+                  }
+                }}
+              />
+              <Button type="button" size="sm" onClick={() => void createFolder()}>
+                Создать
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setCreatingFolder(false);
+                  setNewFolderName("");
+                }}
+              >
+                Отмена
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">{activeCategory?.name ?? "Файлы"}</CardTitle>
+            <CardTitle className="text-base">
+              {breadcrumb.length
+                ? breadcrumb[breadcrumb.length - 1]?.name
+                : (activeCategory?.name ?? "Файлы")}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div
@@ -247,13 +468,28 @@ export function FilesClient() {
               {activeCategory?.slug === IMPORTANT_DOCS_SLUG && (
                 <p className="text-xs text-muted-foreground">PDF и фото, до 20 МБ</p>
               )}
+              {currentFolderId && (
+                <p className="text-xs text-muted-foreground">Файлы попадут в текущую папку</p>
+              )}
             </div>
           </CardContent>
         </Card>
 
-        {items.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted-foreground">Пока нет файлов</p>
-        ) : (
+        {folders.length > 0 && (
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {folders.map((folder) => (
+              <FolderCard
+                key={folder.id}
+                folder={folder}
+                onOpen={() => openFolder(folder.id)}
+                onRemove={() => void removeFolder(folder)}
+                onRename={(name) => void renameFolder(folder, name)}
+              />
+            ))}
+          </div>
+        )}
+
+        {items.length > 0 && (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {items.map((item) => (
               <FileCard
@@ -265,8 +501,96 @@ export function FilesClient() {
             ))}
           </div>
         )}
+
+        {isEmpty && (
+          <p className="py-8 text-center text-sm text-muted-foreground">
+            {currentFolderId ? "В этой папке пока пусто" : "Пока нет папок и файлов"}
+          </p>
+        )}
       </div>
     </div>
+  );
+}
+
+function FolderCard({
+  folder,
+  onOpen,
+  onRemove,
+  onRename,
+}: {
+  folder: FileFolder;
+  onOpen: () => void;
+  onRemove: () => void;
+  onRename: (name: string) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(folder.name);
+
+  useEffect(() => {
+    setDraft(folder.name);
+  }, [folder.name]);
+
+  return (
+    <Card className="overflow-hidden transition-colors hover:border-primary/40">
+      <button
+        type="button"
+        className="flex w-full items-center gap-3 p-3 text-left"
+        onClick={onOpen}
+      >
+        <Folder className="size-8 shrink-0 text-amber-500" />
+        {editing ? (
+          <Input
+            autoFocus
+            className="h-8 text-sm"
+            value={draft}
+            onClick={(e) => e.stopPropagation()}
+            onChange={(e) => setDraft(e.target.value)}
+            onBlur={() => {
+              setEditing(false);
+              onRename(draft);
+            }}
+            onKeyDown={(e) => {
+              e.stopPropagation();
+              if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+              if (e.key === "Escape") {
+                setDraft(folder.name);
+                setEditing(false);
+              }
+            }}
+          />
+        ) : (
+          <span className="min-w-0 flex-1 truncate text-sm font-medium" title={folder.name}>
+            {folder.name}
+          </span>
+        )}
+      </button>
+      <div className="flex justify-end gap-0.5 border-t px-2 py-1">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="size-7"
+          onClick={(e) => {
+            e.stopPropagation();
+            setEditing(true);
+          }}
+        >
+          <Pencil className="size-3.5" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="size-7 text-muted-foreground hover:text-destructive"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+        >
+          <Trash2 className="size-3.5" />
+        </Button>
+      </div>
+    </Card>
   );
 }
 

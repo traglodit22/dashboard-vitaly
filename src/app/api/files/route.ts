@@ -16,12 +16,30 @@ export async function GET(req: Request) {
 
   const { searchParams } = new URL(req.url)
   const categorySlug = searchParams.get('categorySlug')
+  const folderId = searchParams.get('folderId')
+
+  const conditions: string[] = []
+  const values: unknown[] = []
+
+  if (categorySlug) {
+    values.push(categorySlug)
+    conditions.push(`c.slug = $${values.length}`)
+  }
+
+  if (folderId) {
+    values.push(folderId)
+    conditions.push(`f.folder_id = $${values.length}`)
+  } else if (categorySlug) {
+    conditions.push('f.folder_id IS NULL')
+  }
+
+  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
 
   const rows = await query<Record<string, unknown>>(
     `SELECT ${FILE_ITEM_SELECT} ${FILE_ITEM_FROM}
-     ${categorySlug ? 'WHERE c.slug = $1' : ''}
+     ${where}
      ORDER BY f.created_at DESC`,
-    categorySlug ? [categorySlug] : [],
+    values,
   )
 
   return NextResponse.json({ items: rows.map(rowToFileItem) })
@@ -35,6 +53,8 @@ export async function POST(req: Request) {
 
   const form = await req.formData()
   const categorySlug = String(form.get('categorySlug') ?? '').trim()
+  const folderIdRaw = String(form.get('folderId') ?? '').trim()
+  const folderId = folderIdRaw || null
   const titleRaw = String(form.get('title') ?? '').trim()
   const file = form.get('file')
 
@@ -60,6 +80,7 @@ export async function POST(req: Request) {
       categoryId: category.id,
       categorySlug: category.slug,
       storageType: category.storageType as FileStorageType,
+      folderId,
       title,
       originalName: file.name,
       mime,

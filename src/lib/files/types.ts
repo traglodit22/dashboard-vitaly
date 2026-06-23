@@ -8,11 +8,20 @@ export interface FileCategory {
   sortOrder: number
 }
 
+export interface FileFolder {
+  id: string
+  categoryId: string
+  parentId: string | null
+  name: string
+  createdAt: string
+}
+
 export interface FileItem {
   id: string
   categoryId: string
   categorySlug: string
   categoryName: string
+  folderId: string | null
   title: string
   originalName: string
   mimeType: string
@@ -32,3 +41,5 @@ export const LOCAL_ALLOWED_MIMES = new Set([
 ])
 
 export const MAX_FILE_BYTES = 20 * 1024 * 1024
+
+export const FOLDER_KEEP_NAME = '.keep'
