@@ -509,6 +509,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
               onDragEnd={opts.onDragEnd}
               onDragOver={opts.onDragOver}
               onDrop={opts.onDrop}
+              onImageClick={opts.onImageClick}
               onRemove={() => {
                 const full = items.find((i) => i.id === item.id);
                 if (full) void removeItem(full);
@@ -563,6 +564,7 @@ function FileCard({
   onDrop,
   onRemove,
   onRename,
+  onImageClick,
 }: {
   item: Pick<
     FileItem,
@@ -576,6 +578,7 @@ function FileCard({
   onDrop: (e: React.DragEvent) => void;
   onRemove: () => void;
   onRename: (title: string) => void;
+  onImageClick?: () => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(item.title);
@@ -614,6 +617,9 @@ function FileCard({
     return () => window.clearTimeout(timer);
   }, [previewUrl, showPreview, isPdf]);
 
+  const isImage = item.mimeType.startsWith("image/");
+  const useLightbox = Boolean(onImageClick && isImage);
+
   return (
     <Card
       onDragOver={onDragOver}
@@ -638,53 +644,102 @@ function FileCard({
           <span className="text-[10px]">перетащить</span>
         </div>
       )}
-      <a
-        href={`/api/files/${item.id}/content`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="relative block aspect-[4/3] bg-muted/40"
-      >
-        {showPreview ? (
-          <>
-            {previewLoading && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Loader2 className="size-6 animate-spin text-muted-foreground" />
-              </div>
-            )}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={previewUrl}
-              alt=""
-              className={cn(
-                "size-full object-cover object-top",
-                previewLoading && "opacity-0",
+      {useLightbox ? (
+        <button
+          type="button"
+          onClick={onImageClick}
+          className="relative block aspect-[4/3] w-full cursor-zoom-in bg-muted/40"
+        >
+          {showPreview ? (
+            <>
+              {previewLoading && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                </div>
               )}
-              onLoad={() => setPreviewLoading(false)}
-              onError={() => {
-                if (
-                  previewRetryRef.current < 2 &&
-                  (isPdf || item.mimeType.startsWith("image/"))
-                ) {
-                  previewRetryRef.current += 1;
-                  const attempt = previewRetryRef.current;
-                  window.setTimeout(() => {
-                    setPreviewRetry(attempt);
-                    setPreviewLoading(true);
-                  }, 1500 * attempt);
-                  return;
-                }
-                setPreviewFailed(true);
-                setPreviewLoading(false);
-              }}
-            />
-          </>
-        ) : (
-          <div className="flex size-full flex-col items-center justify-center gap-1">
-            <FileText className="size-10 text-muted-foreground/50" />
-            {isPdf && <span className="text-xs text-muted-foreground">PDF</span>}
-          </div>
-        )}
-      </a>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={previewUrl}
+                alt=""
+                className={cn(
+                  "size-full object-cover object-top",
+                  previewLoading && "opacity-0",
+                )}
+                onLoad={() => setPreviewLoading(false)}
+                onError={() => {
+                  if (
+                    previewRetryRef.current < 2 &&
+                    (isPdf || item.mimeType.startsWith("image/"))
+                  ) {
+                    previewRetryRef.current += 1;
+                    const attempt = previewRetryRef.current;
+                    window.setTimeout(() => {
+                      setPreviewRetry(attempt);
+                      setPreviewLoading(true);
+                    }, 1500 * attempt);
+                    return;
+                  }
+                  setPreviewFailed(true);
+                  setPreviewLoading(false);
+                }}
+                draggable={false}
+              />
+            </>
+          ) : (
+            <div className="flex size-full flex-col items-center justify-center gap-1">
+              <FileText className="size-10 text-muted-foreground/50" />
+            </div>
+          )}
+        </button>
+      ) : (
+        <a
+          href={`/api/files/${item.id}/content`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative block aspect-[4/3] bg-muted/40"
+        >
+          {showPreview ? (
+            <>
+              {previewLoading && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                </div>
+              )}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={previewUrl}
+                alt=""
+                className={cn(
+                  "size-full object-cover object-top",
+                  previewLoading && "opacity-0",
+                )}
+                onLoad={() => setPreviewLoading(false)}
+                onError={() => {
+                  if (
+                    previewRetryRef.current < 2 &&
+                    (isPdf || item.mimeType.startsWith("image/"))
+                  ) {
+                    previewRetryRef.current += 1;
+                    const attempt = previewRetryRef.current;
+                    window.setTimeout(() => {
+                      setPreviewRetry(attempt);
+                      setPreviewLoading(true);
+                    }, 1500 * attempt);
+                    return;
+                  }
+                  setPreviewFailed(true);
+                  setPreviewLoading(false);
+                }}
+              />
+            </>
+          ) : (
+            <div className="flex size-full flex-col items-center justify-center gap-1">
+              <FileText className="size-10 text-muted-foreground/50" />
+              {isPdf && <span className="text-xs text-muted-foreground">PDF</span>}
+            </div>
+          )}
+        </a>
+      )}
       <CardContent className="space-y-2 p-3">
         {editing ? (
           <Input

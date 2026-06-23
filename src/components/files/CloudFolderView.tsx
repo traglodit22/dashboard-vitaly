@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GripVertical, Images, Loader2, Type, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
 import type { FileFolder } from "@/lib/files/types";
+import { CloudImageLightbox, LightboxPreviewTrigger } from "@/components/files/CloudImageLightbox";
 
 export interface CloudFileItem {
   id: string;
@@ -44,6 +45,7 @@ interface CloudFolderViewProps {
       onDrop: (e: React.DragEvent) => void;
       onRemove: () => void;
       onRename: (title: string) => void;
+      onImageClick?: () => void;
     },
   ) => React.ReactNode;
 }
@@ -64,7 +66,22 @@ export function CloudFolderView({
 }: CloudFolderViewProps) {
   const [textDraft, setTextDraft] = useState(folder.folderText);
   const [savingText, setSavingText] = useState(false);
+  const [lightboxId, setLightboxId] = useState<string | null>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const imageItems = useMemo(
+    () =>
+      [...galleryItems, ...listItems].filter((i) => i.mimeType.startsWith("image/")),
+    [galleryItems, listItems],
+  );
+
+  const lightboxIndex = lightboxId
+    ? imageItems.findIndex((i) => i.id === lightboxId)
+    : -1;
+
+  const openLightbox = useCallback((id: string) => {
+    if (imageItems.some((i) => i.id === id)) setLightboxId(id);
+  }, [imageItems]);
 
   useEffect(() => {
     setTextDraft(folder.folderText);
@@ -169,6 +186,14 @@ export function CloudFolderView({
 
   return (
     <div className="space-y-6">
+      {lightboxIndex >= 0 && (
+        <CloudImageLightbox
+          images={imageItems}
+          index={lightboxIndex}
+          onIndexChange={(i) => setLightboxId(imageItems[i]!.id)}
+          onClose={() => setLightboxId(null)}
+        />
+      )}
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-xs text-muted-foreground">Модули папки:</span>
         <Button
@@ -252,6 +277,7 @@ export function CloudFolderView({
                       onGalleryItemDrop(item.id);
                     }}
                     onRemoveFromGallery={() => void setInGallery(item, false)}
+                    onOpen={() => openLightbox(item.id)}
                   />
                 ))}
               </div>
@@ -305,6 +331,9 @@ export function CloudFolderView({
                 },
                 onRemove: () => {},
                 onRename: () => {},
+                onImageClick: item.mimeType.startsWith("image/")
+                  ? () => openLightbox(item.id)
+                  : undefined,
               }),
             )}
           </div>
@@ -322,6 +351,7 @@ function GalleryTile({
   onDragOver,
   onDrop,
   onRemoveFromGallery,
+  onOpen,
 }: {
   item: CloudFileItem;
   dragging: boolean;
@@ -330,6 +360,7 @@ function GalleryTile({
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent) => void;
   onRemoveFromGallery: () => void;
+  onOpen: () => void;
 }) {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -364,7 +395,7 @@ function GalleryTile({
       >
         <X className="size-4" />
       </button>
-      <a href={`/api/files/${item.id}/content`} target="_blank" rel="noopener noreferrer">
+      <LightboxPreviewTrigger onOpen={onOpen} className="block w-full">
         {!failed ? (
           <>
             {!loaded && (
@@ -379,6 +410,7 @@ function GalleryTile({
               className={cn("w-full object-cover", !loaded && "hidden")}
               onLoad={() => setLoaded(true)}
               onError={() => setFailed(true)}
+              draggable={false}
             />
           </>
         ) : (
@@ -386,7 +418,7 @@ function GalleryTile({
             {item.title}
           </div>
         )}
-      </a>
+      </LightboxPreviewTrigger>
       <p className="truncate px-2 py-1.5 text-xs text-muted-foreground">{item.title}</p>
     </div>
   );
