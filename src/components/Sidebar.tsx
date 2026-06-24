@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { sectionForPath, activeItem } from "@/components/navigation";
 import { FilesSidebarTree } from "@/components/files/FilesSidebarTree";
+import { GallerySidebarCalendar } from "@/components/gallery/GallerySidebarCalendar";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -18,41 +19,44 @@ export function Sidebar() {
   const settingsActive = pathname === "/settings";
 
   const isFilesSection = section.key === "files";
+  const isGallerySection = section.key === "gallery";
 
   return (
     <aside
       className={cn(
         "hidden shrink-0 flex-col border-r border-border bg-sidebar md:flex",
-        isFilesSection ? "w-72 xl:w-80" : "w-56",
+        isFilesSection ? "w-72 xl:w-80" : isGallerySection ? "w-64 xl:w-72" : "w-56",
       )}
     >
-      <nav className="flex flex-1 flex-col gap-1 p-3">
-        <div className="px-3 pb-1 pt-2 text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
+      <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-hidden p-3">
+        <div className="shrink-0 px-3 pb-1 pt-2 text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
           {section.label}
         </div>
-        {section.items.map(({ href, label, icon: Icon }) => {
-          const active = current?.href === href;
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                active
-                  ? "bg-primary/15 text-primary"
-                  : "text-muted-foreground hover:bg-accent hover:text-foreground",
-              )}
-            >
-              <Icon className="size-4 shrink-0" />
-              <span className="truncate">{label}</span>
-            </Link>
-          );
-        })}
+        {!isGallerySection &&
+          section.items.map(({ href, label, icon: Icon }) => {
+            const active = current?.href === href;
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={cn(
+                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                  active
+                    ? "bg-primary/15 text-primary"
+                    : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                )}
+              >
+                <Icon className="size-4 shrink-0" />
+                <span className="truncate">{label}</span>
+              </Link>
+            );
+          })}
         {section.key === "files" && (
           <Suspense fallback={null}>
             <FilesSidebarTree />
           </Suspense>
         )}
+        {isGallerySection && <GallerySidebarCalendar />}
       </nav>
 
       <div className="space-y-1 border-t border-border p-3">

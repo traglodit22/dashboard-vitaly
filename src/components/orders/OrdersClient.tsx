@@ -37,6 +37,7 @@ import { getStatusName, isRefusal, DELIVERING_STATUS_ID } from "@/lib/delivery/s
 import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
 import { EditOrderDialog } from "@/components/orders/EditOrderDialog";
+import { staleShipmentRowClass } from "@/lib/orders/staleHighlight";
 
 const yuan = new Intl.NumberFormat("ru-RU", {
   minimumFractionDigits: 2,
@@ -558,11 +559,14 @@ export function OrdersClient() {
             <TableBody>
               {paged.map((o) => {
                 const view = statusView(o);
+                const staleRow = staleShipmentRowClass(o);
                 return (
                   <TableRow
                     key={o.id}
                     className={cn(
-                      changedIds.has(o.id) &&
+                      staleRow,
+                      !staleRow &&
+                        changedIds.has(o.id) &&
                         "bg-emerald-500/10 hover:bg-emerald-500/15",
                     )}
                   >

@@ -16,11 +16,13 @@ export function CloudImageLightbox({
   index,
   onIndexChange,
   onClose,
+  footer,
 }: {
   images: LightboxImage[];
   index: number;
   onIndexChange: (index: number) => void;
   onClose: () => void;
+  footer?: React.ReactNode;
 }) {
   const [mounted, setMounted] = useState(false);
   const item = images[index];
@@ -123,6 +125,15 @@ export function CloudImageLightbox({
           </button>
         )}
       </div>
+
+      {footer && (
+        <div
+          className="relative z-20 shrink-0 border-t border-white/10 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {footer}
+        </div>
+      )}
     </div>,
     document.body,
   );

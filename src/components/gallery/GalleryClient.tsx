@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Images, Loader2, Upload } from "lucide-react";
+import { Images, Calendar, Loader2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { CloudImageLightbox } from "@/components/files/CloudImageLightbox";
 import { FilePreviewImage } from "@/components/files/FilePreviewImage";
@@ -15,6 +15,16 @@ import {
   sha256HexBrowser,
 } from "@/lib/gallery/clientImageMeta";
 import type { GalleryYearGroup } from "@/lib/gallery/groupByDate";
+import {
+  galleryDayAnchor,
+  galleryMonthAnchor,
+  parseGalleryHash,
+  scrollToGalleryAnchor,
+} from "@/lib/gallery/groupByDate";
+import { notifyGalleryChanged } from "@/lib/gallery/galleryRoutes";
+import { GallerySidebarCalendar } from "@/components/gallery/GallerySidebarCalendar";
+import { GalleryDateEditor } from "@/components/gallery/GalleryDateEditor";
+import { gallerySortDate } from "@/lib/gallery/capturedAt";
 import { cn } from "@/lib/utils";
 import {
   DASHBOARD_PAGE_CLASS,
@@ -58,12 +68,22 @@ export function GalleryClient() {
     })();
   }, [load]);
 
+  useEffect(() => {
+    if (loading || !grouped.length) return;
+    const parsed = parseGalleryHash(window.location.hash);
+    if (!parsed) return;
+    const t = window.setTimeout(() => {
+      scrollToGalleryAnchor(parsed.year, parsed.month, parsed.day, "auto");
+    }, 80);
+    return () => window.clearTimeout(t);
+  }, [loading, grouped]);
+
   const flatImages = useMemo(
     () =>
       items.map((item) => ({
         id: item.id,
         title: item.title,
-        createdAt: item.capturedAt || item.createdAt,
+        createdAt: gallerySortDate(item),
       })),
     [items],
   );
@@ -71,6 +91,19 @@ export function GalleryClient() {
   const lightboxIndex = lightboxId
     ? flatImages.findIndex((i) => i.id === lightboxId)
     : -1;
+
+  const lightboxItem = lightboxId
+    ? items.find((i) => i.id === lightboxId) ?? null
+    : null;
+
+  const handleDateSaved = useCallback(
+    async (updated: FileItem) => {
+      await load();
+      notifyGalleryChanged();
+      setLightboxId(updated.id);
+    },
+    [load],
+  );
 
   async function prepareUploads(files: File[]): Promise<PendingUpload[]> {
     const images = files.filter((f) => f.type.startsWith("image/"));
@@ -203,6 +236,7 @@ export function GalleryClient() {
       if (ok) {
         toast.success(ok === 1 ? "Фото загружено" : `Загружено фото: ${ok}`);
         await load();
+        notifyGalleryChanged();
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Ошибка загрузки");
@@ -270,7 +304,7 @@ export function GalleryClient() {
   }
 
   return (
-    <div className={DASHBOARD_PAGE_CLASS}>
+    <div className={cn(DASHBOARD_PAGE_CLASS, "max-w-none lg:pr-4")}>
       <div className="mb-4 flex items-center gap-2">
         <Images className="size-6 text-primary" />
         <h1 className={DASHBOARD_PAGE_TITLE_CLASS}>Галерея</h1>
@@ -278,6 +312,15 @@ export function GalleryClient() {
       </div>
 
       {uploadZone}
+
+      <details className="mb-4 rounded-lg border border-border/60 md:hidden">
+        <summary className="cursor-pointer px-3 py-2.5 text-sm font-medium">
+          Календарь по датам
+        </summary>
+        <div className="max-h-72 overflow-y-auto border-t border-border/60 p-2">
+          <GallerySidebarCalendar />
+        </div>
+      </details>
 
       {!grouped.length ? (
         <p className="mt-8 text-center text-sm text-muted-foreground">
@@ -295,18 +338,38 @@ export function GalleryClient() {
               </h2>
               <div className="space-y-6">
                 {yearGroup.months.map((month) => (
-                  <div key={`${yearGroup.year}-${month.month}`}>
+                  <div
+                    key={`${yearGroup.year}-${month.month}`}
+                    id={galleryMonthAnchor(yearGroup.year, month.month)}
+                    className="scroll-mt-16"
+                  >
                     <h3 className="mb-2 text-sm font-medium text-muted-foreground">
                       {month.label}
                       <span className="ml-1.5 text-xs">({month.items.length})</span>
                     </h3>
-                    <div className={FILE_GRID_CLASS}>
-                      {month.items.map((item) => (
-                        <GalleryThumb
-                          key={item.id}
-                          item={item}
-                          onOpen={() => setLightboxId(item.id)}
-                        />
+                    <div className="space-y-4">
+                      {month.days.map((day) => (
+                        <div
+                          key={`${day.year}-${day.month}-${day.day}`}
+                          id={galleryDayAnchor(day.year, day.month, day.day)}
+                          className="scroll-mt-16"
+                        >
+                          {month.days.length > 1 && (
+                            <p className="mb-1.5 text-[11px] font-medium text-muted-foreground/80">
+                              {day.label}
+                            </p>
+                          )}
+                          <div className={FILE_GRID_CLASS}>
+                            {day.items.map((item) => (
+                              <GalleryThumb
+                                key={item.id}
+                                item={item}
+                                onOpen={() => setLightboxId(item.id)}
+                                onDateSaved={handleDateSaved}
+                              />
+                            ))}
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -317,12 +380,20 @@ export function GalleryClient() {
         </div>
       )}
 
-      {lightboxIndex >= 0 && (
+      {lightboxIndex >= 0 && lightboxItem && (
         <CloudImageLightbox
           images={flatImages}
           index={lightboxIndex}
           onIndexChange={(i) => setLightboxId(flatImages[i]?.id ?? null)}
           onClose={() => setLightboxId(null)}
+          footer={
+            <GalleryDateEditor
+              key={lightboxItem.id}
+              item={lightboxItem}
+              variant="dark"
+              onSaved={handleDateSaved}
+            />
+          }
         />
       )}
     </div>
@@ -332,32 +403,69 @@ export function GalleryClient() {
 function GalleryThumb({
   item,
   onOpen,
+  onDateSaved,
 }: {
   item: FileItem;
   onOpen: () => void;
+  onDateSaved: (item: FileItem) => void | Promise<void>;
 }) {
+  const [editingDate, setEditingDate] = useState(false);
   const previewUrl = `/api/files/${item.id}/preview?v=${
     item.hasPreview ? encodeURIComponent(item.updatedAt) : "src"
   }`;
-  const dateLabel = formatPhotoDate(item.capturedAt || item.createdAt);
+  const dateLabel = formatPhotoDate(gallerySortDate(item));
 
   return (
-    <button
-      type="button"
-      className="group relative aspect-square overflow-hidden rounded-lg border border-border/60 bg-muted/30 text-left transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-      onClick={onOpen}
-      title={item.title}
-    >
-      <FilePreviewImage
-        src={previewUrl}
-        alt={item.title}
-        className="size-full"
-        imgClassName="size-full object-cover object-center transition-transform group-hover:scale-[1.02]"
-      />
-      <span className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 to-transparent px-1.5 pb-1 pt-4 text-[10px] text-white/90 opacity-0 transition-opacity group-hover:opacity-100 sm:text-[11px]">
-        {dateLabel}
-      </span>
-    </button>
+    <div className="group relative aspect-square">
+      <button
+        type="button"
+        className="size-full overflow-hidden rounded-lg border border-border/60 bg-muted/30 text-left transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        onClick={() => {
+          if (!editingDate) onOpen();
+        }}
+        title={item.title}
+      >
+        <FilePreviewImage
+          src={previewUrl}
+          alt={item.title}
+          className="size-full"
+          imgClassName="size-full object-cover object-center transition-transform group-hover:scale-[1.02]"
+        />
+        {!editingDate && (
+          <span className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 to-transparent px-1.5 pb-1 pt-4 text-[10px] text-white/90 opacity-0 transition-opacity group-hover:opacity-100 sm:text-[11px]">
+            {dateLabel}
+          </span>
+        )}
+      </button>
+      <button
+        type="button"
+        title="Изменить дату съёмки"
+        className={cn(
+          "absolute right-1 top-1 z-10 flex size-7 items-center justify-center rounded-md bg-black/50 text-white backdrop-blur-sm transition-opacity",
+          editingDate ? "opacity-100" : "opacity-0 group-hover:opacity-100 focus:opacity-100",
+        )}
+        onClick={(e) => {
+          e.stopPropagation();
+          setEditingDate((v) => !v);
+        }}
+      >
+        <Calendar className="size-3.5" />
+      </button>
+      {editingDate && (
+        <div
+          className="absolute inset-x-0 bottom-0 z-20 rounded-b-lg border-t border-border bg-background/95 p-2 shadow-lg backdrop-blur-sm"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <GalleryDateEditor
+            item={item}
+            onSaved={async (updated) => {
+              await onDateSaved(updated);
+              setEditingDate(false);
+            }}
+          />
+        </div>
+      )}
+    </div>
   );
 }
 
