@@ -52,7 +52,7 @@ export async function GET(req: Request) {
     const name = row.original_name as string
     if (
       !isThumbnailPreviewPath(row.preview_path as string | null, row.storage_path as string) &&
-      (isImageMime(mime) || isPdfMime(mime, name))
+      isPdfMime(mime, name)
     ) {
       missingPreviewIds.push(row.id as string)
     }

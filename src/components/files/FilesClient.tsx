@@ -733,7 +733,7 @@ function FileCard({
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(item.title);
   const [previewFailed, setPreviewFailed] = useState(false);
-  const [previewLoading, setPreviewLoading] = useState(item.hasPreview);
+  const [previewLoading, setPreviewLoading] = useState(true);
   const isPdf = item.mimeType === "application/pdf";
   const isImage = item.mimeType.startsWith("image/");
   const previewUrl =
