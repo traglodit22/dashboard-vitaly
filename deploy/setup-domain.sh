@@ -70,7 +70,10 @@ fi
 
 echo "==> Restart app"
 if command -v pm2 >/dev/null; then
-  pm2 restart dashboard --update-env 2>/dev/null || true
+  cd "$APP_DIR"
+  pm2 start ecosystem.config.cjs --only dashboard --update-env 2>/dev/null || \
+    pm2 restart dashboard --update-env 2>/dev/null || true
+  pm2 save 2>/dev/null || true
 fi
 
 echo "==> GCS CORS"

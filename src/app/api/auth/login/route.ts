@@ -14,7 +14,7 @@ export async function POST(req: Request): Promise<Response> {
 
   const user = await findUserByCredentials(email, password)
   if (user) {
-    await createSession(user.email)
+    await createSession(user.email, req)
     return Response.json({ ok: true })
   }
 
@@ -37,6 +37,6 @@ export async function POST(req: Request): Promise<Response> {
     return Response.json({ error: 'Неверный email или пароль' }, { status: 401 })
   }
 
-  await createSession(adminEmail)
+  await createSession(adminEmail, req)
   return Response.json({ ok: true })
 }

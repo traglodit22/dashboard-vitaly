@@ -10,7 +10,24 @@ function getSecret(): Uint8Array {
   return new TextEncoder().encode(secret)
 }
 
-export async function createSession(email: string): Promise<void> {
+function isSecureRequest(req?: Request): boolean {
+  if (process.env.HTTPS_ONLY === 'true') return true
+  const proto = req?.headers.get('x-forwarded-proto')
+  if (proto) return proto.split(',')[0]?.trim() === 'https'
+  return false
+}
+
+function sessionCookieOptions(req?: Request, maxAge = EXPIRY_SECONDS) {
+  return {
+    httpOnly: true,
+    secure: isSecureRequest(req),
+    sameSite: 'lax' as const,
+    path: '/',
+    maxAge,
+  }
+}
+
+export async function createSession(email: string, req?: Request): Promise<void> {
   const token = await new SignJWT({ admin: true, email: email.trim().toLowerCase() })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
@@ -18,14 +35,7 @@ export async function createSession(email: string): Promise<void> {
     .sign(getSecret())
 
   const cookieStore = await cookies()
-  cookieStore.set(COOKIE_NAME, token, {
-    httpOnly: true,
-    // secure включается только если явно указано HTTPS_ONLY=true (при наличии SSL)
-    secure: process.env.HTTPS_ONLY === 'true',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: EXPIRY_SECONDS,
-  })
+  cookieStore.set(COOKIE_NAME, token, sessionCookieOptions(req))
 }
 
 export async function getSessionEmail(req: Request): Promise<string | null> {
@@ -43,7 +53,6 @@ export async function getSessionEmail(req: Request): Promise<string | null> {
 }
 
 export async function getSession(req: Request): Promise<boolean> {
-  // Try reading from the incoming request cookies directly (works in all contexts).
   const cookieHeader = req.headers.get('cookie') ?? ''
   const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]+)`))
   const token = match?.[1]
@@ -56,7 +65,7 @@ export async function getSession(req: Request): Promise<boolean> {
   }
 }
 
-export async function clearSession(): Promise<void> {
+export async function clearSession(req?: Request): Promise<void> {
   const cookieStore = await cookies()
-  cookieStore.set(COOKIE_NAME, '', { maxAge: 0, path: '/' })
+  cookieStore.set(COOKIE_NAME, '', sessionCookieOptions(req, 0))
 }
