@@ -1,5 +1,6 @@
 import { pool, query } from '@/lib/db/index'
 import { ensureBesedkaProcurement } from '@/lib/procurement/ensureBesedkaSeed'
+import { ensureKlubProcurement } from '@/lib/procurement/ensureKlubSeed'
 import { ensurePhotoHubProcurement } from '@/lib/procurement/ensurePhotoHubSeed'
 
 const PROCUREMENT_DDL = `
@@ -145,6 +146,7 @@ export async function ensureHotelProcurement(): Promise<void> {
   await ensureHotelSeedOnly()
   await ensureBesedkaProcurement()
   await ensurePhotoHubProcurement()
+  await ensureKlubProcurement()
 }
 
 async function ensureProcurementSchema(): Promise<void> {

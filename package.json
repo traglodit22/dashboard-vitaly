@@ -13,7 +13,8 @@
     "db:migrate": "node scripts/run-migrations.mjs",
     "deploy": "bash deploy/local-deploy.sh",
     "deploy:fast": "bash deploy/local-deploy.sh --fast",
-    "backfill-previews": "tsx scripts/backfill-file-previews.ts"
+    "backfill-previews": "tsx scripts/backfill-file-previews.ts",
+    "import-klub": "tsx scripts/import-klub-procurement.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.2",
