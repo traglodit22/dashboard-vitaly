@@ -709,7 +709,7 @@ function FileCard({
   const [previewRetry, setPreviewRetry] = useState(0);
   const previewRetryRef = useRef(0);
   const isPdf = item.mimeType === "application/pdf";
-  const previewUrl = `/api/files/${item.id}/preview?v=${encodeURIComponent(item.createdAt)}&r=${previewRetry}`;
+  const previewUrl = `/api/files/${item.id}/preview?v=${item.hasPreview ? encodeURIComponent(item.createdAt) : "gen"}&r=${previewRetry}`;
   const showPreview =
     !previewFailed && (item.hasPreview || item.mimeType.startsWith("image/") || isPdf);
 
@@ -723,7 +723,7 @@ function FileCard({
 
   useEffect(() => {
     if (!showPreview) return;
-    const waitMs = isPdf ? 60_000 : 30_000;
+    const waitMs = isPdf ? 60_000 : 12_000;
     const timer = window.setTimeout(() => {
       setPreviewLoading((loading) => {
         if (!loading) return loading;
@@ -783,6 +783,8 @@ function FileCard({
               <img
                 src={previewUrl}
                 alt=""
+                loading="lazy"
+                decoding="async"
                 className={cn(
                   "size-full object-cover object-top",
                   previewLoading && "opacity-0",
@@ -831,6 +833,8 @@ function FileCard({
               <img
                 src={previewUrl}
                 alt=""
+                loading="lazy"
+                decoding="async"
                 className={cn(
                   "size-full object-cover object-top",
                   previewLoading && "opacity-0",

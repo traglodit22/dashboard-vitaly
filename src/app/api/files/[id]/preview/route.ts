@@ -6,8 +6,10 @@ import {
   readFilePreview,
   readFileContent,
 } from '@/lib/files/fileService'
+import { isPdfMime } from '@/lib/files/mimeDetect'
 import { getGcsReadSignedUrl } from '@/lib/files/gcsStorage'
 import { PREVIEW_CACHE_CONTROL, isThumbnailPreviewPath } from '@/lib/files/previewConstants'
+import { schedulePreviewGeneration } from '@/lib/files/previewQueue'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -36,18 +38,19 @@ export async function GET(
 
   const storageType = row.category_storage_type as string
   const fileMime = row.mime_type as string
+  const originalName = row.original_name as string
   const previewPath = row.preview_path as string | null
   const storagePath = row.storage_path as string
+  const isPdf = isPdfMime(fileMime, originalName)
 
   if (isThumbnailPreviewPath(previewPath, storagePath)) {
     const cached = await readFilePreview(row)
     if (cached) return previewResponse(cached)
   }
 
-  const generated = await ensureFilePreview(row)
-  if (generated) return previewResponse(generated)
-
+  // Картинки без превью — сразу отдаём оригинал (редирект на GCS), превью в фоне.
   if (fileMime.startsWith('image/')) {
+    schedulePreviewGeneration(id)
     if (storageType === 'gcs') {
       const url = await getGcsReadSignedUrl(storagePath)
       return NextResponse.redirect(url, 307)
@@ -59,6 +62,13 @@ export async function GET(
         'Cache-Control': 'private, max-age=3600',
       },
     })
+  }
+
+  // PDF — генерируем по запросу (обычно мало в папке).
+  if (isPdf) {
+    const generated = await ensureFilePreview(row)
+    if (generated) return previewResponse(generated)
+    return NextResponse.json({ error: 'Превью недоступно' }, { status: 404 })
   }
 
   return NextResponse.json({ error: 'Превью недоступно' }, { status: 404 })

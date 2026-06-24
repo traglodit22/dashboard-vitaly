@@ -467,6 +467,8 @@ function GalleryTile({
             <img
               src={previewUrl}
               alt={item.title}
+              loading="lazy"
+              decoding="async"
               className={cn("w-full object-cover", !loaded && "hidden")}
               onLoad={() => setLoaded(true)}
               onError={() => setFailed(true)}
