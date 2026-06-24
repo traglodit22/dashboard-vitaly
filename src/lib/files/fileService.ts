@@ -21,6 +21,7 @@ import {
 import { FILE_ITEM_FROM, FILE_ITEM_SELECT, rowToFileItem } from '@/lib/files/mapRow'
 import { isImageMime, isPdfMime } from '@/lib/files/mimeDetect'
 import type { FileStorageType } from '@/lib/files/types'
+import { isThumbnailPreviewPath } from '@/lib/files/previewConstants'
 import { MAX_FILE_BYTES, MAX_FILE_SIZE_ERROR } from '@/lib/files/types'
 
 async function nextFileSortOrder(categoryId: string, folderId: string | null): Promise<number> {
@@ -69,9 +70,12 @@ export async function uploadFileItem(opts: {
     }
     storagePath = gcsObjectKey(opts.categorySlug, folderPrefix, id, ext)
     await uploadToGcs(storagePath, opts.buffer, opts.mime)
-    // Превью для картинок в облаке — оригинал (lazy через /preview).
     if (isImageMime(opts.mime)) {
-      previewPath = storagePath
+      const thumb = await buildFilePreview(opts.mime, opts.buffer, opts.originalName)
+      if (thumb) {
+        previewPath = gcsPreviewKey(opts.categorySlug, folderPrefix, id)
+        await uploadToGcs(previewPath, thumb, 'image/webp')
+      }
     }
   } else {
     const saved = await saveLocalFile(
@@ -84,8 +88,6 @@ export async function uploadFileItem(opts: {
     storagePath = saved.storagePath
     if (previewBuffer) {
       previewPath = await saveLocalPreview(opts.categorySlug, folderPrefix, id, previewBuffer)
-    } else if (opts.mime.startsWith('image/')) {
-      previewPath = storagePath
     }
   }
 
@@ -147,7 +149,7 @@ export async function completeGcsDirectUpload(opts: {
   const ext = extForMime(opts.mime)
   const folderPrefix = opts.folderId ? await getFolderStoragePrefix(opts.folderId) : ''
   const storagePath = gcsObjectKey(opts.categorySlug, folderPrefix, opts.fileId, ext)
-  const previewPath = isImageMime(opts.mime) ? storagePath : null
+  const previewPath = null
 
   const rows = await query<Record<string, unknown>>(
     `INSERT INTO file_items
@@ -190,47 +192,49 @@ export async function readFilePreview(row: Record<string, unknown>): Promise<Buf
   }
 }
 
-/** Сгенерировать и сохранить превью, если его ещё нет (в т.ч. для уже загруженных PDF). */
+/** Сгенерировать и сохранить WebP-превью (~320px), если его ещё нет. */
 export async function ensureFilePreview(row: Record<string, unknown>): Promise<Buffer | null> {
-  const existing = await readFilePreview(row)
-  if (existing) return existing
-
+  const previewPath = row.preview_path as string | null
+  const storagePath = row.storage_path as string
   const mime = row.mime_type as string
   const originalName = row.original_name as string
-  const storageType = row.category_storage_type as string
-  const categorySlug = row.category_slug as string
-  const fileId = row.id as string
-  const folderId = (row.folder_id as string) ?? null
 
   if (!isPdfMime(mime, originalName) && !mime.startsWith('image/')) return null
 
-  const content = await readFileContent(row)
-  const folderPrefix = folderId ? await getFolderStoragePrefix(folderId) : ''
-  const fileStoragePath = row.storage_path as string
-
-  if (storageType === 'gcs' && mime.startsWith('image/')) {
-    await query(
-      'UPDATE file_items SET preview_path = $1, updated_at = NOW() WHERE id = $2',
-      [fileStoragePath, fileId],
-    )
-    return content
+  if (isThumbnailPreviewPath(previewPath, storagePath)) {
+    const existing = await readFilePreview(row)
+    if (existing) return existing
   }
 
+  const content = await readFileContent(row)
   const previewBuffer = await buildFilePreview(mime, content, originalName)
   if (!previewBuffer) {
     console.error('[files] preview generation returned null', {
-      fileId,
+      fileId: row.id,
       mime,
       originalName,
-      storageType,
+      storageType: row.category_storage_type,
     })
     return mime.startsWith('image/') ? content : null
   }
 
-  let previewPath: string
+  await persistFilePreview(row, previewBuffer)
+  return previewBuffer
+}
 
+async function persistFilePreview(
+  row: Record<string, unknown>,
+  previewBuffer: Buffer,
+): Promise<string> {
+  const storageType = row.category_storage_type as string
+  const categorySlug = row.category_slug as string
+  const fileId = row.id as string
+  const folderId = (row.folder_id as string) ?? null
+  const folderPrefix = folderId ? await getFolderStoragePrefix(folderId) : ''
+
+  let previewPath: string
   if (storageType === 'gcs') {
-    if (!isGcsConfigured()) return previewBuffer
+    if (!isGcsConfigured()) throw new Error('Google Cloud Storage не настроен')
     previewPath = gcsPreviewKey(categorySlug, folderPrefix, fileId)
     await uploadToGcs(previewPath, previewBuffer, 'image/webp')
   } else {
@@ -241,8 +245,7 @@ export async function ensureFilePreview(row: Record<string, unknown>): Promise<B
     'UPDATE file_items SET preview_path = $1, updated_at = NOW() WHERE id = $2',
     [previewPath, fileId],
   )
-
-  return previewBuffer
+  return previewPath
 }
 
 export async function deleteFileItem(row: Record<string, unknown>): Promise<void> {

@@ -3,6 +3,7 @@ import path from 'path'
 import { pathToFileURL } from 'url'
 import { createRequire } from 'module'
 import { createCanvas } from '@napi-rs/canvas'
+import { PREVIEW_MAX_PX } from '@/lib/files/previewConstants'
 
 const require = createRequire(import.meta.url)
 
@@ -57,7 +58,7 @@ async function renderPdfPreviewInner(pdfBuffer: Buffer): Promise<Buffer | null> 
     const pdf = await loadingTask.promise
     const page = await pdf.getPage(1)
     const viewport = page.getViewport({ scale: 1 })
-    const maxW = 480
+    const maxW = PREVIEW_MAX_PX
     const scale = Math.min(maxW / viewport.width, maxW / viewport.height, 2)
     const scaled = page.getViewport({ scale })
     const canvas = createCanvas(Math.ceil(scaled.width), Math.ceil(scaled.height))
@@ -67,7 +68,7 @@ async function renderPdfPreviewInner(pdfBuffer: Buffer): Promise<Buffer | null> 
       viewport: scaled,
       canvas: canvas as unknown as HTMLCanvasElement,
     }).promise
-    return canvas.toBuffer('image/webp')
+    return canvas.toBuffer('image/webp', 80)
   } catch (err) {
     console.error('[files] PDF preview render failed:', err)
     return null
@@ -79,14 +80,14 @@ export async function renderImagePreview(imageBuffer: Buffer): Promise<Buffer | 
   try {
     const { loadImage } = await import('@napi-rs/canvas')
     const img = await loadImage(imageBuffer)
-    const maxW = 480
+    const maxW = PREVIEW_MAX_PX
     const scale = Math.min(maxW / img.width, maxW / img.height, 1)
     const w = Math.ceil(img.width * scale)
     const h = Math.ceil(img.height * scale)
     const canvas = createCanvas(w, h)
     const ctx = canvas.getContext('2d')
     ctx.drawImage(img, 0, 0, w, h)
-    return canvas.toBuffer('image/webp')
+    return canvas.toBuffer('image/webp', 80)
   } catch (err) {
     console.error('[files] image preview failed:', err)
     return null

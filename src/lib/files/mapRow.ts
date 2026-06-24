@@ -1,4 +1,5 @@
 import type { FileCategory, FileFolder, FileItem, FileStorageType } from '@/lib/files/types'
+import { isThumbnailPreviewPath } from '@/lib/files/previewConstants'
 
 export function rowToFileCategory(row: Record<string, unknown>): FileCategory {
   return {
@@ -35,7 +36,10 @@ export function rowToFileItem(row: Record<string, unknown>): FileItem {
     originalName: row.original_name as string,
     mimeType: row.mime_type as string,
     sizeBytes: Number(row.size_bytes ?? 0),
-    hasPreview: Boolean(row.preview_path),
+    hasPreview: isThumbnailPreviewPath(
+      row.preview_path as string | null,
+      row.storage_path as string,
+    ),
     sortOrder: Number(row.sort_order ?? 0),
     inGallery: Boolean(row.in_gallery),
     gallerySortOrder: Number(row.gallery_sort_order ?? 0),
