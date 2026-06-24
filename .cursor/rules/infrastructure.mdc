@@ -11,7 +11,7 @@ alwaysApply: true
 
 - **GitHub**: `traglodit22/dashboard-vitaly`, ветка `main`
 - **Локально**: `npm run dev`, `.env.local`
-- **Прод**: http://135.106.161.215, `/var/www/dashboard`, `.env` на VPS
+- **Прод**: https://plansolo.ru, `/var/www/dashboard`, `.env` на VPS
 - **Деплой**: `git push` → GitHub Actions → `deploy/deploy.sh`
 - **Не в git**: `.env*`, `.local/`, `bot/bot.js` (кастом на VPS)
 

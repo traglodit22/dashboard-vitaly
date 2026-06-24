@@ -18,7 +18,7 @@ Mac → git push main → GitHub → Actions → VPS (135.106.161.215)
 ```
 
 - Репозиторий: https://github.com/traglodit22/dashboard-vitaly
-- Прод: http://135.106.161.215
+- Прод: https://plansolo.ru (также http://135.106.161.215)
 - Деплой: автоматически при push в `main`
 
 ## Команды
