@@ -3,7 +3,8 @@ import { requireAuth } from '@/lib/auth/requireAuth'
 import { ensureFilesSeed, getCategoryBySlug } from '@/lib/files/ensureFilesSeed'
 import { rowToFileCategory } from '@/lib/files/mapRow'
 import { prepareGcsDirectUpload } from '@/lib/files/fileService'
-import { resolveUploadMime } from '@/lib/files/mimeDetect'
+import { GALLERY_SLUG } from '@/lib/files/types'
+import { resolveUploadMime, isImageMime } from '@/lib/files/mimeDetect'
 import { isGcsConfigured } from '@/lib/files/gcsStorage'
 
 export const runtime = 'nodejs'
@@ -44,6 +45,10 @@ export async function POST(req: Request) {
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     return NextResponse.json({ error: message }, { status: 400 })
+  }
+
+  if (categorySlug === GALLERY_SLUG && !isImageMime(mime)) {
+    return NextResponse.json({ error: 'В галерею можно загружать только фото' }, { status: 400 })
   }
 
   try {

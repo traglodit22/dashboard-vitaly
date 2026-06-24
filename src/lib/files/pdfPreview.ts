@@ -10,7 +10,20 @@ const require = createRequire(import.meta.url)
 let pdfjsConfigured = false
 
 function pdfjsPackageDir(): string {
-  return path.dirname(require.resolve('pdfjs-dist/package.json'))
+  const candidates: string[] = []
+  const envDir = process.env.PDFJS_DIST_DIR?.trim()
+  if (envDir) candidates.push(envDir)
+  candidates.push(path.join(process.cwd(), 'node_modules', 'pdfjs-dist'))
+  try {
+    candidates.push(path.dirname(require.resolve('pdfjs-dist/package.json')))
+  } catch {
+    /* standalone bundle */
+  }
+  for (const dir of candidates) {
+    const worker = path.join(dir, 'legacy/build/pdf.worker.mjs')
+    if (fs.existsSync(worker)) return dir
+  }
+  throw new Error(`pdfjs-dist not found (cwd=${process.cwd()})`)
 }
 
 function pdfjsAssetUrl(subdir: string): string {

@@ -1,13 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { GripVertical, Images, Loader2, Type, X } from "lucide-react";
+import { GripVertical, Images, Loader2, Type, X, Download } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
 import type { FileFolder } from "@/lib/files/types";
 import { CloudImageLightbox, LightboxPreviewTrigger } from "@/components/files/CloudImageLightbox";
+import { FilePreviewImage } from "@/components/files/FilePreviewImage";
+import { FILE_GRID_CLASS } from "@/lib/files/fileCardLayout";
+import { fileDownloadUrl } from "@/lib/files/routes";
 
 export interface CloudFileItem {
   id: string;
@@ -327,7 +330,7 @@ export function CloudFolderView({
                 : "В этой папке пока нет файлов"}
           </p>
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className={FILE_GRID_CLASS}>
             {listItems.map((item) =>
               renderFileCard(item, {
                 draggable: manualSort && listItems.length > 1,
@@ -421,18 +424,17 @@ function GalleryTile({
   onRemoveFromGallery: () => void;
   onOpen: () => void;
 }) {
-  const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
+  const isPdf = item.mimeType === "application/pdf";
   const previewUrl =
-    item.mimeType.startsWith("image/") || item.hasPreview
+    item.mimeType.startsWith("image/") || isPdf || item.hasPreview
       ? `/api/files/${item.id}/preview?v=${
           item.hasPreview ? encodeURIComponent(item.updatedAt) : "src"
         }`
       : null;
-  const pending = !item.hasPreview && item.mimeType === "application/pdf";
+  const pending = isPdf && !item.hasPreview && !failed;
 
   useEffect(() => {
-    setLoaded(false);
     setFailed(false);
   }, [item.id, item.hasPreview, item.updatedAt]);
 
@@ -459,34 +461,31 @@ function GalleryTile({
           <GripVertical className="size-4" />
         </div>
       )}
+      <a
+        href={fileDownloadUrl(item.id)}
+        download
+        title="Скачать оригинал"
+        onClick={(e) => e.stopPropagation()}
+        className="absolute right-2 top-2 z-10 flex size-8 items-center justify-center rounded-md bg-black/40 text-white opacity-100 backdrop-blur-sm transition-opacity hover:bg-black/55 sm:size-7 sm:opacity-0 sm:group-hover:opacity-100"
+      >
+        <Download className="size-4" />
+      </a>
       <button
         type="button"
         title="Убрать из галереи"
         onClick={onRemoveFromGallery}
-        className="absolute right-2 top-2 z-10 flex size-8 items-center justify-center rounded-md bg-black/40 text-white opacity-100 backdrop-blur-sm transition-opacity hover:bg-black/55 sm:size-7 sm:opacity-0 sm:group-hover:opacity-100"
+        className="absolute right-11 top-2 z-10 flex size-8 items-center justify-center rounded-md bg-black/40 text-white opacity-100 backdrop-blur-sm transition-opacity hover:bg-black/55 sm:right-10 sm:size-7 sm:opacity-0 sm:group-hover:opacity-100"
       >
         <X className="size-4" />
       </button>
       <LightboxPreviewTrigger onOpen={onOpen} className="block w-full">
         {previewUrl && !failed ? (
-          <>
-            {!loaded && (
-              <div className="flex aspect-[4/3] items-center justify-center">
-                <Loader2 className="size-6 animate-spin text-muted-foreground" />
-              </div>
-            )}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={previewUrl}
-              alt={item.title}
-              loading="lazy"
-              decoding="async"
-              className={cn("w-full object-cover", !loaded && "hidden")}
-              onLoad={() => setLoaded(true)}
-              onError={() => setFailed(true)}
-              draggable={false}
-            />
-          </>
+          <FilePreviewImage
+            src={previewUrl}
+            alt={item.title}
+            imgClassName="w-full object-cover"
+            onFailed={() => setFailed(true)}
+          />
         ) : pending ? (
           <div className="flex aspect-[4/3] items-center justify-center gap-1 text-muted-foreground">
             <Loader2 className="size-5 animate-spin" />

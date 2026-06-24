@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChevronDown, ChevronRight, Folder, FolderPlus, GripVertical, Loader2, Pencil, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Folder, FolderPlus, GripVertical, Loader2, Pencil, Star, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,7 @@ interface FileFolder {
   name: string;
   sortOrder: number;
   createdAt: string;
+  isFavorite: boolean;
 }
 
 interface FolderNode extends FileFolder {
@@ -118,9 +119,9 @@ export function FilesSidebarTree({
     })
   }, [folders, currentFolderId])
 
-  const tree = useMemo(() => buildFolderTree(folders), [folders])
+  const tree = useMemo(() => buildFolderTree(folders), [folders]);
 
-  if (!categorySlug) return null
+  if (!categorySlug) return null;
 
   function startCreate(parentId: string | null) {
     setCreatingIn(parentId)
@@ -228,6 +229,26 @@ export function FilesSidebarTree({
     }
   }
 
+  async function toggleFavorite(folder: FileFolder) {
+    const res = await apiFetch(`/api/files/folders/${folder.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isFavorite: !folder.isFavorite }),
+    });
+    const data = await res.json();
+    if (res.ok && data.folder) {
+      setFolders((prev) =>
+        prev.map((f) =>
+          f.id === folder.id ? { ...f, isFavorite: Boolean(data.folder.isFavorite) } : f,
+        ),
+      );
+      notifyFilesChanged();
+      toast.success(data.folder.isFavorite ? "Добавлено в избранное" : "Убрано из избранного");
+    } else {
+      toast.error("Не удалось обновить избранное", { description: data.error });
+    }
+  }
+
   function toggleExpand(id: string) {
     setExpanded((prev) => {
       const next = new Set(prev)
@@ -282,6 +303,7 @@ export function FilesSidebarTree({
               onToggle={toggleExpand}
               onDelete={deleteFolder}
               onRename={renameFolderItem}
+              onToggleFavorite={toggleFavorite}
               onCreateSubfolder={startCreate}
               onDragStart={setDragFolderId}
               onDragEnd={() => setDragFolderId(null)}
@@ -357,6 +379,7 @@ function FolderTreeNode({
   onToggle,
   onDelete,
   onRename,
+  onToggleFavorite,
   onCreateSubfolder,
   onDragStart,
   onDragEnd,
@@ -374,6 +397,7 @@ function FolderTreeNode({
   onToggle: (id: string) => void
   onDelete: (folder: FileFolder) => void
   onRename: (folder: FileFolder, name: string) => void
+  onToggleFavorite: (folder: FileFolder) => void
   onCreateSubfolder: (parentId: string) => void
   onDragStart: (id: string) => void
   onDragEnd: () => void
@@ -496,11 +520,25 @@ function FolderTreeNode({
               <div
                 className={cn(
                   "mt-0.5 flex shrink-0 gap-0.5",
-                  compactActions
+                  compactActions || node.isFavorite
                     ? "opacity-100"
                     : "opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100",
                 )}
               >
+                <button
+                  type="button"
+                  aria-label={node.isFavorite ? "Убрать из избранного" : "В избранное"}
+                  title={node.isFavorite ? "Убрать из избранного" : "В избранное"}
+                  className="flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+                  onClick={() => onToggleFavorite(node)}
+                >
+                  <Star
+                    className={cn(
+                      "size-3",
+                      node.isFavorite && "fill-amber-400 text-amber-400",
+                    )}
+                  />
+                </button>
                 <button
                   type="button"
                   aria-label={`Переименовать «${node.name}»`}
@@ -550,6 +588,7 @@ function FolderTreeNode({
             onToggle={onToggle}
             onDelete={onDelete}
             onRename={onRename}
+            onToggleFavorite={onToggleFavorite}
             onCreateSubfolder={onCreateSubfolder}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}

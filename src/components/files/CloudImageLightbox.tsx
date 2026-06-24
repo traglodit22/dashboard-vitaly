@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,10 +22,15 @@ export function CloudImageLightbox({
   onIndexChange: (index: number) => void;
   onClose: () => void;
 }) {
+  const [mounted, setMounted] = useState(false);
   const item = images[index];
   const hasPrev = index > 0;
   const hasNext = index < images.length - 1;
   const src = item ? `/api/files/${item.id}/content` : "";
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -41,21 +47,27 @@ export function CloudImageLightbox({
     };
   }, [index, hasPrev, hasNext, onClose, onIndexChange]);
 
-  if (!item) return null;
+  if (!item || !mounted) return null;
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex flex-col bg-black/92 backdrop-blur-sm"
+      className="fixed inset-0 z-[200] flex flex-col bg-black/92 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-label="Просмотр фото"
-      onClick={onClose}
     >
+      <button
+        type="button"
+        aria-label="Закрыть"
+        className="absolute inset-0 z-0"
+        onClick={onClose}
+      />
+
       <div
-        className="flex shrink-0 items-center justify-between gap-3 px-4 py-3 text-white"
+        className="relative z-20 flex shrink-0 items-center gap-3 px-4 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] text-white"
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="min-w-0 truncate text-sm font-medium">
+        <p className="min-w-0 flex-1 truncate pr-2 text-sm font-medium">
           {item.title}
           <span className="ml-2 text-white/60">
             {index + 1} / {images.length}
@@ -64,15 +76,18 @@ export function CloudImageLightbox({
         <button
           type="button"
           aria-label="Закрыть"
-          onClick={onClose}
-          className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          className="flex size-11 shrink-0 touch-manipulation items-center justify-center rounded-full bg-white/15 text-white transition-colors active:bg-white/30"
         >
-          <X className="size-5" />
+          <X className="size-6" />
         </button>
       </div>
 
       <div
-        className="relative flex min-h-0 flex-1 items-center justify-center px-4 pb-6 sm:px-16"
+        className="relative z-10 flex min-h-0 flex-1 items-center justify-center px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-16"
         onClick={(e) => e.stopPropagation()}
       >
         {hasPrev && (
@@ -80,7 +95,7 @@ export function CloudImageLightbox({
             type="button"
             aria-label="Предыдущее фото"
             onClick={() => onIndexChange(index - 1)}
-            className="absolute left-2 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/70 sm:left-4"
+            className="absolute left-[max(0.5rem,env(safe-area-inset-left))] top-1/2 z-20 flex size-11 -translate-y-1/2 touch-manipulation items-center justify-center rounded-full bg-black/50 text-white transition-colors active:bg-black/70 sm:left-4"
           >
             <ChevronLeft className="size-7" />
           </button>
@@ -92,7 +107,8 @@ export function CloudImageLightbox({
             key={item.id}
             src={src}
             alt={item.title}
-            className="max-h-[calc(100vh-7rem)] max-w-full object-contain"
+            className="max-h-[calc(100dvh-6rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] max-w-full select-none object-contain"
+            draggable={false}
           />
         </div>
 
@@ -101,13 +117,14 @@ export function CloudImageLightbox({
             type="button"
             aria-label="Следующее фото"
             onClick={() => onIndexChange(index + 1)}
-            className="absolute right-2 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/70 sm:right-4"
+            className="absolute right-[max(0.5rem,env(safe-area-inset-right))] top-1/2 z-20 flex size-11 -translate-y-1/2 touch-manipulation items-center justify-center rounded-full bg-black/50 text-white transition-colors active:bg-black/70 sm:right-4"
           >
             <ChevronRight className="size-7" />
           </button>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

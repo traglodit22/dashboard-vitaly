@@ -28,3 +28,11 @@ export function notifyFilesChanged(): void {
     window.dispatchEvent(new Event(FILES_CHANGED_EVENT))
   }
 }
+
+export function fileContentUrl(fileId: string): string {
+  return `/api/files/${fileId}/content`
+}
+
+export function fileDownloadUrl(fileId: string): string {
+  return `/api/files/${fileId}/content?download=1`
+}

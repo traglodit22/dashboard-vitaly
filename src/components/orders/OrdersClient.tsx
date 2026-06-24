@@ -523,10 +523,10 @@ export function OrdersClient() {
                 : "В этой вкладке пока пусто."}
           </p>
         ) : (
-          <Table>
+          <Table className="table-fixed text-xs sm:text-sm">
             <TableHeader>
               <TableRow>
-                <TableHead>Дата</TableHead>
+                <TableHead className="w-[3.25rem] px-1.5">Дата</TableHead>
                 <TableHead
                   className="cursor-pointer select-none hover:text-foreground"
                   onClick={() => toggleSort("item")}
@@ -534,22 +534,25 @@ export function OrdersClient() {
                   Товар<SortIcon col="item" />
                 </TableHead>
                 <TableHead
-                  className="cursor-pointer select-none hover:text-foreground"
+                  className="hidden w-[4.5rem] cursor-pointer select-none hover:text-foreground sm:table-cell"
                   onClick={() => toggleSort("store")}
                 >
-                  Магазин<SortIcon col="store" />
+                  Маг.<SortIcon col="store" />
                 </TableHead>
-                <TableHead className="text-right">Кол-во</TableHead>
                 <TableHead
-                  className="cursor-pointer select-none text-right hover:text-foreground"
+                  className="w-[4.5rem] cursor-pointer select-none text-right hover:text-foreground"
                   onClick={() => toggleSort("value")}
                 >
-                  Ценность<SortIcon col="value" />
+                  ¥<SortIcon col="value" />
                 </TableHead>
-                {showWeight && <TableHead className="text-right">Вес</TableHead>}
-                <TableHead>Статус</TableHead>
-                <TableHead>Действие / трек</TableHead>
-                <TableHead></TableHead>
+                {showWeight && (
+                  <TableHead className="hidden w-[3.5rem] text-right md:table-cell">
+                    кг
+                  </TableHead>
+                )}
+                <TableHead className="w-[5.5rem]">Статус</TableHead>
+                <TableHead className="min-w-0">Трек / действие</TableHead>
+                <TableHead className="w-[4.75rem] px-1" />
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -563,49 +566,59 @@ export function OrdersClient() {
                         "bg-emerald-500/10 hover:bg-emerald-500/15",
                     )}
                   >
-                    <TableCell className="whitespace-nowrap font-mono text-xs text-muted-foreground">
+                    <TableCell className="whitespace-normal px-1.5 py-1.5 align-top font-mono text-[10px] leading-tight text-muted-foreground sm:text-xs">
                       {dt.format(new Date(o.createdAt))}
                     </TableCell>
-                    <TableCell className="max-w-56">
-                      <div className="truncate font-medium">
+                    <TableCell className="max-w-0 whitespace-normal py-1.5 align-top">
+                      <div
+                        className="line-clamp-2 text-xs font-medium leading-snug sm:text-sm"
+                        title={o.itemDescription}
+                      >
                         {o.itemDescription}
                       </div>
                       <a
                         href={o.itemStoreLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary"
+                        className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground hover:text-primary sm:text-xs"
                       >
-                        ссылка <ExternalLink className="size-3" />
+                        ссылка <ExternalLink className="size-2.5 sm:size-3" />
                       </a>
+                      <span className="mt-0.5 block truncate text-[10px] text-muted-foreground sm:hidden">
+                        {o.store}
+                      </span>
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
+                    <TableCell className="hidden max-w-0 truncate py-1.5 align-top text-xs text-muted-foreground sm:table-cell">
                       {o.store}
                     </TableCell>
-                    <TableCell className="text-right font-mono tabular-nums">
-                      {o.numberOfItemPieces}
-                    </TableCell>
-                    <TableCell className="text-right font-mono tabular-nums text-amber-500">
-                      ¥{yuan.format(o.totalAmount)}
+                    <TableCell className="whitespace-normal py-1.5 text-right align-top font-mono tabular-nums leading-tight">
+                      <div className="text-amber-500">¥{yuan.format(o.totalAmount)}</div>
+                      <div className="text-[10px] text-muted-foreground sm:text-xs">
+                        ×{o.numberOfItemPieces}
+                      </div>
                     </TableCell>
                     {showWeight && (
-                      <TableCell className="text-right font-mono tabular-nums text-muted-foreground">
-                        {o.dpWeightKg != null ? `${kg.format(o.dpWeightKg)} кг` : "—"}
+                      <TableCell className="hidden py-1.5 text-right align-top font-mono text-xs tabular-nums text-muted-foreground md:table-cell">
+                        {o.dpWeightKg != null ? kg.format(o.dpWeightKg) : "—"}
                       </TableCell>
                     )}
-                    <TableCell>
-                      <Badge variant="outline" className={view.className}>
+                    <TableCell className="whitespace-normal py-1.5 align-top">
+                      <Badge
+                        variant="outline"
+                        className={cn("max-w-full truncate px-1.5 py-0 text-[10px] sm:text-xs", view.className)}
+                        title={view.label}
+                      >
                         {view.label}
                       </Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="max-w-0 whitespace-normal py-1.5 align-top">
                       {o.status === "awaiting_track" && (
-                        <div className="flex items-center gap-2">
+                        <div className="flex min-w-0 items-center gap-1">
                           <Input
                             value={tracks[o.id] ?? ""}
                             maxLength={15}
-                            placeholder="трек по Китаю"
-                            className="h-8 w-40 font-mono text-xs"
+                            placeholder="трек Китай"
+                            className="h-7 min-w-0 flex-1 px-2 font-mono text-[11px] sm:text-xs"
                             onChange={(e) =>
                               setTracks((t) => ({
                                 ...t,
@@ -614,46 +627,45 @@ export function OrdersClient() {
                             }
                           />
                           <Button
-                            size="sm"
-                            className="h-8"
+                            size="icon"
+                            className="size-7 shrink-0"
                             disabled={busy === o.id}
                             onClick={() => addTrack(o.id)}
+                            title="Сохранить трек"
                           >
                             {busy === o.id ? (
                               <Loader2 className="size-3 animate-spin" />
                             ) : (
-                              "ОК"
+                              <span className="text-[10px] font-semibold">OK</span>
                             )}
                           </Button>
                         </div>
                       )}
                       {o.status === "ready" && (
-                        <div className="flex flex-col gap-1">
+                        <div className="flex min-w-0 flex-col gap-0.5">
                           <Button
-                            size="sm"
+                            size="icon"
                             variant="secondary"
-                            className="h-8 w-fit"
+                            className="size-7"
                             disabled={busy === o.id}
                             onClick={() => send(o.id)}
+                            title="Отправить в ДоброПост"
                           >
                             {busy === o.id ? (
                               <Loader2 className="size-3 animate-spin" />
                             ) : (
-                              <Send className="size-3" />
+                              <Send className="size-3.5" />
                             )}
-                            Отправить
                           </Button>
                           {o.incomingDeclaration && (
-                            <span className="text-xs text-muted-foreground">
+                            <span className="truncate text-[10px] text-muted-foreground sm:text-xs">
                               Китай:{" "}
-                              <span className="font-mono">
-                                {o.incomingDeclaration}
-                              </span>
+                              <span className="font-mono">{o.incomingDeclaration}</span>
                             </span>
                           )}
                           {o.lastError && (
                             <span
-                              className="max-w-48 truncate text-xs text-destructive"
+                              className="line-clamp-2 text-[10px] text-destructive sm:text-xs"
                               title={o.lastError}
                             >
                               {o.lastError}
@@ -662,10 +674,10 @@ export function OrdersClient() {
                         </div>
                       )}
                       {o.status === "sent" && (
-                        <div className="flex flex-col gap-0.5 text-xs">
+                        <div className="flex min-w-0 flex-col gap-0.5 text-[10px] sm:text-xs">
                           {o.dpTrackNumber && (
                             <span
-                              className="font-mono text-emerald-400"
+                              className="truncate font-mono text-emerald-400"
                               title="Трек ДоброПост"
                             >
                               {o.dpTrackNumber}
@@ -673,53 +685,51 @@ export function OrdersClient() {
                           )}
                           {o.incomingDeclaration && (
                             <span
-                              className="text-muted-foreground"
+                              className="truncate text-muted-foreground"
                               title="Трек по Китаю"
                             >
                               Китай:{" "}
-                              <span className="font-mono">
-                                {o.incomingDeclaration}
-                              </span>
+                              <span className="font-mono">{o.incomingDeclaration}</span>
                             </span>
                           )}
                         </div>
                       )}
                     </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
+                    <TableCell className="px-1 py-1.5 align-top">
+                      <div className="flex items-center justify-end gap-0">
                         {o.status !== "sent" && (
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="size-8 text-muted-foreground hover:text-foreground"
+                            className="size-7 text-muted-foreground hover:text-foreground"
                             onClick={() => setEditing(o)}
                             title="Редактировать"
                           >
-                            <Pencil className="size-4" />
+                            <Pencil className="size-3.5" />
                           </Button>
                         )}
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="size-8 text-muted-foreground hover:text-foreground"
+                          className="size-7 text-muted-foreground hover:text-foreground"
                           disabled={busy === o.id}
                           onClick={() => copy(o)}
-                          title="Скопировать (повторная покупка)"
+                          title="Скопировать"
                         >
                           {busy === o.id ? (
-                            <Loader2 className="size-4 animate-spin" />
+                            <Loader2 className="size-3.5 animate-spin" />
                           ) : (
-                            <Copy className="size-4" />
+                            <Copy className="size-3.5" />
                           )}
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="size-8 text-muted-foreground hover:text-destructive"
+                          className="size-7 text-muted-foreground hover:text-destructive"
                           onClick={() => remove(o.id)}
                           title="Удалить"
                         >
-                          <Trash2 className="size-4" />
+                          <Trash2 className="size-3.5" />
                         </Button>
                       </div>
                     </TableCell>

@@ -1,19 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogIn, Loader2, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { user, loading, refreshAuth } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (!loading && user) router.replace("/");
+  }, [loading, user, router]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -31,12 +37,26 @@ export default function LoginPage() {
         setError((data as { error?: string }).error ?? "Неверный email или пароль");
         return;
       }
-      router.replace("/");
+      const ok = await refreshAuth();
+      if (ok) {
+        router.replace("/");
+      } else {
+        // Safari/PWA: cookie может примениться только после полной перезагрузки
+        window.location.assign("/");
+      }
     } catch {
       setError("Ошибка сети — попробуйте снова");
     } finally {
       setBusy(false);
     }
+  }
+
+  if (loading || user) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center">
+        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+      </div>
+    );
   }
 
   return (

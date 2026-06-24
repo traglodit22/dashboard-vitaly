@@ -104,13 +104,28 @@ export async function getGcsUploadSignedUrl(
   return url
 }
 
-export async function getGcsReadSignedUrl(objectKey: string): Promise<string> {
+export async function getGcsReadSignedUrl(
+  objectKey: string,
+  opts?: { attachment?: boolean; fileName?: string },
+): Promise<string> {
   const storage = getSigningStorage()
-  const [url] = await storage.bucket(gcsBucketName()).file(objectKey).getSignedUrl({
+  const signOpts: {
+    version: 'v4'
+    action: 'read'
+    expires: number
+    queryParams?: Record<string, string>
+  } = {
     version: 'v4',
     action: 'read',
     expires: Date.now() + 60 * 60 * 1000,
-  })
+  }
+  if (opts?.attachment && opts.fileName) {
+    const safe = opts.fileName.replace(/["\r\n]/g, '_')
+    signOpts.queryParams = {
+      'response-content-disposition': `attachment; filename="${safe}"; filename*=UTF-8''${encodeURIComponent(opts.fileName)}`,
+    }
+  }
+  const [url] = await storage.bucket(gcsBucketName()).file(objectKey).getSignedUrl(signOpts)
   return url
 }
 

@@ -23,6 +23,8 @@ import { isImageMime, isPdfMime } from '@/lib/files/mimeDetect'
 import type { FileStorageType } from '@/lib/files/types'
 import { isThumbnailPreviewPath } from '@/lib/files/previewConstants'
 import { dropCachedPreview } from '@/lib/files/previewMemoryCache'
+import { findFileByContentHash } from '@/lib/gallery/galleryService'
+import { analyzeImageBuffer } from '@/lib/gallery/imageMeta'
 import { MAX_FILE_BYTES, MAX_FILE_SIZE_ERROR } from '@/lib/files/types'
 
 async function nextFileSortOrder(categoryId: string, folderId: string | null): Promise<number> {
@@ -33,6 +35,35 @@ async function nextFileSortOrder(categoryId: string, folderId: string | null): P
     [categoryId, folderId],
   )
   return Number(rows[0]?.next_order ?? 10)
+}
+
+async function buildUploadPreview(
+  mime: string,
+  buffer: Buffer,
+  originalName: string,
+): Promise<Buffer | null> {
+  if (!isImageMime(mime) && !isPdfMime(mime, originalName)) return null
+  return buildFilePreview(mime, buffer, originalName)
+}
+
+async function persistPreviewForUpload(opts: {
+  storageType: FileStorageType
+  categorySlug: string
+  folderPrefix: string
+  fileId: string
+  mime: string
+  buffer: Buffer
+  originalName: string
+}): Promise<string | null> {
+  const thumb = await buildUploadPreview(opts.mime, opts.buffer, opts.originalName)
+  if (!thumb) return null
+
+  if (opts.storageType === 'gcs') {
+    const previewPath = gcsPreviewKey(opts.categorySlug, opts.folderPrefix, opts.fileId)
+    await uploadToGcs(previewPath, thumb, 'image/webp')
+    return previewPath
+  }
+  return saveLocalPreview(opts.categorySlug, opts.folderPrefix, opts.fileId, thumb)
 }
 
 export async function fetchFileItem(id: string) {
@@ -52,18 +83,31 @@ export async function uploadFileItem(opts: {
   originalName: string
   mime: string
   buffer: Buffer
+  contentHash?: string | null
+  capturedAt?: Date | string | null
 }) {
+  let contentHash = opts.contentHash ?? null
+  let capturedAt = opts.capturedAt
+    ? opts.capturedAt instanceof Date
+      ? opts.capturedAt
+      : new Date(opts.capturedAt)
+    : null
+  if (!contentHash && opts.mime.startsWith('image/')) {
+    const meta = await analyzeImageBuffer(opts.buffer, opts.mime)
+    contentHash = meta.contentHash
+    if (!capturedAt) capturedAt = meta.capturedAt
+  }
+
+  if (contentHash) {
+    const existing = await findFileByContentHash(opts.categoryId, contentHash)
+    if (existing) return { item: existing, duplicate: true as const }
+  }
+
   const id = randomUUID()
   const ext = extForMime(opts.mime)
   const folderPrefix = opts.folderId ? await getFolderStoragePrefix(opts.folderId) : ''
   let storagePath: string
   let previewPath: string | null = null
-
-  // Превью картинок при загрузке; PDF — лениво через GET /preview (тяжёлая операция).
-  const previewBuffer =
-    opts.storageType !== 'gcs' && isImageMime(opts.mime)
-      ? await buildFilePreview(opts.mime, opts.buffer, opts.originalName)
-      : null
 
   if (opts.storageType === 'gcs') {
     if (!isGcsConfigured()) {
@@ -71,13 +115,15 @@ export async function uploadFileItem(opts: {
     }
     storagePath = gcsObjectKey(opts.categorySlug, folderPrefix, id, ext)
     await uploadToGcs(storagePath, opts.buffer, opts.mime)
-    if (isImageMime(opts.mime)) {
-      const thumb = await buildFilePreview(opts.mime, opts.buffer, opts.originalName)
-      if (thumb) {
-        previewPath = gcsPreviewKey(opts.categorySlug, folderPrefix, id)
-        await uploadToGcs(previewPath, thumb, 'image/webp')
-      }
-    }
+    previewPath = await persistPreviewForUpload({
+      storageType: 'gcs',
+      categorySlug: opts.categorySlug,
+      folderPrefix,
+      fileId: id,
+      mime: opts.mime,
+      buffer: opts.buffer,
+      originalName: opts.originalName,
+    })
   } else {
     const saved = await saveLocalFile(
       opts.categorySlug,
@@ -87,15 +133,21 @@ export async function uploadFileItem(opts: {
       opts.mime,
     )
     storagePath = saved.storagePath
-    if (previewBuffer) {
-      previewPath = await saveLocalPreview(opts.categorySlug, folderPrefix, id, previewBuffer)
-    }
+    previewPath = await persistPreviewForUpload({
+      storageType: 'local',
+      categorySlug: opts.categorySlug,
+      folderPrefix,
+      fileId: id,
+      mime: opts.mime,
+      buffer: opts.buffer,
+      originalName: opts.originalName,
+    })
   }
 
   const rows = await query<Record<string, unknown>>(
     `INSERT INTO file_items
-      (id, category_id, folder_id, title, original_name, mime_type, size_bytes, storage_path, preview_path, sort_order)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      (id, category_id, folder_id, title, original_name, mime_type, size_bytes, storage_path, preview_path, sort_order, content_hash, captured_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
      RETURNING id`,
     [
       id,
@@ -108,10 +160,14 @@ export async function uploadFileItem(opts: {
       storagePath,
       previewPath,
       await nextFileSortOrder(opts.categoryId, opts.folderId),
+      contentHash,
+      capturedAt,
     ],
   )
 
-  return fetchFileItem(rows[0].id as string)
+  const item = await fetchFileItem(rows[0].id as string)
+  if (!item) throw new Error('Не удалось сохранить файл')
+  return { item, duplicate: false as const }
 }
 
 export async function prepareGcsDirectUpload(opts: {
@@ -146,16 +202,49 @@ export async function completeGcsDirectUpload(opts: {
   originalName: string
   mime: string
   sizeBytes: number
+  contentHash?: string | null
+  capturedAt?: Date | string | null
 }) {
   const ext = extForMime(opts.mime)
   const folderPrefix = opts.folderId ? await getFolderStoragePrefix(opts.folderId) : ''
   const storagePath = gcsObjectKey(opts.categorySlug, folderPrefix, opts.fileId, ext)
+
+  let contentHash = opts.contentHash ?? null
+  let capturedAt = opts.capturedAt
+    ? opts.capturedAt instanceof Date
+      ? opts.capturedAt
+      : new Date(opts.capturedAt)
+    : null
+
+  if (!contentHash && opts.mime.startsWith('image/')) {
+    try {
+      const buffer = await downloadFromGcs(storagePath)
+      const meta = await analyzeImageBuffer(buffer, opts.mime)
+      contentHash = meta.contentHash
+      if (!capturedAt) capturedAt = meta.capturedAt
+    } catch (err) {
+      console.error('[files] gallery meta from GCS failed', err)
+    }
+  }
+
+  if (contentHash) {
+    const existing = await findFileByContentHash(opts.categoryId, contentHash)
+    if (existing) {
+      try {
+        await deleteFromGcs(storagePath)
+      } catch {
+        /* orphan object */
+      }
+      return { item: existing, duplicate: true as const }
+    }
+  }
+
   const previewPath = null
 
   const rows = await query<Record<string, unknown>>(
     `INSERT INTO file_items
-      (id, category_id, folder_id, title, original_name, mime_type, size_bytes, storage_path, preview_path, sort_order)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      (id, category_id, folder_id, title, original_name, mime_type, size_bytes, storage_path, preview_path, sort_order, content_hash, captured_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
      RETURNING id`,
     [
       opts.fileId,
@@ -168,10 +257,14 @@ export async function completeGcsDirectUpload(opts: {
       storagePath,
       previewPath,
       await nextFileSortOrder(opts.categoryId, opts.folderId),
+      contentHash,
+      capturedAt,
     ],
   )
 
-  return fetchFileItem(rows[0].id as string)
+  const item = await fetchFileItem(rows[0].id as string)
+  if (!item) throw new Error('Не удалось сохранить файл')
+  return { item, duplicate: false as const }
 }
 
 export async function readFileContent(row: Record<string, unknown>): Promise<Buffer> {

@@ -101,7 +101,7 @@ export async function POST(req: Request) {
   const title = titleRaw || file.name.replace(/\.[^.]+$/, '')
 
   try {
-    const item = await uploadFileItem({
+    const result = await uploadFileItem({
       categoryId: category.id,
       categorySlug: category.slug,
       storageType: category.storageType as FileStorageType,
@@ -111,10 +111,13 @@ export async function POST(req: Request) {
       mime,
       buffer,
     })
-    if (!item) {
+    if (!result.item) {
       return NextResponse.json({ error: 'Не удалось сохранить файл' }, { status: 500 })
     }
-    return NextResponse.json({ item }, { status: 201 })
+    return NextResponse.json(
+      { item: result.item, duplicate: result.duplicate },
+      { status: result.duplicate ? 200 : 201 },
+    )
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     return NextResponse.json({ error: message }, { status: 400 })

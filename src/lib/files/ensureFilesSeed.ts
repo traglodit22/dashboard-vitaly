@@ -60,11 +60,28 @@ async function ensureSortOrderColumns(): Promise<void> {
   await pool.query(
     'ALTER TABLE file_items ADD COLUMN IF NOT EXISTS gallery_sort_order INTEGER NOT NULL DEFAULT 0',
   )
+  await pool.query(
+    'ALTER TABLE file_items ADD COLUMN IF NOT EXISTS content_hash CHAR(64)',
+  )
+  await pool.query(
+    'ALTER TABLE file_items ADD COLUMN IF NOT EXISTS captured_at TIMESTAMPTZ',
+  )
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS file_items_captured_at_idx
+      ON file_items (captured_at DESC NULLS LAST)
+      WHERE mime_type LIKE 'image/%'
+  `)
+  await pool.query(`
+    CREATE UNIQUE INDEX IF NOT EXISTS file_items_category_hash_uidx
+      ON file_items (category_id, content_hash)
+      WHERE content_hash IS NOT NULL
+  `)
 }
 
 const DEFAULT_CATEGORIES = [
   { slug: IMPORTANT_DOCS_SLUG, name: 'Важные документы', storageType: 'local', sortOrder: 10 },
   { slug: 'cloud', name: 'Облако (Google Cloud)', storageType: 'gcs', sortOrder: 20 },
+  { slug: 'gallery', name: 'Галерея', storageType: 'gcs', sortOrder: 25 },
 ] as const
 
 export async function ensureFilesSchema(): Promise<void> {

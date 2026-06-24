@@ -43,6 +43,29 @@ export async function listAllFolders(categoryId: string) {
   return rows.map(rowToFileFolder)
 }
 
+export interface FavoriteFolder {
+  id: string
+  name: string
+  categorySlug: string
+  categoryName: string
+}
+
+export async function listFavoriteFolders(): Promise<FavoriteFolder[]> {
+  const rows = await query<Record<string, unknown>>(
+    `SELECT f.id, f.name, c.slug AS category_slug, c.name AS category_name
+     FROM file_folders f
+     JOIN file_categories c ON c.id = f.category_id
+     WHERE f.is_favorite = true
+     ORDER BY f.name ASC`,
+  )
+  return rows.map((row) => ({
+    id: row.id as string,
+    name: row.name as string,
+    categorySlug: row.category_slug as string,
+    categoryName: row.category_name as string,
+  }))
+}
+
 export async function createFolder(opts: {
   categoryId: string
   categorySlug: string
@@ -191,6 +214,7 @@ export async function updateFolderSettings(
     moduleTextEnabled?: boolean
     moduleGalleryEnabled?: boolean
     folderText?: string
+    isFavorite?: boolean
   },
 ) {
   const row = await fetchFolder(folderId)
@@ -235,6 +259,10 @@ export async function updateFolderSettings(
   if (opts.folderText !== undefined) {
     updates.push(`folder_text = $${idx++}`)
     values.push(opts.folderText)
+  }
+  if (opts.isFavorite !== undefined) {
+    updates.push(`is_favorite = $${idx++}`)
+    values.push(opts.isFavorite)
   }
 
   if (!updates.length) return rowToFileFolder(row)

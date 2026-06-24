@@ -39,6 +39,7 @@ module.exports = {
         HOSTNAME: "127.0.0.1",
         MIGRATIONS_DIR: path.join(appDir, "runtime/current/db/migrations"),
         UPLOAD_DIR: path.join(appDir, "uploads"),
+        PDFJS_DIST_DIR: path.join(appDir, "runtime/current/node_modules/pdfjs-dist"),
         ...fileEnv,
       },
       max_memory_restart: "512M",

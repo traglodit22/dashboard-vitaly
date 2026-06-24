@@ -39,6 +39,7 @@ export async function PATCH(
       moduleGalleryEnabled:
         body.moduleGalleryEnabled !== undefined ? Boolean(body.moduleGalleryEnabled) : undefined,
       folderText: body.folderText !== undefined ? String(body.folderText) : undefined,
+      isFavorite: body.isFavorite !== undefined ? Boolean(body.isFavorite) : undefined,
     })
     return NextResponse.json({ folder })
   } catch (err) {

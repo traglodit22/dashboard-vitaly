@@ -1,11 +1,12 @@
 import { ProcurementClient } from "@/components/procurement/ProcurementClient";
+import { DASHBOARD_PAGE_CLASS, DASHBOARD_PAGE_TITLE_CLASS } from "@/lib/dashboard/pageLayout";
 
 export default function ProcurementPage() {
   return (
-    <div className="w-full min-w-0 p-4 sm:p-6 lg:p-8">
-      <header className="mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight">Закупки</h1>
-        <p className="text-sm text-muted-foreground">
+    <div className={DASHBOARD_PAGE_CLASS}>
+      <header className="mb-4 sm:mb-6">
+        <h1 className={DASHBOARD_PAGE_TITLE_CLASS}>Закупки</h1>
+        <p className="text-xs text-muted-foreground sm:text-sm">
           Учёт закупок для Китая: сколько нужно, есть на складе и в пути.
         </p>
       </header>

@@ -27,6 +27,7 @@ export function rowToFileFolder(row: Record<string, unknown>): FileFolder {
     moduleTextEnabled: Boolean(row.module_text_enabled),
     moduleGalleryEnabled: Boolean(row.module_gallery_enabled),
     folderText: String(row.folder_text ?? ''),
+    isFavorite: Boolean(row.is_favorite),
   }
 }
 
@@ -50,6 +51,10 @@ export function rowToFileItem(row: Record<string, unknown>): FileItem {
     gallerySortOrder: Number(row.gallery_sort_order ?? 0),
     createdAt: rowTimestamp(row.created_at),
     updatedAt: rowTimestamp(row.updated_at) || rowTimestamp(row.created_at),
+    contentHash: (row.content_hash as string) ?? null,
+    capturedAt: row.captured_at
+      ? rowTimestamp(row.captured_at)
+      : null,
   }
 }
 

@@ -1,4 +1,4 @@
-import { Package, Boxes, Users, Wallet, UserSquare, LayoutDashboard, ShoppingCart, Cloud } from "lucide-react";
+import { Package, Boxes, Users, Wallet, UserSquare, LayoutDashboard, ShoppingCart, Cloud, Images } from "lucide-react";
 import { CLOUD_SLUG } from "@/lib/files/types";
 
 export interface NavItem {
@@ -26,6 +26,22 @@ export const SECTIONS: NavSection[] = [
     ],
   },
   {
+    key: "files",
+    label: "Файлы",
+    basePath: `/files/${CLOUD_SLUG}`,
+    items: [
+      { href: `/files/${CLOUD_SLUG}`, label: "Облако", icon: Cloud },
+    ],
+  },
+  {
+    key: "gallery",
+    label: "Галерея",
+    basePath: "/gallery",
+    items: [
+      { href: "/gallery", label: "Галерея", icon: Images },
+    ],
+  },
+  {
     key: "china",
     label: "Китай",
     basePath: "/procurement",
@@ -34,14 +50,6 @@ export const SECTIONS: NavSection[] = [
       { href: "/orders", label: "Отправки", icon: Boxes },
       { href: "/orders/new", label: "Создать", icon: Package },
       { href: "/recipients", label: "Получатели", icon: Users },
-    ],
-  },
-  {
-    key: "files",
-    label: "Файлы",
-    basePath: `/files/${CLOUD_SLUG}`,
-    items: [
-      { href: `/files/${CLOUD_SLUG}`, label: "Облако", icon: Cloud },
     ],
   },
   {

@@ -3,7 +3,7 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ChevronRight, FileText, FolderTree, GripVertical, Loader2, Pencil, Trash2, Upload } from "lucide-react";
+import { ChevronRight, FileText, FolderTree, GripVertical, Loader2, Pencil, Trash2, Upload, Download } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,13 +11,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
 import { IMPORTANT_DOCS_SLUG, CLOUD_SLUG, MAX_FILE_MB, type FileFolder } from "@/lib/files/types";
-import { FILES_CHANGED_EVENT, filesCategoryPath, notifyFilesChanged } from "@/lib/files/routes";
+import { FILES_CHANGED_EVENT, filesCategoryPath, notifyFilesChanged, fileDownloadUrl } from "@/lib/files/routes";
 import { reorderById } from "@/lib/files/reorderList";
 import { uploadFileToGcsWithFallback } from "@/lib/files/gcsDirectUpload";
 import { CloudFolderView } from "@/components/files/CloudFolderView";
 import { FilesListToolbar } from "@/components/files/FilesListToolbar";
 import { FilesSubfolderGrid } from "@/components/files/FilesSubfolderGrid";
 import { FilesMobileFolderDrawer } from "@/components/files/FilesMobileFolderDrawer";
+import { FilePreviewImage } from "@/components/files/FilePreviewImage";
+import { CloudPdfViewer } from "@/components/files/CloudPdfViewer";
+import { FILE_GRID_CLASS } from "@/lib/files/fileCardLayout";
 import {
   collectExtensionOptions,
   filterByExtension,
@@ -426,7 +429,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
   const uploadZone = (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed px-3 py-6 text-center transition-colors sm:px-4 sm:py-10",
+        "flex flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed px-3 py-3 text-center transition-colors sm:gap-2 sm:py-5",
         uploading ? "opacity-60" : "cursor-pointer hover:border-primary/50 hover:bg-muted/30 active:bg-muted/40",
       )}
       onClick={() => !uploading && inputRef.current?.click()}
@@ -451,11 +454,11 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
         }}
       />
       {uploading ? (
-        <Loader2 className="size-8 animate-spin text-muted-foreground" />
+        <Loader2 className="size-6 animate-spin text-muted-foreground sm:size-7" />
       ) : (
-        <Upload className="size-8 text-muted-foreground" />
+        <Upload className="size-6 text-muted-foreground sm:size-7" />
       )}
-      <p className="text-sm font-medium">
+      <p className="text-xs font-medium sm:text-sm">
         {uploading
           ? uploadLabel
             ? `Загрузка «${uploadLabel}»…`
@@ -468,7 +471,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
           )}
       </p>
       {!uploading && manualSort && listItems.length > 1 && !isCloudFolder && (
-        <p className="text-xs text-muted-foreground">Порядок карточек — перетаскиванием</p>
+        <p className="hidden text-[10px] text-muted-foreground sm:block">Порядок карточек — перетаскиванием</p>
       )}
     </div>
   );
@@ -597,6 +600,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
               moduleTextEnabled: false,
               moduleGalleryEnabled: false,
               folderText: "",
+              isFavorite: false,
             }
           }
           galleryItems={galleryItems}
@@ -667,7 +671,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
               Нет файлов с выбранным типом
             </p>
           ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className={FILE_GRID_CLASS}>
           {listItems.map((item) => (
             <FileCard
               key={item.id}
@@ -733,11 +737,11 @@ function FileCard({
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(item.title);
   const [previewFailed, setPreviewFailed] = useState(false);
-  const [previewLoading, setPreviewLoading] = useState(true);
+  const [pdfOpen, setPdfOpen] = useState(false);
   const isPdf = item.mimeType === "application/pdf";
   const isImage = item.mimeType.startsWith("image/");
   const previewUrl =
-    isImage || item.hasPreview
+    isImage || isPdf || item.hasPreview
       ? `/api/files/${item.id}/preview?v=${
           item.hasPreview ? encodeURIComponent(item.updatedAt) : "src"
         }`
@@ -748,65 +752,35 @@ function FileCard({
   useEffect(() => {
     setDraft(item.title);
     setPreviewFailed(false);
-    setPreviewLoading(Boolean(previewUrl));
-  }, [item.id, item.title, item.hasPreview, item.updatedAt, previewUrl]);
-
-  useEffect(() => {
-    if (!previewUrl) return;
-    const waitMs = isPdf ? 90_000 : 20_000;
-    const timer = window.setTimeout(() => {
-      setPreviewLoading((loading) => {
-        if (!loading) return loading;
-        setPreviewFailed(true);
-        return false;
-      });
-    }, waitMs);
-    return () => window.clearTimeout(timer);
-  }, [previewUrl, isPdf]);
+    setPdfOpen(false);
+  }, [item.id, item.title, item.hasPreview, item.updatedAt]);
 
   const useLightbox = Boolean(onImageClick && isImage);
+  const usePdfViewer = isPdf;
 
   function renderPreviewBody() {
     if (showPreview && previewUrl) {
       return (
-        <>
-          {previewLoading && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Loader2 className="size-6 animate-spin text-muted-foreground" />
-            </div>
-          )}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={previewUrl}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            className={cn(
-              "size-full object-cover object-top",
-              previewLoading && "opacity-0",
-            )}
-            onLoad={() => setPreviewLoading(false)}
-            onError={() => {
-              setPreviewFailed(true);
-              setPreviewLoading(false);
-            }}
-            draggable={false}
-          />
-        </>
+        <FilePreviewImage
+          src={previewUrl}
+          className="size-full"
+          imgClassName="size-full object-cover object-top"
+          onFailed={() => setPreviewFailed(true)}
+        />
       );
     }
     if (showPending) {
       return (
-        <div className="flex size-full flex-col items-center justify-center gap-1">
-          <Loader2 className="size-6 animate-spin text-muted-foreground/70" />
-          <span className="text-[10px] text-muted-foreground">превью…</span>
+        <div className="flex size-full flex-col items-center justify-center gap-0.5">
+          <Loader2 className="size-4 animate-spin text-muted-foreground/70" />
+          <span className="text-[9px] text-muted-foreground">превью…</span>
         </div>
       );
     }
     return (
-      <div className="flex size-full flex-col items-center justify-center gap-1">
-        <FileText className="size-10 text-muted-foreground/50" />
-        {isPdf && <span className="text-xs text-muted-foreground">PDF</span>}
+      <div className="flex size-full flex-col items-center justify-center gap-0.5">
+        <FileText className="size-7 text-muted-foreground/50" />
+        {isPdf && <span className="text-[9px] text-muted-foreground">PDF</span>}
       </div>
     );
   }
@@ -815,49 +789,38 @@ function FileCard({
     <Card
       onDragOver={onDragOver}
       onDrop={onDrop}
+      size="sm"
       className={cn(
-        "group overflow-hidden",
+        "gap-0 py-0 [--card-spacing:0]",
         dragging && "opacity-50 ring-2 ring-primary/40",
       )}
     >
-      {draggable && (
-        <div
-          draggable
-          title="Перетащить"
-          onDragStart={(e) => {
-            e.dataTransfer.effectAllowed = "move";
-            onDragStart();
-          }}
-          onDragEnd={onDragEnd}
-          className="hidden cursor-grab items-center gap-1 border-b border-border/50 bg-muted/30 px-2 py-1 text-muted-foreground active:cursor-grabbing sm:flex"
-        >
-          <GripVertical className="size-3.5 shrink-0" />
-          <span className="text-[10px]">перетащить</span>
-        </div>
+      {pdfOpen && (
+        <CloudPdfViewer
+          fileId={item.id}
+          title={item.title}
+          onClose={() => setPdfOpen(false)}
+        />
       )}
-      {useLightbox ? (
-        <button
-          type="button"
-          onClick={onImageClick}
-          className="relative block aspect-[4/3] w-full cursor-zoom-in bg-muted/40"
-        >
-          {renderPreviewBody()}
-        </button>
-      ) : (
-        <a
-          href={`/api/files/${item.id}/content`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="relative block aspect-[4/3] bg-muted/40"
-        >
-          {renderPreviewBody()}
-        </a>
-      )}
-      <CardContent className="space-y-2 p-3">
+      <div className="flex items-center gap-0.5 border-b border-border/50 bg-muted/25 px-1 py-0.5">
+        {draggable ? (
+          <div
+            draggable
+            title="Перетащить"
+            onDragStart={(e) => {
+              e.dataTransfer.effectAllowed = "move";
+              onDragStart();
+            }}
+            onDragEnd={onDragEnd}
+            className="flex size-6 shrink-0 cursor-grab touch-manipulation items-center justify-center rounded text-muted-foreground active:cursor-grabbing"
+          >
+            <GripVertical className="size-3.5" />
+          </div>
+        ) : null}
         {editing ? (
           <Input
             autoFocus
-            className="h-8 text-sm"
+            className="h-6 min-w-0 flex-1 px-1.5 text-[11px]"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onBlur={() => {
@@ -873,43 +836,67 @@ function FileCard({
             }}
           />
         ) : (
-          <div className="flex items-start justify-between gap-1">
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium" title={item.title}>
-                {item.title}
-              </p>
-              <p className="truncate text-xs text-muted-foreground" title={item.originalName}>
-                {isPdf
-                  ? "PDF"
-                  : item.mimeType.startsWith("image/")
-                    ? "Фото"
-                    : item.originalName.split(".").pop()?.toUpperCase() ?? "Файл"}{" "}
-                · {formatBytes(item.sizeBytes)}
-              </p>
-            </div>
-            <div className="flex shrink-0 gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100">
+          <>
+            <p
+              className="min-w-0 flex-1 truncate text-[10px] leading-tight sm:text-[11px]"
+              title={`${item.title} · ${formatBytes(item.sizeBytes)}`}
+            >
+              <span className="font-medium text-foreground">{item.title}</span>
+              <span className="text-muted-foreground"> · {formatBytes(item.sizeBytes)}</span>
+            </p>
+            <div className="flex shrink-0">
+              <a
+                href={fileDownloadUrl(item.id)}
+                download
+                title="Скачать оригинал"
+                className="flex size-6 touch-manipulation items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+              >
+                <Download className="size-3" />
+              </a>
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="size-7"
+                className="size-6 touch-manipulation"
                 onClick={() => setEditing(true)}
               >
-                <Pencil className="size-3.5" />
+                <Pencil className="size-3" />
               </Button>
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="size-7 text-muted-foreground hover:text-destructive"
+                className="size-6 touch-manipulation text-muted-foreground hover:text-destructive"
                 onClick={onRemove}
               >
-                <Trash2 className="size-3.5" />
+                <Trash2 className="size-3" />
               </Button>
             </div>
-          </div>
+          </>
         )}
-      </CardContent>
+      </div>
+      {useLightbox ? (
+        <button
+          type="button"
+          onClick={onImageClick}
+          className="relative block aspect-square w-full cursor-zoom-in bg-muted/40"
+        >
+          {renderPreviewBody()}
+        </button>
+      ) : usePdfViewer ? (
+        <button
+          type="button"
+          onClick={() => setPdfOpen(true)}
+          className="relative block aspect-square w-full cursor-pointer bg-muted/40"
+          title="Открыть PDF"
+        >
+          {renderPreviewBody()}
+        </button>
+      ) : (
+        <div className="relative block aspect-square bg-muted/40">
+          {renderPreviewBody()}
+        </div>
+      )}
     </Card>
   );
 }

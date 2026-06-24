@@ -18,6 +18,7 @@ export interface FileFolder {
   moduleTextEnabled: boolean
   moduleGalleryEnabled: boolean
   folderText: string
+  isFavorite: boolean
 }
 
 export interface FileItem {
@@ -36,10 +37,13 @@ export interface FileItem {
   gallerySortOrder: number
   createdAt: string
   updatedAt: string
+  contentHash: string | null
+  capturedAt: string | null
 }
 
 export const IMPORTANT_DOCS_SLUG = 'important-documents'
 export const CLOUD_SLUG = 'cloud'
+export const GALLERY_SLUG = 'gallery'
 
 export const LOCAL_ALLOWED_MIMES = new Set([
   'application/pdf',

@@ -14,12 +14,24 @@ import {
   Scale,
   DollarSign,
   RefreshCw,
+  Star,
+  Folder,
 } from "lucide-react";
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { filesCategoryPath, FILES_CHANGED_EVENT } from "@/lib/files/routes";
+import { CLOUD_SLUG } from "@/lib/files/types";
+
+interface FavoriteFolder {
+  id: string;
+  name: string;
+  categorySlug: string;
+  categoryName: string;
+}
 
 interface OrderStats {
   total: number;
@@ -57,16 +69,19 @@ const balFmt = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximu
 export function DashboardHome() {
   const [stats, setStats] = useState<OrderStats | null>(null);
   const [balances, setBalances] = useState<BalanceProvider[]>([]);
+  const [favoriteFolders, setFavoriteFolders] = useState<FavoriteFolder[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const loadAll = useCallback(async () => {
-    const [statsData, balData] = await Promise.all([
+    const [statsData, balData, favData] = await Promise.all([
       apiFetch("/api/stats/overview", { cache: "no-store" }).then((r) => r.json()),
       apiFetch("/api/balances", { cache: "no-store" }).then((r) => r.json()),
+      apiFetch("/api/files/folders/favorites", { cache: "no-store" }).then((r) => r.json()),
     ]);
     setStats(statsData.orders ?? null);
     setBalances((balData.providers ?? []).filter((p: BalanceProvider) => p.active));
+    setFavoriteFolders(favData.folders ?? []);
   }, []);
 
   useEffect(() => {
@@ -75,6 +90,12 @@ export function DashboardHome() {
       .catch(() => {})
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
+  }, [loadAll]);
+
+  useEffect(() => {
+    const onChange = () => void loadAll();
+    window.addEventListener(FILES_CHANGED_EVENT, onChange);
+    return () => window.removeEventListener(FILES_CHANGED_EVENT, onChange);
   }, [loadAll]);
 
   async function refreshBalances() {
@@ -119,7 +140,39 @@ export function DashboardHome() {
   ] as const;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
+
+      {favoriteFolders.length > 0 && (
+        <Card>
+          <CardContent className="py-4 sm:py-5">
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <p className="flex items-center gap-2 text-sm font-medium">
+                <Star className="size-4 fill-amber-400 text-amber-400" />
+                Быстрый доступ к файлам
+              </p>
+              <Link
+                href={filesCategoryPath(CLOUD_SLUG)}
+                className="text-xs text-muted-foreground hover:text-foreground"
+              >
+                Все файлы →
+              </Link>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {favoriteFolders.map((folder) => (
+                <Link
+                  key={folder.id}
+                  href={filesCategoryPath(folder.categorySlug, folder.id)}
+                  className="flex max-w-full items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-2 text-xs font-medium transition-colors hover:border-primary/40 hover:bg-primary/5 sm:px-3 sm:text-sm"
+                  title={folder.name}
+                >
+                  <Folder className="size-3.5 shrink-0 text-amber-500" />
+                  <span className="truncate">{folder.name}</span>
+                </Link>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Balances — top */}
       {balances.length > 0 && (

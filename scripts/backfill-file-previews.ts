@@ -5,7 +5,7 @@
  *   cd /var/www/dashboard && set -a && source .env && set +a && npm run backfill-previews
  *
  * Опции:
- *   --pdf      включить PDF (медленно)
+ *   --images-only  только изображения (без PDF)
  *   --limit N  обработать не больше N файлов
  *   --force    пересоздать даже если превью уже есть (только фото без --pdf)
  */
@@ -16,7 +16,7 @@ import { isImageMime, isPdfMime } from '../src/lib/files/mimeDetect'
 import { isThumbnailPreviewPath } from '../src/lib/files/previewConstants'
 
 const args = process.argv.slice(2)
-const includePdf = args.includes('--pdf')
+const includePdf = !args.includes('--images-only')
 const force = args.includes('--force')
 const dryRun = args.includes('--dry-run')
 const limitIdx = args.indexOf('--limit')
@@ -47,7 +47,7 @@ async function main(): Promise<void> {
 
   console.log(`Всего файлов: ${rows.length}`)
   console.log(`Без превью: ${pending.length} (обработаем: ${targets.length})`)
-  if (!includePdf) console.log('Только изображения (добавь --pdf для PDF)')
+  if (!includePdf) console.log('Только изображения (без --images-only будут и PDF)')
 
   if (dryRun) {
     for (const row of targets) {

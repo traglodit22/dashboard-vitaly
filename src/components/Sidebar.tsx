@@ -22,8 +22,8 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "flex shrink-0 flex-col border-r border-border bg-sidebar",
-        isFilesSection ? "hidden w-72 md:flex xl:w-80" : "flex w-56 shrink-0",
+        "hidden shrink-0 flex-col border-r border-border bg-sidebar md:flex",
+        isFilesSection ? "w-72 xl:w-80" : "w-56",
       )}
     >
       <nav className="flex flex-1 flex-col gap-1 p-3">

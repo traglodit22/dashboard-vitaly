@@ -11,6 +11,7 @@ import {
 import { isImageMime, isPdfMime, resolveUploadMime } from '@/lib/files/mimeDetect'
 
 export const runtime = 'nodejs'
+export const maxDuration = 120
 
 export async function POST(req: Request) {
   const unauth = await requireAuth(req)
@@ -49,9 +50,11 @@ export async function POST(req: Request) {
   }
 
   const title = titleRaw || fileName.replace(/\.[^.]+$/, '')
+  const contentHash = body.contentHash ? String(body.contentHash).trim() : null
+  const capturedAtRaw = body.capturedAt ? String(body.capturedAt).trim() : null
 
   try {
-    let item = await completeGcsDirectUpload({
+    const result = await completeGcsDirectUpload({
       fileId,
       categoryId: category.id,
       categorySlug: category.slug,
@@ -60,31 +63,30 @@ export async function POST(req: Request) {
       originalName: fileName,
       mime,
       sizeBytes,
+      contentHash,
+      capturedAt: capturedAtRaw,
     })
+    let item = result.item
     if (!item) {
       return NextResponse.json({ error: 'Не удалось сохранить файл' }, { status: 500 })
     }
 
-    if (isImageMime(mime) || isPdfMime(mime, fileName)) {
+    if (!result.duplicate && (isImageMime(mime) || isPdfMime(mime, fileName))) {
       const row = await fetchFileRow(item.id)
       if (row) {
         try {
-          if (isImageMime(mime)) {
-            await ensureFilePreview(row)
-            item = (await fetchFileItem(item.id)) ?? item
-          } else {
-            const fileId = item.id
-            void ensureFilePreview(row).catch((err) => {
-              console.error('[files] background PDF preview failed', fileId, err)
-            })
-          }
+          await ensureFilePreview(row)
+          item = (await fetchFileItem(item.id)) ?? item
         } catch (err) {
           console.error('[files] preview after upload failed', err)
         }
       }
     }
 
-    return NextResponse.json({ item }, { status: 201 })
+    return NextResponse.json(
+      { item, duplicate: result.duplicate },
+      { status: result.duplicate ? 200 : 201 },
+    )
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     return NextResponse.json({ error: message }, { status: 400 })

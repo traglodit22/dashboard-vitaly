@@ -108,6 +108,7 @@ if [[ "$MODE" == "rsync" ]]; then
     --exclude uploads \
     --exclude .git \
     --exclude .local \
+    --exclude .env \
     --exclude .env.local \
     --exclude .deploy.lock \
     -e "$RSYNC_SSH" \

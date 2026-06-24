@@ -1,0 +1,1 @@
+ALTER TABLE file_folders ADD COLUMN IF NOT EXISTS is_favorite BOOLEAN NOT NULL DEFAULT false;
