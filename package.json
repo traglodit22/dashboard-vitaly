@@ -10,7 +10,9 @@
     "lint": "eslint",
     "db:setup": "bash scripts/setup-local-db.sh",
     "db:tunnel": "bash scripts/db-tunnel.sh",
-    "db:migrate": "node scripts/run-migrations.mjs"
+    "db:migrate": "node scripts/run-migrations.mjs",
+    "deploy": "bash deploy/local-deploy.sh",
+    "deploy:fast": "bash deploy/local-deploy.sh --fast"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.2",

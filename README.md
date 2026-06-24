@@ -14,18 +14,25 @@ npm run dev
 ## Синхронизация с продом
 
 ```
-Mac → git push main → GitHub → Actions → VPS (135.106.161.215)
+Mac → npm run deploy → VPS (сразу)
+         └─ git push → GitHub (бэкап кода)
 ```
 
 - Репозиторий: https://github.com/traglodit22/dashboard-vitaly
-- Прод: https://plansolo.ru (также http://135.106.161.215)
-- Деплой: автоматически при push в `main`
+- Прод: https://plansolo.ru
+- **Деплой:** `npm run deploy` с Mac (прямой SSH, без ожидания Actions)
+- **Быстрее:** `npm run deploy:fast` — rsync + деплой, push в GitHub в фоне
+- GitHub Actions: только ручной запуск (резервный путь)
+
+Первый раз: скопируй `deploy/deploy.env.example` → `deploy/deploy.env.local`, настрой SSH-ключ.
 
 ## Команды
 
 | Команда | Описание |
 |---------|----------|
 | `npm run dev` | Локальная разработка |
+| `npm run deploy` | Деплой на VPS (push + SSH) |
+| `npm run deploy:fast` | Rsync на VPS, push в GitHub в фоне |
 | `npm run db:setup` | Создать локальную БД |
 | `npm run db:tunnel` | SSH-туннель к прод-БД |
 

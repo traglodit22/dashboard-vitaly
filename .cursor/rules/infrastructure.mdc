@@ -9,10 +9,11 @@ alwaysApply: true
 
 ## Синхронизация
 
-- **GitHub**: `traglodit22/dashboard-vitaly`, ветка `main`
+- **GitHub**: `traglodit22/dashboard-vitaly`, ветка `main` (бэкап кода)
 - **Локально**: `npm run dev`, `.env.local`
 - **Прод**: https://plansolo.ru, `/var/www/dashboard`, `.env` на VPS
-- **Деплой**: `git push` → GitHub Actions → `deploy/deploy.sh`
+- **Деплой**: `npm run deploy` с Mac → прямой SSH на VPS
+- **Резерв**: GitHub Actions → Deploy to VPS (ручной запуск)
 - **Не в git**: `.env*`, `.local/`, `bot/bot.js` (кастом на VPS)
 
 ## Прод-специфика
