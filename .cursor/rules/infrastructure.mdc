@@ -5,24 +5,19 @@ alwaysApply: true
 
 # Dashboard Vitaly — инфраструктура
 
-Перед деплоем/SSH/секретами читай **`.local/CONTEXT.md`** (gitignored).
+**Перед деплоем, SSH или работой с продом читай `.local/CONTEXT.md`** — там доступы, пароли, логика продукта.
 
-## Синхронизация
+## Деплой
 
-- **GitHub**: `traglodit22/dashboard-vitaly`, ветка `main` (бэкап кода)
-- **Локально**: `npm run dev`, `.env.local`
-- **Прод**: https://plansolo.ru, `/var/www/dashboard`, `.env` на VPS
-- **Деплой**: `npm run deploy` с Mac → прямой SSH на VPS
-- **Резерв**: GitHub Actions → Deploy to VPS (ручной запуск)
-- **Не в git**: `.env*`, `.local/`, `bot/bot.js` (кастом на VPS)
+1. Закоммить изменения (если пользователь не просил иначе).
+2. `npm run deploy` с Mac — push в GitHub + прямой SSH на VPS.
+3. Проверить: `ssh root@135.106.161.215 "cd /var/www/dashboard && git log -1 --oneline"`.
+4. Не коммитить: `.env*`, `.local/`, `deploy/deploy.env.local`, `bot/bot.js`.
 
-## Прод-специфика
+## Кратко
 
-- Telegram через privoxy `127.0.0.1:8118`
-- PM2: `dashboard` (auto-deploy), `dashboard-bot` (отдельно, `bot/bot.js`)
-- Cron: `/usr/local/bin/dashboard-cron.sh` каждые 6 ч
-
-## Локальная разработка
-
-- `npm run db:setup` — локальный Postgres
-- `npm run db:tunnel` — туннель к прод-БД (осторожно)
+- **Прод**: https://plansolo.ru · `/var/www/dashboard`
+- **GitHub**: `traglodit22/dashboard-vitaly` · `main` (бэкап)
+- **Локально**: `npm run dev` · `.env.local`
+- **PM2**: `dashboard` + `dashboard-bot` (отдельно)
+- **Telegram**: privoxy `127.0.0.1:8118`
