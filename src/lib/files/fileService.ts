@@ -22,6 +22,7 @@ import { FILE_ITEM_FROM, FILE_ITEM_SELECT, rowToFileItem } from '@/lib/files/map
 import { isImageMime, isPdfMime } from '@/lib/files/mimeDetect'
 import type { FileStorageType } from '@/lib/files/types'
 import { isThumbnailPreviewPath } from '@/lib/files/previewConstants'
+import { dropCachedPreview } from '@/lib/files/previewMemoryCache'
 import { MAX_FILE_BYTES, MAX_FILE_SIZE_ERROR } from '@/lib/files/types'
 
 async function nextFileSortOrder(categoryId: string, folderId: string | null): Promise<number> {
@@ -245,6 +246,7 @@ async function persistFilePreview(
     'UPDATE file_items SET preview_path = $1, updated_at = NOW() WHERE id = $2',
     [previewPath, fileId],
   )
+  dropCachedPreview(fileId)
   return previewPath
 }
 

@@ -35,6 +35,7 @@ export interface FileItem {
   inGallery: boolean
   gallerySortOrder: number
   createdAt: string
+  updatedAt: string
 }
 
 export const IMPORTANT_DOCS_SLUG = 'important-documents'

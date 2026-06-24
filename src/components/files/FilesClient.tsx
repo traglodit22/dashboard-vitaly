@@ -48,6 +48,7 @@ interface FileItem {
   inGallery: boolean;
   gallerySortOrder: number;
   createdAt: string;
+  updatedAt: string;
 }
 
 interface BreadcrumbItem {
@@ -229,6 +230,26 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     window.addEventListener(FILES_CHANGED_EVENT, onChange);
     return () => window.removeEventListener(FILES_CHANGED_EVENT, onChange);
   }, [refresh]);
+
+  const pendingPreviewCount = useMemo(
+    () =>
+      items.filter(
+        (i) =>
+          !i.hasPreview &&
+          (i.mimeType.startsWith("image/") || i.mimeType === "application/pdf"),
+      ).length,
+    [items],
+  );
+
+  useEffect(() => {
+    if (pendingPreviewCount === 0) return;
+    const interval = window.setInterval(() => void loadItems(), 3000);
+    const stop = window.setTimeout(() => window.clearInterval(interval), 120_000);
+    return () => {
+      window.clearInterval(interval);
+      window.clearTimeout(stop);
+    };
+  }, [pendingPreviewCount, loadItems, currentFolderId, categorySlug]);
 
   async function persistFileOrder(ordered: { id: string }[], scope: "files" | "gallery" = "files") {
     const res = await apiFetch("/api/files/reorder", {
@@ -690,7 +711,14 @@ function FileCard({
 }: {
   item: Pick<
     FileItem,
-    "id" | "title" | "originalName" | "mimeType" | "sizeBytes" | "hasPreview" | "createdAt"
+    | "id"
+    | "title"
+    | "originalName"
+    | "mimeType"
+    | "sizeBytes"
+    | "hasPreview"
+    | "createdAt"
+    | "updatedAt"
   >;
   draggable: boolean;
   dragging: boolean;
@@ -705,42 +733,81 @@ function FileCard({
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(item.title);
   const [previewFailed, setPreviewFailed] = useState(false);
-  const [previewLoading, setPreviewLoading] = useState(true);
-  const [previewRetry, setPreviewRetry] = useState(0);
-  const previewRetryRef = useRef(0);
+  const [previewLoading, setPreviewLoading] = useState(item.hasPreview);
   const isPdf = item.mimeType === "application/pdf";
-  const previewUrl = `/api/files/${item.id}/preview?v=${item.hasPreview ? encodeURIComponent(item.createdAt) : "gen"}&r=${previewRetry}`;
-  const showPreview =
-    !previewFailed && (item.hasPreview || item.mimeType.startsWith("image/") || isPdf);
+  const isImage = item.mimeType.startsWith("image/");
+  const canPreview = isImage || isPdf;
+  const previewUrl = item.hasPreview
+    ? `/api/files/${item.id}/preview?v=${encodeURIComponent(item.updatedAt)}`
+    : null;
+  const showPreview = Boolean(previewUrl) && !previewFailed;
+  const showPending = canPreview && !item.hasPreview && !previewFailed;
 
   useEffect(() => {
     setDraft(item.title);
     setPreviewFailed(false);
-    setPreviewLoading(true);
-    setPreviewRetry(0);
-    previewRetryRef.current = 0;
-  }, [item.id, item.title, item.createdAt]);
+    setPreviewLoading(Boolean(previewUrl));
+  }, [item.id, item.title, item.hasPreview, item.updatedAt, previewUrl]);
 
   useEffect(() => {
-    if (!showPreview) return;
-    const waitMs = isPdf ? 60_000 : 12_000;
+    if (!previewUrl) return;
+    const waitMs = isPdf ? 90_000 : 20_000;
     const timer = window.setTimeout(() => {
       setPreviewLoading((loading) => {
         if (!loading) return loading;
-        if (previewRetryRef.current < 2) {
-          previewRetryRef.current += 1;
-          setPreviewRetry(previewRetryRef.current);
-          return true;
-        }
         setPreviewFailed(true);
         return false;
       });
     }, waitMs);
     return () => window.clearTimeout(timer);
-  }, [previewUrl, showPreview, isPdf]);
+  }, [previewUrl, isPdf]);
 
-  const isImage = item.mimeType.startsWith("image/");
   const useLightbox = Boolean(onImageClick && isImage);
+
+  function renderPreviewBody() {
+    if (showPreview && previewUrl) {
+      return (
+        <>
+          {previewLoading && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Loader2 className="size-6 animate-spin text-muted-foreground" />
+            </div>
+          )}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={previewUrl}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className={cn(
+              "size-full object-cover object-top",
+              previewLoading && "opacity-0",
+            )}
+            onLoad={() => setPreviewLoading(false)}
+            onError={() => {
+              setPreviewFailed(true);
+              setPreviewLoading(false);
+            }}
+            draggable={false}
+          />
+        </>
+      );
+    }
+    if (showPending) {
+      return (
+        <div className="flex size-full flex-col items-center justify-center gap-1">
+          <Loader2 className="size-6 animate-spin text-muted-foreground/70" />
+          <span className="text-[10px] text-muted-foreground">превью…</span>
+        </div>
+      );
+    }
+    return (
+      <div className="flex size-full flex-col items-center justify-center gap-1">
+        <FileText className="size-10 text-muted-foreground/50" />
+        {isPdf && <span className="text-xs text-muted-foreground">PDF</span>}
+      </div>
+    );
+  }
 
   return (
     <Card
@@ -772,48 +839,7 @@ function FileCard({
           onClick={onImageClick}
           className="relative block aspect-[4/3] w-full cursor-zoom-in bg-muted/40"
         >
-          {showPreview ? (
-            <>
-              {previewLoading && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Loader2 className="size-6 animate-spin text-muted-foreground" />
-                </div>
-              )}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={previewUrl}
-                alt=""
-                loading="lazy"
-                decoding="async"
-                className={cn(
-                  "size-full object-cover object-top",
-                  previewLoading && "opacity-0",
-                )}
-                onLoad={() => setPreviewLoading(false)}
-                onError={() => {
-                  if (
-                    previewRetryRef.current < 2 &&
-                    (isPdf || item.mimeType.startsWith("image/"))
-                  ) {
-                    previewRetryRef.current += 1;
-                    const attempt = previewRetryRef.current;
-                    window.setTimeout(() => {
-                      setPreviewRetry(attempt);
-                      setPreviewLoading(true);
-                    }, 1500 * attempt);
-                    return;
-                  }
-                  setPreviewFailed(true);
-                  setPreviewLoading(false);
-                }}
-                draggable={false}
-              />
-            </>
-          ) : (
-            <div className="flex size-full flex-col items-center justify-center gap-1">
-              <FileText className="size-10 text-muted-foreground/50" />
-            </div>
-          )}
+          {renderPreviewBody()}
         </button>
       ) : (
         <a
@@ -822,48 +848,7 @@ function FileCard({
           rel="noopener noreferrer"
           className="relative block aspect-[4/3] bg-muted/40"
         >
-          {showPreview ? (
-            <>
-              {previewLoading && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Loader2 className="size-6 animate-spin text-muted-foreground" />
-                </div>
-              )}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={previewUrl}
-                alt=""
-                loading="lazy"
-                decoding="async"
-                className={cn(
-                  "size-full object-cover object-top",
-                  previewLoading && "opacity-0",
-                )}
-                onLoad={() => setPreviewLoading(false)}
-                onError={() => {
-                  if (
-                    previewRetryRef.current < 2 &&
-                    (isPdf || item.mimeType.startsWith("image/"))
-                  ) {
-                    previewRetryRef.current += 1;
-                    const attempt = previewRetryRef.current;
-                    window.setTimeout(() => {
-                      setPreviewRetry(attempt);
-                      setPreviewLoading(true);
-                    }, 1500 * attempt);
-                    return;
-                  }
-                  setPreviewFailed(true);
-                  setPreviewLoading(false);
-                }}
-              />
-            </>
-          ) : (
-            <div className="flex size-full flex-col items-center justify-center gap-1">
-              <FileText className="size-10 text-muted-foreground/50" />
-              {isPdf && <span className="text-xs text-muted-foreground">PDF</span>}
-            </div>
-          )}
+          {renderPreviewBody()}
         </a>
       )}
       <CardContent className="space-y-2 p-3">

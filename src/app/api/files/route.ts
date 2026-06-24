@@ -4,7 +4,9 @@ import { requireAuth } from '@/lib/auth/requireAuth'
 import { ensureFilesSeed, getCategoryBySlug } from '@/lib/files/ensureFilesSeed'
 import { FILE_ITEM_FROM, FILE_ITEM_SELECT, rowToFileItem, rowToFileCategory } from '@/lib/files/mapRow'
 import { uploadFileItem } from '@/lib/files/fileService'
-import { resolveUploadMime } from '@/lib/files/mimeDetect'
+import { resolveUploadMime, isImageMime, isPdfMime } from '@/lib/files/mimeDetect'
+import { isThumbnailPreviewPath } from '@/lib/files/previewConstants'
+import { schedulePreviewGenerationBatch } from '@/lib/files/previewQueue'
 import type { FileStorageType } from '@/lib/files/types'
 
 export const runtime = 'nodejs'
@@ -43,6 +45,21 @@ export async function GET(req: Request) {
      ORDER BY f.sort_order ASC, f.created_at DESC`,
     values,
   )
+
+  const missingPreviewIds: string[] = []
+  for (const row of rows) {
+    const mime = row.mime_type as string
+    const name = row.original_name as string
+    if (
+      !isThumbnailPreviewPath(row.preview_path as string | null, row.storage_path as string) &&
+      (isImageMime(mime) || isPdfMime(mime, name))
+    ) {
+      missingPreviewIds.push(row.id as string)
+    }
+  }
+  if (missingPreviewIds.length) {
+    schedulePreviewGenerationBatch(missingPreviewIds)
+  }
 
   return NextResponse.json({ items: rows.map(rowToFileItem) })
 }

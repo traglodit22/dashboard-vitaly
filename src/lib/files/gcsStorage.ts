@@ -273,29 +273,21 @@ export async function uploadToGcs(
       contentType: mime,
       resumable: false,
       validation: false,
-      metadata: { cacheControl: 'private, max-age=3600' },
+      metadata: {
+        cacheControl:
+          mime === 'image/webp' && objectKey.endsWith('-preview.webp')
+            ? 'public, max-age=31536000, immutable'
+            : 'private, max-age=3600',
+      },
     })
   })
 }
 
 export async function downloadFromGcs(objectKey: string): Promise<Buffer> {
-  const url = await getGcsReadSignedUrl(objectKey)
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), 60_000)
-  try {
-    const res = await fetch(url, { signal: controller.signal })
-    if (!res.ok) {
-      throw new Error(`Не удалось скачать из Google Cloud (${res.status})`)
-    }
-    return Buffer.from(await res.arrayBuffer())
-  } catch (err) {
-    if (err instanceof Error && err.name === 'AbortError') {
-      throw new Error('Таймаут чтения из Google Cloud')
-    }
-    throw err
-  } finally {
-    clearTimeout(timer)
-  }
+  return withGcsRetry(`download ${objectKey}`, async (client) => {
+    const [data] = await client.bucket(gcsBucketName()).file(objectKey).download()
+    return Buffer.from(data)
+  })
 }
 
 export async function deleteFromGcs(objectKey: string): Promise<void> {

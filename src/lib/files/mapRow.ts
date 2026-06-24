@@ -1,6 +1,11 @@
 import type { FileCategory, FileFolder, FileItem, FileStorageType } from '@/lib/files/types'
 import { isThumbnailPreviewPath } from '@/lib/files/previewConstants'
 
+function rowTimestamp(value: unknown): string {
+  if (value instanceof Date) return value.toISOString()
+  return String(value ?? '')
+}
+
 export function rowToFileCategory(row: Record<string, unknown>): FileCategory {
   return {
     id: row.id as string,
@@ -43,7 +48,8 @@ export function rowToFileItem(row: Record<string, unknown>): FileItem {
     sortOrder: Number(row.sort_order ?? 0),
     inGallery: Boolean(row.in_gallery),
     gallerySortOrder: Number(row.gallery_sort_order ?? 0),
-    createdAt: (row.created_at as string) ?? '',
+    createdAt: rowTimestamp(row.created_at),
+    updatedAt: rowTimestamp(row.updated_at) || rowTimestamp(row.created_at),
   }
 }
 

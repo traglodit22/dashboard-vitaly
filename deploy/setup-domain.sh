@@ -70,12 +70,16 @@ fi
 
 echo "==> Restart app"
 if command -v pm2 >/dev/null; then
-  sudo -u deploy pm2 restart dashboard --update-env 2>/dev/null || pm2 restart dashboard --update-env || true
+  pm2 restart dashboard --update-env 2>/dev/null || true
 fi
 
 echo "==> GCS CORS"
 if [[ -f "$ENV_FILE" ]] && grep -qE '^GCS_BUCKET=' "$ENV_FILE"; then
-  sudo -u deploy bash -lc "cd '$APP_DIR' && node scripts/configure-gcs-cors.mjs" || true
+  set -a
+  # shellcheck disable=SC1090
+  source "$ENV_FILE"
+  set +a
+  (cd "$APP_DIR" && node scripts/configure-gcs-cors.mjs) || true
 fi
 
 echo ""

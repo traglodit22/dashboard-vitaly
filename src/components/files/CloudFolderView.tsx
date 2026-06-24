@@ -20,6 +20,7 @@ export interface CloudFileItem {
   inGallery: boolean;
   gallerySortOrder: number;
   createdAt: string;
+  updatedAt: string;
 }
 
 interface CloudFolderViewProps {
@@ -422,7 +423,15 @@ function GalleryTile({
 }) {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
-  const previewUrl = `/api/files/${item.id}/preview?v=${encodeURIComponent(item.createdAt)}`;
+  const previewUrl = item.hasPreview
+    ? `/api/files/${item.id}/preview?v=${encodeURIComponent(item.updatedAt)}`
+    : null;
+  const pending = !item.hasPreview;
+
+  useEffect(() => {
+    setLoaded(false);
+    setFailed(false);
+  }, [item.id, item.hasPreview, item.updatedAt]);
 
   return (
     <div
@@ -456,7 +465,7 @@ function GalleryTile({
         <X className="size-4" />
       </button>
       <LightboxPreviewTrigger onOpen={onOpen} className="block w-full">
-        {!failed ? (
+        {previewUrl && !failed ? (
           <>
             {!loaded && (
               <div className="flex aspect-[4/3] items-center justify-center">
@@ -475,6 +484,11 @@ function GalleryTile({
               draggable={false}
             />
           </>
+        ) : pending ? (
+          <div className="flex aspect-[4/3] items-center justify-center gap-1 text-muted-foreground">
+            <Loader2 className="size-5 animate-spin" />
+            <span className="text-[10px]">превью…</span>
+          </div>
         ) : (
           <div className="flex aspect-[4/3] items-center justify-center text-xs text-muted-foreground">
             {item.title}
