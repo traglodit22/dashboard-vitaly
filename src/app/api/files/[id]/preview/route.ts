@@ -5,6 +5,7 @@ import {
   readFilePreview,
 } from '@/lib/files/fileService'
 import { isPdfMime } from '@/lib/files/mimeDetect'
+import { getGcsReadSignedUrl } from '@/lib/files/gcsStorage'
 import { PREVIEW_CACHE_CONTROL, isThumbnailPreviewPath } from '@/lib/files/previewConstants'
 import { getCachedPreview, setCachedPreview } from '@/lib/files/previewMemoryCache'
 import { schedulePreviewGeneration } from '@/lib/files/previewQueue'
@@ -74,6 +75,10 @@ export async function GET(
 
   if (fileMime.startsWith('image/') || isPdf) {
     schedulePreviewGeneration(id)
+    if (fileMime.startsWith('image/') && row.category_storage_type === 'gcs') {
+      const url = await getGcsReadSignedUrl(storagePath)
+      return NextResponse.redirect(url, 307)
+    }
     return NextResponse.json({ error: 'Превью готовится' }, { status: 404 })
   }
 

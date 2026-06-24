@@ -1,19 +1,6 @@
 import fs from 'fs'
-import { GoogleAuth } from 'google-auth-library'
 import { Storage } from '@google-cloud/storage'
 import { MAX_FILE_BYTES, MAX_FILE_SIZE_ERROR, UPLOAD_TIMEOUT_MS } from '@/lib/files/types'
-
-const GCS_SCOPES = ['https://www.googleapis.com/auth/devstorage.read_write']
-
-const GCS_RETRY_OPTIONS = {
-  autoRetry: true,
-  maxRetries: 8,
-  retryDelayMultiplier: 2,
-  totalTimeout: 180,
-  maxRetryDelay: 64,
-} as const
-
-let storagePromise: Promise<Storage> | null = null
 
 type ServiceAccountCredentials = {
   project_id?: string
@@ -52,41 +39,57 @@ function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms))
 }
 
-function invalidateStorageClient(): void {
-  storagePromise = null
-}
-
-async function buildStorageClient(): Promise<Storage> {
-  if (!process.env.GCS_BUCKET?.trim()) {
-    throw new Error('GCS_BUCKET не задан')
-  }
-
-  const { projectId, credentials } = loadCredentials()
-  const auth = new GoogleAuth({
-    credentials,
-    projectId,
-    scopes: GCS_SCOPES,
-    clientOptions: {
-      transporterOptions: {
-        timeout: 30_000,
-      },
-    },
-  })
-
-  return new Storage({
-    authClient: auth,
-    projectId,
-    retryOptions: GCS_RETRY_OPTIONS,
-  })
-}
-
-/** Подпись URL локально — без OAuth-запросов к Google. */
+/** Подпись URL локально — без OAuth-запросов к Google (важно для VPS). */
 function getSigningStorage(): Storage {
   const { projectId, credentials } = loadCredentials()
   return new Storage({ projectId, credentials })
 }
 
-/** Signed URL для прямой загрузки из браузера в GCS (обходит VPS→Google). */
+function isTransientGcsError(err: unknown): boolean {
+  const msg = (err instanceof Error ? err.message : String(err)).toLowerCase()
+  return (
+    msg.includes('premature close') ||
+    msg.includes('invalid response body') ||
+    msg.includes('econnreset') ||
+    msg.includes('etimedout') ||
+    msg.includes('socket hang up') ||
+    msg.includes('network') ||
+    msg.includes('fetch failed') ||
+    msg.includes('timeout') ||
+    msg.includes('503') ||
+    msg.includes('502') ||
+    msg.includes('abort')
+  )
+}
+
+function gcsErrorMessage(err: unknown): string {
+  if (isTransientGcsError(err)) {
+    return 'Сбой соединения с Google Cloud. Попробуйте ещё раз через несколько секунд.'
+  }
+  if (err instanceof Error && err.message) return err.message
+  return 'Ошибка Google Cloud Storage'
+}
+
+async function withSignedUrlRetry<T>(label: string, fn: () => Promise<T>): Promise<T> {
+  const attempts = 6
+  const delays = [0, 500, 1500, 3000, 5000, 8000]
+  let lastError: unknown
+
+  for (let i = 0; i < attempts; i++) {
+    if (delays[i]) await sleep(delays[i])
+    try {
+      return await fn()
+    } catch (err) {
+      lastError = err
+      console.error(`[gcs] ${label} attempt ${i + 1}/${attempts} failed:`, err)
+      if (!isTransientGcsError(err)) break
+    }
+  }
+
+  throw new Error(gcsErrorMessage(lastError))
+}
+
+/** Signed URL для прямой загрузки из браузера в GCS (обходит VPS→Google OAuth). */
 export async function getGcsUploadSignedUrl(
   objectKey: string,
   contentType: string,
@@ -123,7 +126,7 @@ export function assertGcsSignedUploadUrl(uploadUrl: string): void {
   }
 }
 
-/** PUT через signed URL с сервера (обходит CORS браузера). */
+/** PUT через signed URL с сервера (без OAuth). */
 export async function putBufferToSignedUrl(
   uploadUrl: string,
   buffer: Buffer,
@@ -157,64 +160,6 @@ export async function putBufferToSignedUrl(
   } finally {
     clearTimeout(timer)
   }
-}
-
-async function getStorage(): Promise<Storage> {
-  if (!storagePromise) {
-    storagePromise = buildStorageClient().catch((err) => {
-      storagePromise = null
-      throw err
-    })
-  }
-  return storagePromise
-}
-
-function isTransientGcsError(err: unknown): boolean {
-  const msg = (err instanceof Error ? err.message : String(err)).toLowerCase()
-  return (
-    msg.includes('premature close') ||
-    msg.includes('invalid response body') ||
-    msg.includes('econnreset') ||
-    msg.includes('etimedout') ||
-    msg.includes('socket hang up') ||
-    msg.includes('network') ||
-    msg.includes('fetch failed') ||
-    msg.includes('timeout') ||
-    msg.includes('503') ||
-    msg.includes('502')
-  )
-}
-
-function gcsErrorMessage(err: unknown): string {
-  if (isTransientGcsError(err)) {
-    return 'Сбой соединения с Google Cloud. Попробуйте ещё раз через несколько секунд.'
-  }
-  if (err instanceof Error && err.message) return err.message
-  return 'Ошибка Google Cloud Storage'
-}
-
-async function withGcsRetry<T>(label: string, fn: (storage: Storage) => Promise<T>): Promise<T> {
-  const attempts = 6
-  const delays = [0, 1500, 3000, 5000, 8000, 12000]
-  let lastError: unknown
-
-  for (let i = 0; i < attempts; i++) {
-    if (delays[i]) await sleep(delays[i])
-    try {
-      const client = await getStorage()
-      return await fn(client)
-    } catch (err) {
-      lastError = err
-      console.error(`[gcs] ${label} attempt ${i + 1}/${attempts} failed:`, err)
-      if (isTransientGcsError(err)) {
-        invalidateStorageClient()
-        continue
-      }
-      break
-    }
-  }
-
-  throw new Error(gcsErrorMessage(lastError))
 }
 
 export function gcsBucketName(): string {
@@ -260,6 +205,7 @@ export function gcsFolderKeepKey(categorySlug: string, folderPrefix: string): st
   return `dashboard/${categorySlug}/${folderPrefix}/.keep`
 }
 
+/** Загрузка в GCS через signed URL (без OAuth SDK). */
 export async function uploadToGcs(
   objectKey: string,
   buffer: Buffer,
@@ -268,39 +214,57 @@ export async function uploadToGcs(
   if (buffer.length > MAX_FILE_BYTES) {
     throw new Error(MAX_FILE_SIZE_ERROR)
   }
-  await withGcsRetry(`upload ${objectKey}`, async (client) => {
-    await client.bucket(gcsBucketName()).file(objectKey).save(buffer, {
-      contentType: mime,
-      resumable: false,
-      validation: false,
-      metadata: {
-        cacheControl:
-          mime === 'image/webp' && objectKey.endsWith('-preview.webp')
-            ? 'public, max-age=31536000, immutable'
-            : 'private, max-age=3600',
-      },
-    })
+  await withSignedUrlRetry(`upload ${objectKey}`, async () => {
+    const uploadUrl = await getGcsUploadSignedUrl(objectKey, mime)
+    await putBufferToSignedUrl(uploadUrl, buffer, mime)
   })
 }
 
+/** Скачивание из GCS через signed URL (без OAuth SDK). */
 export async function downloadFromGcs(objectKey: string): Promise<Buffer> {
-  return withGcsRetry(`download ${objectKey}`, async (client) => {
-    const [data] = await client.bucket(gcsBucketName()).file(objectKey).download()
-    return Buffer.from(data)
+  return withSignedUrlRetry(`download ${objectKey}`, async () => {
+    const url = await getGcsReadSignedUrl(objectKey)
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 60_000)
+    try {
+      const res = await fetch(url, { signal: controller.signal })
+      if (!res.ok) {
+        throw new Error(`Не удалось скачать из Google Cloud (${res.status})`)
+      }
+      return Buffer.from(await res.arrayBuffer())
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        throw new Error('Таймаут чтения из Google Cloud')
+      }
+      throw err
+    } finally {
+      clearTimeout(timer)
+    }
   })
 }
 
 export async function deleteFromGcs(objectKey: string): Promise<void> {
-  await withGcsRetry(`delete ${objectKey}`, async (client) => {
-    await client.bucket(gcsBucketName()).file(objectKey).delete({ ignoreNotFound: true })
+  await withSignedUrlRetry(`delete ${objectKey}`, async () => {
+    const storage = getSigningStorage()
+    const [url] = await storage.bucket(gcsBucketName()).file(objectKey).getSignedUrl({
+      version: 'v4',
+      action: 'delete',
+      expires: Date.now() + 15 * 60 * 1000,
+    })
+    const res = await fetch(url, { method: 'DELETE' })
+    if (!res.ok && res.status !== 404) {
+      throw new Error(`Не удалось удалить из Google Cloud (${res.status})`)
+    }
   })
 }
 
-/** Проверка доступа к bucket (для диагностики). */
+/** Проверка: ключи есть, подпись URL работает. */
 export async function pingGcs(): Promise<boolean> {
   if (!isGcsConfigured()) return false
-  await withGcsRetry('ping', async (client) => {
-    await client.bucket(gcsBucketName()).getMetadata()
-  })
-  return true
+  try {
+    await getGcsReadSignedUrl(`${gcsObjectKey('_ping', '', 'test', 'txt')}`)
+    return true
+  } catch {
+    return false
+  }
 }

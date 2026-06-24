@@ -423,10 +423,13 @@ function GalleryTile({
 }) {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
-  const previewUrl = item.hasPreview
-    ? `/api/files/${item.id}/preview?v=${encodeURIComponent(item.updatedAt)}`
-    : null;
-  const pending = !item.hasPreview;
+  const previewUrl =
+    item.mimeType.startsWith("image/") || item.hasPreview
+      ? `/api/files/${item.id}/preview?v=${
+          item.hasPreview ? encodeURIComponent(item.updatedAt) : "src"
+        }`
+      : null;
+  const pending = !item.hasPreview && item.mimeType === "application/pdf";
 
   useEffect(() => {
     setLoaded(false);

@@ -139,6 +139,10 @@ fi
 echo "==> GCS bucket CORS (direct browser upload)"
 if grep -qE '^GCS_BUCKET=' .env 2>/dev/null; then
   set +e
+  set -a
+  # shellcheck disable=SC1091
+  source .env
+  set +a
   node scripts/configure-gcs-cors.mjs
   cors_rc=$?
   set -e

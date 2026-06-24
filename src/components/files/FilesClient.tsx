@@ -736,12 +736,14 @@ function FileCard({
   const [previewLoading, setPreviewLoading] = useState(item.hasPreview);
   const isPdf = item.mimeType === "application/pdf";
   const isImage = item.mimeType.startsWith("image/");
-  const canPreview = isImage || isPdf;
-  const previewUrl = item.hasPreview
-    ? `/api/files/${item.id}/preview?v=${encodeURIComponent(item.updatedAt)}`
-    : null;
+  const previewUrl =
+    isImage || item.hasPreview
+      ? `/api/files/${item.id}/preview?v=${
+          item.hasPreview ? encodeURIComponent(item.updatedAt) : "src"
+        }`
+      : null;
   const showPreview = Boolean(previewUrl) && !previewFailed;
-  const showPending = canPreview && !item.hasPreview && !previewFailed;
+  const showPending = isPdf && !item.hasPreview && !previewFailed;
 
   useEffect(() => {
     setDraft(item.title);
