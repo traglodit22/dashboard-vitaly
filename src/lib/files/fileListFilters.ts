@@ -48,6 +48,7 @@ const EXT_LABELS: Record<string, string> = {
   xlsx: "XLSX",
   txt: "TXT",
   zip: "ZIP",
+  dwg: "DWG",
   other: "Другое",
 };
 
@@ -72,6 +73,7 @@ export function fileExtension(item: Pick<FileListRow, "originalName" | "mimeType
   }
   if (item.mimeType === "text/plain") return "txt";
   if (item.mimeType === "application/zip") return "zip";
+  if (item.mimeType === "image/vnd.dwg") return "dwg";
   if (item.mimeType === "image/jpeg") return "jpg";
   if (item.mimeType === "image/png") return "png";
   if (item.mimeType === "image/webp") return "webp";

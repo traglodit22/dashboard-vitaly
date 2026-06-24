@@ -48,7 +48,7 @@ export function extForMime(mime: string): string {
 
 export function validateLocalUpload(mime: string, size: number): void {
   if (!LOCAL_ALLOWED_MIMES.has(mime)) {
-    throw new Error('Допустимы PDF, изображения, DOC/DOCX, XLS/XLSX, TXT и ZIP')
+    throw new Error('Допустимы PDF, изображения, DOC/DOCX, XLS/XLSX, TXT, ZIP и DWG')
   }
   if (size > MAX_FILE_BYTES) {
     throw new Error(MAX_FILE_SIZE_ERROR)

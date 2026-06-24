@@ -13,6 +13,7 @@ export const EXT_TO_MIME: Record<string, string> = {
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   txt: 'text/plain',
   zip: 'application/zip',
+  dwg: 'image/vnd.dwg',
 }
 
 const GENERIC_BINARY = new Set(['application/octet-stream', 'application/zip'])
@@ -41,7 +42,7 @@ export function resolveUploadMime(fileName: string, reportedType: string): strin
   }
 
   throw new Error(
-    'Допустимы PDF, изображения, DOC/DOCX, XLS/XLSX, TXT и ZIP',
+    'Допустимы PDF, изображения, DOC/DOCX, XLS/XLSX, TXT, ZIP и DWG',
   )
 }
 

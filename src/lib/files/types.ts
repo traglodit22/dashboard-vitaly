@@ -57,6 +57,11 @@ export const LOCAL_ALLOWED_MIMES = new Set([
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   'text/plain',
   'application/zip',
+  'image/vnd.dwg',
+  'application/acad',
+  'application/x-acad',
+  'application/dwg',
+  'application/vnd.dwg',
 ])
 
 export const MAX_FILE_MB = 50

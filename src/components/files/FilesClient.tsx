@@ -196,14 +196,8 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
 
   const manualSort = sortBy === "manual" && extFilter === "all";
 
-  const galleryItems = useMemo(() => {
-    const base = items.filter((i) => i.inGallery);
-    return sortFileList(filterByExtension(base, extFilter), sortBy, "gallery");
-  }, [items, extFilter, sortBy]);
-
   const listItems = useMemo(() => {
-    const base = items.filter((i) => !i.inGallery);
-    return sortFileList(filterByExtension(base, extFilter), sortBy, "files");
+    return sortFileList(filterByExtension(items, extFilter), sortBy, "files");
   }, [items, extFilter, sortBy]);
 
   const filesToolbar =
@@ -215,7 +209,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
         onExtFilterChange={setExtFilter}
         extensions={extensionOptions}
         totalCount={items.length}
-        visibleCount={galleryItems.length + listItems.length}
+        visibleCount={listItems.length}
       />
     ) : null;
 
@@ -285,7 +279,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
 
   function onFileDrop(targetId: string) {
     if (!manualSort || !dragItemId || dragItemId === targetId) return;
-    const pool = listItems.length ? listItems : items.filter((i) => !i.inGallery);
+    const pool = listItems.length ? listItems : items;
     if (pool.length < 2) return;
     const next = reorderById(pool, dragItemId, targetId);
     setDragItemId(null);
@@ -603,7 +597,6 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
               isFavorite: false,
             }
           }
-          galleryItems={galleryItems}
           listItems={listItems}
           filesToolbar={filesToolbar}
           manualSort={manualSort}
@@ -611,20 +604,8 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
           allItemsCount={items.length}
           dragItemId={dragItemId}
           onFolderChange={setFolder}
-          onItemChange={(item) => {
-            setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, ...item } : i)));
-          }}
           onDragStart={setDragItemId}
           onDragEnd={() => setDragItemId(null)}
-          onGalleryReorder={(ordered) => {
-            const sortMap = new Map(ordered.map((item, i) => [item.id, (i + 1) * 10]));
-            setItems((prev) =>
-              prev.map((i) =>
-                sortMap.has(i.id) ? { ...i, gallerySortOrder: sortMap.get(i.id)! } : i,
-              ),
-            );
-            void persistFileOrder(ordered, "gallery");
-          }}
           onListReorder={(ordered) => {
             const sortMap = new Map(ordered.map((item, i) => [item.id, (i + 1) * 10]));
             setItems((prev) =>
