@@ -1,9 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Bell,
   Bot,
+  ChevronDown,
+  ChevronUp,
   Database,
   Download,
   FolderArchive,
@@ -38,6 +40,9 @@ import {
 } from "@/components/settings/shared";
 import { EMPTY_SETTINGS, formatBytes, formatMsk, type SettingsData } from "@/components/settings/types";
 import type { VpsBackupRun } from "@/lib/backup/types";
+import { SECTIONS } from "@/components/navigation";
+import { notifyNavOrderChanged } from "@/components/navigation/NavOrderProvider";
+import { orderNavSections } from "@/lib/navigation/orderSections";
 
 export function SettingsClient() {
   const [settings, setSettings] = useState<SettingsData>(EMPTY_SETTINGS);
@@ -61,6 +66,7 @@ export function SettingsClient() {
       deepseekConfigured: Boolean(data.deepseekConfigured),
       siteTitle: data.siteTitle ?? "",
       hasFavicon: Boolean(data.hasFavicon),
+      navSectionOrder: Array.isArray(data.navSectionOrder) ? data.navSectionOrder : [],
     });
   }, []);
 
@@ -111,12 +117,54 @@ function AppearanceSection({
   const [faviconBase64, setFaviconBase64] = useState("");
   const [hasFavicon, setHasFavicon] = useState(settings.hasFavicon);
   const [saving, setSaving] = useState(false);
+  const [navOrder, setNavOrder] = useState<string[]>([]);
+  const [savingNavOrder, setSavingNavOrder] = useState(false);
 
   useEffect(() => setMounted(true), []);
   useEffect(() => {
     setTitle(settings.siteTitle);
     setHasFavicon(settings.hasFavicon);
-  }, [settings.siteTitle, settings.hasFavicon]);
+    setNavOrder(
+      settings.navSectionOrder.length > 0
+        ? settings.navSectionOrder
+        : SECTIONS.map((s) => s.key),
+    );
+  }, [settings.siteTitle, settings.hasFavicon, settings.navSectionOrder]);
+
+  const orderedNavSections = useMemo(
+    () => orderNavSections(SECTIONS, navOrder),
+    [navOrder],
+  );
+
+  function moveNavSection(index: number, direction: -1 | 1) {
+    setNavOrder((prev) => {
+      const next = [...prev];
+      const target = index + direction;
+      if (target < 0 || target >= next.length) return prev;
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+  }
+
+  async function saveNavOrder() {
+    setSavingNavOrder(true);
+    try {
+      const res = await apiFetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ navSectionOrder: navOrder }),
+      });
+      if (!res.ok) {
+        toast.error("Не удалось сохранить порядок меню");
+        return;
+      }
+      toast.success("Порядок вкладок сохранён");
+      notifyNavOrderChanged();
+      await onSaved();
+    } finally {
+      setSavingNavOrder(false);
+    }
+  }
 
   const themeOptions = [
     { value: "light", label: "Светлая", icon: Sun },
@@ -197,6 +245,60 @@ function AppearanceSection({
             );
           })}
         </div>
+      </SettingsField>
+
+      <SettingsDivider />
+
+      <SettingsField label="Порядок вкладок в верхнем меню">
+        <p className="mb-3 text-xs text-muted-foreground">
+          Первая вкладка станет разделом по умолчанию при открытии логотипа Dashboard.
+        </p>
+        <div className="space-y-1">
+          {orderedNavSections.map((section, index) => (
+            <div
+              key={section.key}
+              className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2"
+            >
+              <span className="flex-1 text-sm font-medium">{section.label}</span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="size-8 shrink-0"
+                disabled={index === 0}
+                onClick={() => moveNavSection(index, -1)}
+                aria-label={`Поднять «${section.label}»`}
+              >
+                <ChevronUp className="size-4" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="size-8 shrink-0"
+                disabled={index === navOrder.length - 1}
+                onClick={() => moveNavSection(index, 1)}
+                aria-label={`Опустить «${section.label}»`}
+              >
+                <ChevronDown className="size-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+        <Button
+          type="button"
+          variant="secondary"
+          className="mt-3"
+          onClick={() => void saveNavOrder()}
+          disabled={savingNavOrder}
+        >
+          {savingNavOrder ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Save className="size-4" />
+          )}
+          Сохранить порядок
+        </Button>
       </SettingsField>
 
       <SettingsDivider />

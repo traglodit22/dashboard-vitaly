@@ -7,6 +7,7 @@ import { LogOut, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { sectionForPath, activeItem } from "@/components/navigation";
+import { useNavSections } from "@/components/navigation/NavOrderProvider";
 import { FilesSidebarTree } from "@/components/files/FilesSidebarTree";
 import { GallerySidebarCalendar } from "@/components/gallery/GallerySidebarCalendar";
 import { FunkoSidebar } from "@/components/funko/FunkoSidebar";
@@ -15,7 +16,8 @@ export function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
-  const section = sectionForPath(pathname);
+  const sections = useNavSections();
+  const section = sectionForPath(pathname, sections);
   const current = activeItem(section.items, pathname);
   const settingsActive = pathname === "/settings";
 

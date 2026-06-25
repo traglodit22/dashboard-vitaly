@@ -77,12 +77,15 @@ function matchesItem(item: NavItem, pathname: string): boolean {
   return pathname === item.href || pathname.startsWith(item.href + "/");
 }
 
-// Раздел, которому принадлежит текущий путь. По умолчанию — первый (Китай),
+// Раздел, которому принадлежит текущий путь. По умолчанию — первый в списке,
 // чтобы вспомогательные страницы вроде /settings показывали осмысленный сайдбар.
-export function sectionForPath(pathname: string): NavSection {
+export function sectionForPath(
+  pathname: string,
+  sections: NavSection[] = SECTIONS,
+): NavSection {
   return (
-    SECTIONS.find((s) => s.items.some((i) => matchesItem(i, pathname))) ??
-    SECTIONS[0]
+    sections.find((s) => s.items.some((i) => matchesItem(i, pathname))) ??
+    sections[0]
   );
 }
 

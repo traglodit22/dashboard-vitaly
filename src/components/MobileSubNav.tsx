@@ -4,11 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { activeItem, sectionForPath } from "@/components/navigation";
+import { useNavSections } from "@/components/navigation/NavOrderProvider";
 
 /** Горизонтальная навигация по пунктам раздела на телефоне (вместо бокового сайдбара). */
 export function MobileSubNav() {
   const pathname = usePathname();
-  const section = sectionForPath(pathname);
+  const sections = useNavSections();
+  const section = sectionForPath(pathname, sections);
   const current = activeItem(section.items, pathname);
 
   if (section.items.length <= 1) return null;

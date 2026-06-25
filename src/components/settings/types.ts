@@ -10,6 +10,7 @@ export interface SettingsData {
   deepseekConfigured: boolean
   siteTitle: string
   hasFavicon: boolean
+  navSectionOrder: string[]
 }
 
 export const EMPTY_SETTINGS: SettingsData = {
@@ -24,6 +25,7 @@ export const EMPTY_SETTINGS: SettingsData = {
   deepseekConfigured: false,
   siteTitle: '',
   hasFavicon: false,
+  navSectionOrder: [],
 }
 
 export function formatBytes(bytes: number | null | undefined): string {

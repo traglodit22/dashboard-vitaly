@@ -28,6 +28,9 @@ export async function GET(req: Request) {
     deepseekConfigured: Boolean(s.deepseek_api_key),
     siteTitle: (s.site_title as string) ?? '',
     hasFavicon: Boolean(s.favicon_base64),
+    navSectionOrder: Array.isArray(s.nav_section_order)
+      ? (s.nav_section_order as string[])
+      : [],
   })
 }
 
@@ -88,6 +91,12 @@ export async function POST(req: Request) {
   if (body.removeFavicon === true) {
     setClauses.push(`favicon_base64 = $${idx++}`)
     values.push(null)
+  }
+  if (Array.isArray(body.navSectionOrder)) {
+    const { saveNavSectionOrder } = await import('@/lib/navigation/navOrder')
+    const saved = await saveNavSectionOrder(body.navSectionOrder)
+    setClauses.push(`nav_section_order = $${idx++}`)
+    values.push(saved)
   }
 
   if (setClauses.length > 0) {
