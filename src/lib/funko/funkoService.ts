@@ -1,5 +1,5 @@
 import { query } from '@/lib/db/index'
-import { getCategorySeriesLabel } from '@/lib/funko/categoryConfig'
+import { getCategorySeriesLabel, isAllFunkoCategorySlug } from '@/lib/funko/categoryConfig'
 import { applyFunkoCategoryOrder, getFunkoCategoryOrderKeys } from '@/lib/funko/categoryOrder'
 import { enrichFunkoItems } from '@/lib/funko/enrichItem'
 import { ensureFunkoSchema } from '@/lib/funko/ensureFunko'
@@ -59,7 +59,7 @@ export async function listFunkoItems(
   const params: unknown[] = []
   let idx = 1
 
-  if (options.categorySlug) {
+  if (options.categorySlug && !isAllFunkoCategorySlug(options.categorySlug)) {
     clauses.push(`c.slug = $${idx++}`)
     params.push(options.categorySlug)
   }
@@ -120,7 +120,7 @@ export async function getFunkoStats(categorySlug?: string): Promise<FunkoCatalog
 
   const params: unknown[] = []
   let where = ''
-  if (categorySlug) {
+  if (categorySlug && !isAllFunkoCategorySlug(categorySlug)) {
     where = 'WHERE c.slug = $1'
     params.push(categorySlug)
   }

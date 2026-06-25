@@ -67,6 +67,18 @@ export const FUNKO_CATEGORY_DEFS: FunkoCategoryDef[] = [
 
 export const DEFAULT_FUNKO_CATEGORY_SLUG = 'animation'
 
+/** Виртуальная категория: все фигурки без фильтра по линейке. */
+export const ALL_FUNKO_CATEGORY_SLUG = 'all'
+
+export function isAllFunkoCategorySlug(slug: string): boolean {
+  return slug === ALL_FUNKO_CATEGORY_SLUG
+}
+
+export function getFunkoCategoryDisplayName(slug: string): string {
+  if (isAllFunkoCategorySlug(slug)) return 'Все категории'
+  return getCategoryDef(slug)?.name ?? 'Pop! Animation'
+}
+
 /** Порядок категорий по умолчанию (до пользовательской сортировки). */
 export const DEFAULT_FUNKO_CATEGORY_ORDER = FUNKO_CATEGORY_DEFS.map((d) => d.slug)
 

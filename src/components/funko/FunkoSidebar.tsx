@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowDownUp,
   ChevronDown,
@@ -11,20 +11,20 @@ import {
   PackageCheck,
   Plus,
   Save,
-  Search,
   Sparkles,
   Truck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { apiFetch } from "@/lib/apiFetch";
 import { getCategoryDef } from "@/lib/funko/categoryConfig";
 import {
+  ALL_FUNKO_CATEGORY,
   buildFunkoHref,
   DEFAULT_FUNKO_CATEGORY,
   FUNKO_CATEGORY_ORDER_CHANGED_EVENT,
   FUNKO_CHANGED_EVENT,
+  isAllFunkoCategorySlug,
   notifyFunkoCategoryOrderChanged,
   notifyFunkoChanged,
   parseFunkoSearchParams,
@@ -36,11 +36,9 @@ import { cn } from "@/lib/utils";
 
 function FunkoSidebarInner() {
   const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { category, filter, q } = parseFunkoSearchParams(searchParams);
+  const { category, filter } = parseFunkoSearchParams(searchParams);
 
-  const [search, setSearch] = useState(q);
   const [categories, setCategories] = useState<FunkoCategory[]>([]);
   const [orderDraft, setOrderDraft] = useState<string[]>([]);
   const [sortMode, setSortMode] = useState(false);
@@ -90,10 +88,6 @@ function FunkoSidebarInner() {
   }, [category]);
 
   useEffect(() => {
-    setSearch(q);
-  }, [q]);
-
-  useEffect(() => {
     void (async () => {
       try {
         await Promise.all([loadCategories(), loadStats()]);
@@ -118,19 +112,14 @@ function FunkoSidebarInner() {
     category?: string;
     filter?: FunkoFilter;
     page?: number;
-    q?: string;
   }) {
     const href = buildFunkoHref({
       category: opts.category ?? category,
       filter: opts.filter ?? filter,
       page: opts.page ?? 1,
-      q: opts.q !== undefined ? opts.q : q,
+      q: searchParams.get("q") ?? "",
     });
     router.push(href);
-  }
-
-  function applySearch() {
-    navigate({ q: search, page: 1 });
   }
 
   function moveCategory(index: number, direction: -1 | 1) {
@@ -243,7 +232,22 @@ function FunkoSidebarInner() {
         {loading && !categories.length ? (
           <div className="px-2 py-3 text-xs text-muted-foreground">Загрузка…</div>
         ) : (
-          orderedCategories.map((cat, index) => {
+          <>
+            {!sortMode && (
+              <button
+                type="button"
+                onClick={() => navigate({ category: ALL_FUNKO_CATEGORY, page: 1 })}
+                className={cn(
+                  "flex w-full items-center rounded-md px-3 py-1.5 text-left text-xs font-semibold transition-colors",
+                  isAllFunkoCategorySlug(category)
+                    ? "bg-primary/15 text-primary"
+                    : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                )}
+              >
+                ВСЕ
+              </button>
+            )}
+            {orderedCategories.map((cat, index) => {
             const label = getCategoryDef(cat.slug)?.shortLabel ?? cat.name;
             const active = cat.slug === category;
             if (sortMode) {
@@ -295,7 +299,8 @@ function FunkoSidebarInner() {
                 <span className="truncate">{label}</span>
               </button>
             );
-          })
+          })}
+          </>
         )}
       </div>
 
@@ -318,29 +323,7 @@ function FunkoSidebarInner() {
         </div>
       )}
 
-      <div className="shrink-0 space-y-2 border-t border-border px-2 pt-2">
-        <div className="relative">
-          <Search className="pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && applySearch()}
-            placeholder="Поиск…"
-            className="h-8 pl-8 text-sm"
-          />
-        </div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="h-8 w-full"
-          onClick={applySearch}
-        >
-          Найти
-        </Button>
-      </div>
-
-      <div className="shrink-0 space-y-0.5 px-1">
+      <div className="shrink-0 space-y-0.5 border-t border-border px-1 pt-2">
         {filters.map(({ key, label, icon: Icon, count }) => (
           <button
             key={key}
@@ -379,7 +362,7 @@ function FunkoSidebarInner() {
           size="sm"
           variant="outline"
           className="w-full"
-          disabled={importingCatalog}
+          disabled={importingCatalog || isAllFunkoCategorySlug(category)}
           onClick={() => void handleImportCatalog()}
         >
           {importingCatalog ? (

@@ -10,12 +10,14 @@ import {
   MessageSquare,
   PackageCheck,
   Pencil,
+  Search,
   Trash2,
   Truck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { FunkoImagePicker } from "@/components/funko/FunkoImagePicker";
 import { FunkoItemDialog } from "@/components/funko/FunkoItemDialog";
 import { apiFetch } from "@/lib/apiFetch";
@@ -24,10 +26,11 @@ import {
   DEFAULT_FUNKO_CATEGORY,
   FUNKO_CHANGED_EVENT,
   FUNKO_CREATE_EVENT,
+  isAllFunkoCategorySlug,
   notifyFunkoChanged,
   parseFunkoSearchParams,
 } from "@/lib/funko/funkoRoutes";
-import { getCategoryDef } from "@/lib/funko/categoryConfig";
+import { getFunkoCategoryDisplayName } from "@/lib/funko/categoryConfig";
 import {
   DASHBOARD_PAGE_CLASS,
   DASHBOARD_PAGE_TITLE_CLASS,
@@ -48,7 +51,10 @@ function FunkoClientInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { category, filter, page, q } = parseFunkoSearchParams(searchParams);
-  const categoryDef = getCategoryDef(category) ?? getCategoryDef(DEFAULT_FUNKO_CATEGORY)!;
+  const categoryLabel = getFunkoCategoryDisplayName(category);
+  const createCategorySlug = isAllFunkoCategorySlug(category)
+    ? DEFAULT_FUNKO_CATEGORY
+    : category;
 
   const [items, setItems] = useState<FunkoItem[]>([]);
   const [stats, setStats] = useState<FunkoCatalogStats>({
@@ -66,6 +72,22 @@ function FunkoClientInner() {
   const [editItem, setEditItem] = useState<FunkoItem | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
   const [pickerItem, setPickerItem] = useState<FunkoItem | null>(null);
+  const [searchInput, setSearchInput] = useState(q);
+
+  useEffect(() => {
+    setSearchInput(q);
+  }, [q]);
+
+  useEffect(() => {
+    const next = searchInput.trim();
+    if (next === q.trim()) return;
+
+    const timer = window.setTimeout(() => {
+      router.replace(buildFunkoHref({ category, filter, page: 1, q: searchInput }));
+    }, 300);
+
+    return () => window.clearTimeout(timer);
+  }, [searchInput, category, filter, q, router]);
 
   useEffect(() => {
     if (!searchParams.get("filter")) {
@@ -170,12 +192,23 @@ function FunkoClientInner() {
 
   return (
     <div className={DASHBOARD_PAGE_CLASS}>
-      <header className="mb-4 flex flex-col gap-1 sm:mb-6">
-        <h1 className={DASHBOARD_PAGE_TITLE_CLASS}>Funko</h1>
-        <p className="text-sm text-muted-foreground">
-          {categoryDef.name} · {filterLabel}
-          {q.trim() ? ` · «${q.trim()}»` : ""}
-        </p>
+      <header className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <h1 className={DASHBOARD_PAGE_TITLE_CLASS}>Funko</h1>
+          <p className="text-sm text-muted-foreground">
+            {categoryLabel} · {filterLabel}
+            {q.trim() ? ` · «${q.trim()}»` : ""}
+          </p>
+        </div>
+        <div className="relative w-full shrink-0 sm:w-64 lg:w-72">
+          <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="Поиск…"
+            className="h-9 pl-9 text-sm"
+          />
+        </div>
       </header>
 
       {loading ? (
@@ -199,6 +232,7 @@ function FunkoClientInner() {
               <FunkoCard
                 key={item.id}
                 item={item}
+                showCategory={isAllFunkoCategorySlug(category)}
                 onPatch={patchItem}
                 onEdit={() => {
                   setEditItem(item);
@@ -242,7 +276,7 @@ function FunkoClientInner() {
       <FunkoItemDialog
         open={editorOpen}
         item={editItem}
-        categorySlug={category}
+        categorySlug={createCategorySlug}
         onClose={() => setEditorOpen(false)}
         onSaved={() => onItemSaved()}
       />
@@ -278,12 +312,14 @@ export function FunkoClient() {
 
 function FunkoCard({
   item,
+  showCategory,
   onPatch,
   onEdit,
   onDelete,
   onPickImage,
 }: {
   item: FunkoItem;
+  showCategory?: boolean;
   onPatch: (id: string, patch: ItemPatch) => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -359,6 +395,11 @@ function FunkoCard({
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-2">
+        {showCategory && (
+          <p className="truncate text-[10px] font-medium text-muted-foreground">
+            {item.categoryName}
+          </p>
+        )}
         <h3 className="line-clamp-2 min-h-[2.5rem] text-xs leading-snug font-medium">
           {item.title}
         </h3>

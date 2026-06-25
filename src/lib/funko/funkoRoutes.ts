@@ -23,6 +23,9 @@ export function requestFunkoCreate(): void {
 export type FunkoFilter = 'owned' | 'inTransit' | 'all'
 
 export const DEFAULT_FUNKO_CATEGORY = 'animation'
+export const ALL_FUNKO_CATEGORY = 'all'
+
+export { isAllFunkoCategorySlug } from '@/lib/funko/categoryConfig'
 
 export function parseFunkoSearchParams(params: URLSearchParams): {
   category: string
