@@ -78,11 +78,15 @@ export async function matchCatalogImage(row: CollectionImportRow): Promise<strin
 }
 
 export function collectionHandle(row: CollectionImportRow, index: number): string {
-  const base = norm(row.name || row.subseries || `pop-${row.popNumber ?? index}`)
+  const sort = row.sortOrder ?? index
+  const base = norm(row.name || row.subseries || `pop-${row.popNumber ?? sort}`)
     .replace(/\s+/g, '-')
-    .slice(0, 48)
-  const pop = row.popNumber ?? index
-  return `col-${pop}-${base || 'item'}`
+    .slice(0, 40)
+  const pop = row.popNumber ?? sort
+  const feat = row.features
+    ? norm(row.features).replace(/\s+/g, '-').slice(0, 24)
+    : ''
+  return `col-${sort}-${pop}-${base}${feat ? `-${feat}` : ''}`.slice(0, 120)
 }
 
 export async function loadCollectionJson(): Promise<CollectionImportRow[]> {
