@@ -1,6 +1,6 @@
 [
   {
-    "popNumber": null,
+    "popNumber": 1,
     "subseries": "",
     "name": "Lebron James",
     "title": "Lebron James",
@@ -13,7 +13,7 @@
     "sortOrder": 0
   },
   {
-    "popNumber": null,
+    "popNumber": 19,
     "subseries": "",
     "name": "Stephen Curry",
     "title": "Stephen Curry",
@@ -26,7 +26,7 @@
     "sortOrder": 1
   },
   {
-    "popNumber": null,
+    "popNumber": 19,
     "subseries": "",
     "name": "Stephen Curry",
     "title": "Stephen Curry",
@@ -39,7 +39,7 @@
     "sortOrder": 2
   },
   {
-    "popNumber": null,
+    "popNumber": 26,
     "subseries": "",
     "name": "John Wall",
     "title": "John Wall",
@@ -52,7 +52,7 @@
     "sortOrder": 3
   },
   {
-    "popNumber": null,
+    "popNumber": 1,
     "subseries": "",
     "name": "Muhammad Ali",
     "title": "Muhammad Ali",
@@ -65,7 +65,7 @@
     "sortOrder": 4
   },
   {
-    "popNumber": null,
+    "popNumber": 10,
     "subseries": "",
     "name": "Mario Andretti",
     "title": "Mario Andretti",
@@ -78,7 +78,7 @@
     "sortOrder": 5
   },
   {
-    "popNumber": null,
+    "popNumber": 18,
     "subseries": "",
     "name": "Virat Kohli",
     "title": "Virat Kohli",
@@ -91,7 +91,7 @@
     "sortOrder": 6
   },
   {
-    "popNumber": null,
+    "popNumber": 42,
     "subseries": "",
     "name": "Lebron James",
     "title": "Lebron James",
@@ -104,7 +104,7 @@
     "sortOrder": 7
   },
   {
-    "popNumber": null,
+    "popNumber": 32,
     "subseries": "",
     "name": "Giannis Antetokounmpo",
     "title": "Giannis Antetokounmpo",
@@ -117,7 +117,7 @@
     "sortOrder": 8
   },
   {
-    "popNumber": null,
+    "popNumber": 39,
     "subseries": "Timberwolves",
     "name": "Karl-Anthony Towns",
     "title": "Timberwolves — Karl-Anthony Towns",
@@ -130,7 +130,7 @@
     "sortOrder": 9
   },
   {
-    "popNumber": null,
+    "popNumber": 40,
     "subseries": "",
     "name": "Russell Westbrook",
     "title": "Russell Westbrook",
@@ -143,7 +143,7 @@
     "sortOrder": 10
   },
   {
-    "popNumber": null,
+    "popNumber": 41,
     "subseries": "",
     "name": "Kristaps Porzingis",
     "title": "Kristaps Porzingis",
@@ -156,7 +156,7 @@
     "sortOrder": 11
   },
   {
-    "popNumber": null,
+    "popNumber": 50,
     "subseries": "Lakers",
     "name": "Lonzo Ball",
     "title": "Lakers — Lonzo Ball",
@@ -169,7 +169,7 @@
     "sortOrder": 12
   },
   {
-    "popNumber": null,
+    "popNumber": 51,
     "subseries": "76ers",
     "name": "Joel Embiid",
     "title": "76ers — Joel Embiid",
@@ -182,7 +182,7 @@
     "sortOrder": 13
   },
   {
-    "popNumber": null,
+    "popNumber": 52,
     "subseries": "Lakers",
     "name": "Lebron James",
     "title": "Lakers — Lebron James",
@@ -195,7 +195,7 @@
     "sortOrder": 14
   },
   {
-    "popNumber": null,
+    "popNumber": 54,
     "subseries": "",
     "name": "Michael Jordan",
     "title": "Michael Jordan",
@@ -208,7 +208,7 @@
     "sortOrder": 15
   },
   {
-    "popNumber": null,
+    "popNumber": 75,
     "subseries": "",
     "name": "Michael Jordan",
     "title": "Michael Jordan",
@@ -221,7 +221,7 @@
     "sortOrder": 16
   },
   {
-    "popNumber": null,
+    "popNumber": 103,
     "subseries": "",
     "name": "Dennis Rodman",
     "title": "Dennis Rodman",
@@ -234,7 +234,7 @@
     "sortOrder": 17
   },
   {
-    "popNumber": null,
+    "popNumber": 121,
     "subseries": "",
     "name": "Jamal Murray",
     "title": "Jamal Murray",
@@ -247,7 +247,7 @@
     "sortOrder": 18
   },
   {
-    "popNumber": null,
+    "popNumber": 122,
     "subseries": "Rocket",
     "name": "John Wall",
     "title": "Rocket — John Wall",
@@ -260,7 +260,7 @@
     "sortOrder": 19
   },
   {
-    "popNumber": null,
+    "popNumber": 123,
     "subseries": "Hornets",
     "name": "Gordon Hayward",
     "title": "Hornets — Gordon Hayward",
@@ -273,7 +273,7 @@
     "sortOrder": 20
   },
   {
-    "popNumber": null,
+    "popNumber": 126,
     "subseries": "",
     "name": "Michael Jordan",
     "title": "Michael Jordan",
@@ -286,7 +286,7 @@
     "sortOrder": 21
   },
   {
-    "popNumber": null,
+    "popNumber": 132,
     "subseries": "Suns",
     "name": "Chris Paul",
     "title": "Suns — Chris Paul",
@@ -299,7 +299,7 @@
     "sortOrder": 22
   },
   {
-    "popNumber": null,
+    "popNumber": 138,
     "subseries": "",
     "name": "Magic Johnson",
     "title": "Magic Johnson",
@@ -312,7 +312,7 @@
     "sortOrder": 23
   },
   {
-    "popNumber": null,
+    "popNumber": 139,
     "subseries": "",
     "name": "Larry Bird",
     "title": "Larry Bird",
@@ -325,7 +325,7 @@
     "sortOrder": 24
   },
   {
-    "popNumber": null,
+    "popNumber": 140,
     "subseries": "",
     "name": "Karl Malone",
     "title": "Karl Malone",
@@ -338,7 +338,7 @@
     "sortOrder": 25
   },
   {
-    "popNumber": null,
+    "popNumber": 141,
     "subseries": "",
     "name": "John Stockton",
     "title": "John Stockton",
@@ -351,7 +351,7 @@
     "sortOrder": 26
   },
   {
-    "popNumber": null,
+    "popNumber": 142,
     "subseries": "",
     "name": "Isiah Thomas",
     "title": "Isiah Thomas",
@@ -364,7 +364,7 @@
     "sortOrder": 27
   },
   {
-    "popNumber": null,
+    "popNumber": 157,
     "subseries": "State Warriors",
     "name": "Stephen Curry",
     "title": "State Warriors — Stephen Curry",
@@ -377,7 +377,7 @@
     "sortOrder": 28
   },
   {
-    "popNumber": null,
+    "popNumber": 173,
     "subseries": "",
     "name": "Donovan Mitchell",
     "title": "Donovan Mitchell",
@@ -390,7 +390,7 @@
     "sortOrder": 29
   },
   {
-    "popNumber": null,
+    "popNumber": 177,
     "subseries": "",
     "name": "Damian Lillard",
     "title": "Damian Lillard",
@@ -403,7 +403,7 @@
     "sortOrder": 30
   },
   {
-    "popNumber": null,
+    "popNumber": 180,
     "subseries": "",
     "name": "Paolo Banchero",
     "title": "Paolo Banchero",
@@ -416,7 +416,7 @@
     "sortOrder": 31
   },
   {
-    "popNumber": null,
+    "popNumber": 181,
     "subseries": "",
     "name": "Darius Garland",
     "title": "Darius Garland",
@@ -429,7 +429,7 @@
     "sortOrder": 32
   },
   {
-    "popNumber": null,
+    "popNumber": 193,
     "subseries": "",
     "name": "Michael Jordan",
     "title": "Michael Jordan",
@@ -442,7 +442,7 @@
     "sortOrder": 33
   },
   {
-    "popNumber": null,
+    "popNumber": 194,
     "subseries": "",
     "name": "John Stockton",
     "title": "John Stockton",
@@ -455,7 +455,7 @@
     "sortOrder": 34
   },
   {
-    "popNumber": null,
+    "popNumber": 195,
     "subseries": "",
     "name": "Jason Kidd",
     "title": "Jason Kidd",
@@ -468,7 +468,7 @@
     "sortOrder": 35
   },
   {
-    "popNumber": null,
+    "popNumber": 196,
     "subseries": "",
     "name": "Grant Hill",
     "title": "Grant Hill",
@@ -481,7 +481,7 @@
     "sortOrder": 36
   },
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "Boy",
     "name": "Oscar De La Hoya",
     "title": "Boy — Oscar De La Hoya",
@@ -494,7 +494,7 @@
     "sortOrder": 37
   },
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "United",
     "name": "Romelu Lukaku",
     "title": "United — Romelu Lukaku",
@@ -507,7 +507,7 @@
     "sortOrder": 38
   },
   {
-    "popNumber": null,
+    "popNumber": 4,
     "subseries": "United",
     "name": "Paul Pogba",
     "title": "United — Paul Pogba",
@@ -520,7 +520,7 @@
     "sortOrder": 39
   },
   {
-    "popNumber": null,
+    "popNumber": 9,
     "subseries": "",
     "name": "Roberto Firmino",
     "title": "Roberto Firmino",
@@ -533,7 +533,7 @@
     "sortOrder": 40
   },
   {
-    "popNumber": null,
+    "popNumber": 10,
     "subseries": "",
     "name": "Sadio Mane",
     "title": "Sadio Mane",
@@ -546,7 +546,7 @@
     "sortOrder": 41
   },
   {
-    "popNumber": null,
+    "popNumber": 16,
     "subseries": "",
     "name": "Virgil Van Dijk",
     "title": "Virgil Van Dijk",
@@ -559,7 +559,7 @@
     "sortOrder": 42
   },
   {
-    "popNumber": null,
+    "popNumber": 22,
     "subseries": "",
     "name": "Marco Verratti",
     "title": "Marco Verratti",
@@ -572,7 +572,7 @@
     "sortOrder": 43
   },
   {
-    "popNumber": null,
+    "popNumber": 25,
     "subseries": "",
     "name": "Alisson Becker",
     "title": "Alisson Becker",
@@ -585,7 +585,7 @@
     "sortOrder": 44
   },
   {
-    "popNumber": null,
+    "popNumber": 30,
     "subseries": "",
     "name": "Kylian Mbappé",
     "title": "Kylian Mbappé",
@@ -598,7 +598,7 @@
     "sortOrder": 45
   },
   {
-    "popNumber": null,
+    "popNumber": 32,
     "subseries": "",
     "name": "Sadio Mane",
     "title": "Sadio Mane",
@@ -611,7 +611,7 @@
     "sortOrder": 46
   },
   {
-    "popNumber": null,
+    "popNumber": 38,
     "subseries": "City",
     "name": "Bernardo Silva",
     "title": "City — Bernardo Silva",
@@ -624,7 +624,7 @@
     "sortOrder": 47
   },
   {
-    "popNumber": null,
+    "popNumber": 41,
     "subseries": "",
     "name": "Mohamed Salah",
     "title": "Mohamed Salah",
@@ -637,7 +637,7 @@
     "sortOrder": 48
   },
   {
-    "popNumber": null,
+    "popNumber": 42,
     "subseries": "",
     "name": "Roberto Firmino",
     "title": "Roberto Firmino",
@@ -650,7 +650,7 @@
     "sortOrder": 49
   },
   {
-    "popNumber": null,
+    "popNumber": 44,
     "subseries": "",
     "name": "Andy Robertson",
     "title": "Andy Robertson",
@@ -663,7 +663,7 @@
     "sortOrder": 50
   },
   {
-    "popNumber": null,
+    "popNumber": 48,
     "subseries": "City",
     "name": "Raheem Sterling",
     "title": "City — Raheem Sterling",
@@ -676,7 +676,7 @@
     "sortOrder": 51
   },
   {
-    "popNumber": null,
+    "popNumber": 49,
     "subseries": "City",
     "name": "Phil Foden",
     "title": "City — Phil Foden",
@@ -689,7 +689,7 @@
     "sortOrder": 52
   },
   {
-    "popNumber": null,
+    "popNumber": 50,
     "subseries": "",
     "name": "Lionel Messi",
     "title": "Lionel Messi",
@@ -702,7 +702,7 @@
     "sortOrder": 53
   },
   {
-    "popNumber": null,
+    "popNumber": 53,
     "subseries": "",
     "name": "Darwin Núñez",
     "title": "Darwin Núñez",
@@ -715,7 +715,7 @@
     "sortOrder": 54
   },
   {
-    "popNumber": null,
+    "popNumber": 54,
     "subseries": "",
     "name": "Jürgen Klopp",
     "title": "Jürgen Klopp",
@@ -728,7 +728,7 @@
     "sortOrder": 55
   },
   {
-    "popNumber": null,
+    "popNumber": 55,
     "subseries": "",
     "name": "Luis Diaz",
     "title": "Luis Diaz",
@@ -741,7 +741,7 @@
     "sortOrder": 56
   },
   {
-    "popNumber": null,
+    "popNumber": 64,
     "subseries": "",
     "name": "Lewandowski",
     "title": "Lewandowski",
@@ -754,7 +754,7 @@
     "sortOrder": 57
   },
   {
-    "popNumber": null,
+    "popNumber": 67,
     "subseries": "",
     "name": "Ter Stegen",
     "title": "Ter Stegen",
@@ -767,7 +767,7 @@
     "sortOrder": 58
   },
   {
-    "popNumber": null,
+    "popNumber": 68,
     "subseries": "",
     "name": "Erling Haaland",
     "title": "Erling Haaland",
@@ -780,7 +780,7 @@
     "sortOrder": 59
   },
   {
-    "popNumber": null,
+    "popNumber": 68,
     "subseries": "",
     "name": "Ezekiel Elliott",
     "title": "Ezekiel Elliott",
@@ -793,7 +793,7 @@
     "sortOrder": 60
   },
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "",
     "name": "Sidney Crosby",
     "title": "Sidney Crosby",
@@ -806,7 +806,7 @@
     "sortOrder": 61
   },
   {
-    "popNumber": null,
+    "popNumber": 20,
     "subseries": "",
     "name": "Auston Matthews",
     "title": "Auston Matthews",
@@ -819,7 +819,7 @@
     "sortOrder": 62
   },
   {
-    "popNumber": null,
+    "popNumber": 42,
     "subseries": "",
     "name": "Patrice Bergeron",
     "title": "Patrice Bergeron",
@@ -832,7 +832,7 @@
     "sortOrder": 63
   },
   {
-    "popNumber": null,
+    "popNumber": 49,
     "subseries": "",
     "name": "Mario Lemieux",
     "title": "Mario Lemieux",
@@ -845,7 +845,7 @@
     "sortOrder": 64
   },
   {
-    "popNumber": null,
+    "popNumber": 81,
     "subseries": "",
     "name": "Bobby Clarke",
     "title": "Bobby Clarke",
@@ -858,7 +858,7 @@
     "sortOrder": 65
   },
   {
-    "popNumber": null,
+    "popNumber": 82,
     "subseries": "",
     "name": "Jean Beliveau",
     "title": "Jean Beliveau",
@@ -871,7 +871,7 @@
     "sortOrder": 66
   },
   {
-    "popNumber": null,
+    "popNumber": 83,
     "subseries": "",
     "name": "Wayne Gretzky",
     "title": "Wayne Gretzky",
@@ -884,7 +884,7 @@
     "sortOrder": 67
   },
   {
-    "popNumber": null,
+    "popNumber": 84,
     "subseries": "",
     "name": "Nathan MacKinnon",
     "title": "Nathan MacKinnon",
@@ -897,7 +897,7 @@
     "sortOrder": 68
   },
   {
-    "popNumber": null,
+    "popNumber": 85,
     "subseries": "",
     "name": "Patrick Kane",
     "title": "Patrick Kane",
@@ -910,7 +910,7 @@
     "sortOrder": 69
   },
   {
-    "popNumber": null,
+    "popNumber": 86,
     "subseries": "",
     "name": "Patrice Bergeron",
     "title": "Patrice Bergeron",
@@ -923,7 +923,7 @@
     "sortOrder": 70
   },
   {
-    "popNumber": null,
+    "popNumber": 87,
     "subseries": "",
     "name": "William Karlsson",
     "title": "William Karlsson",
@@ -936,7 +936,7 @@
     "sortOrder": 71
   },
   {
-    "popNumber": null,
+    "popNumber": 88,
     "subseries": "",
     "name": "Philipp Grubauer",
     "title": "Philipp Grubauer",
@@ -949,7 +949,7 @@
     "sortOrder": 72
   },
   {
-    "popNumber": null,
+    "popNumber": 89,
     "subseries": "",
     "name": "Jamie Benn",
     "title": "Jamie Benn",
@@ -962,7 +962,7 @@
     "sortOrder": 73
   },
   {
-    "popNumber": null,
+    "popNumber": 91,
     "subseries": "",
     "name": "Quinn Hughes",
     "title": "Quinn Hughes",
@@ -975,7 +975,7 @@
     "sortOrder": 74
   },
   {
-    "popNumber": null,
+    "popNumber": 6,
     "subseries": "",
     "name": "Anthony Rizzo",
     "title": "Anthony Rizzo",
@@ -988,7 +988,7 @@
     "sortOrder": 75
   },
   {
-    "popNumber": null,
+    "popNumber": 20,
     "subseries": "",
     "name": "Joey Votto",
     "title": "Joey Votto",
@@ -1001,7 +1001,7 @@
     "sortOrder": 76
   },
   {
-    "popNumber": null,
+    "popNumber": 26,
     "subseries": "",
     "name": "Ronald Acuña Jr.",
     "title": "Ronald Acuña Jr.",
@@ -1014,7 +1014,7 @@
     "sortOrder": 77
   },
   {
-    "popNumber": null,
+    "popNumber": 46,
     "subseries": "",
     "name": "Xander Bogaerts",
     "title": "Xander Bogaerts",
@@ -1027,7 +1027,7 @@
     "sortOrder": 78
   },
   {
-    "popNumber": null,
+    "popNumber": 47,
     "subseries": "",
     "name": "Charlie Blackmon",
     "title": "Charlie Blackmon",
@@ -1040,7 +1040,7 @@
     "sortOrder": 79
   },
   {
-    "popNumber": null,
+    "popNumber": 50,
     "subseries": "",
     "name": "Alex Bregman",
     "title": "Alex Bregman",
@@ -1053,7 +1053,7 @@
     "sortOrder": 80
   },
   {
-    "popNumber": null,
+    "popNumber": 62,
     "subseries": "",
     "name": "Christian Yelich",
     "title": "Christian Yelich",
@@ -1066,7 +1066,7 @@
     "sortOrder": 81
   },
   {
-    "popNumber": null,
+    "popNumber": 63,
     "subseries": "",
     "name": "Cody Bellinger",
     "title": "Cody Bellinger",
@@ -1079,7 +1079,7 @@
     "sortOrder": 82
   },
   {
-    "popNumber": null,
+    "popNumber": 69,
     "subseries": "",
     "name": "Whit Merrifield",
     "title": "Whit Merrifield",
@@ -1092,7 +1092,7 @@
     "sortOrder": 83
   },
   {
-    "popNumber": null,
+    "popNumber": 74,
     "subseries": "",
     "name": "Mookie Betts Home Uniform",
     "title": "Mookie Betts Home Uniform",
@@ -1105,7 +1105,7 @@
     "sortOrder": 84
   },
   {
-    "popNumber": null,
+    "popNumber": 76,
     "subseries": "",
     "name": "Jose Altuve",
     "title": "Jose Altuve",
@@ -1118,7 +1118,7 @@
     "sortOrder": 85
   },
   {
-    "popNumber": null,
+    "popNumber": 78,
     "subseries": "",
     "name": "Francisco Lindor",
     "title": "Francisco Lindor",
@@ -1131,7 +1131,7 @@
     "sortOrder": 86
   },
   {
-    "popNumber": null,
+    "popNumber": 83,
     "subseries": "",
     "name": "Johnny Bench",
     "title": "Johnny Bench",
@@ -1144,7 +1144,7 @@
     "sortOrder": 87
   },
   {
-    "popNumber": null,
+    "popNumber": 105,
     "subseries": "",
     "name": "Shohei Ohtani",
     "title": "Shohei Ohtani",
@@ -1157,7 +1157,7 @@
     "sortOrder": 88
   },
   {
-    "popNumber": null,
+    "popNumber": 106,
     "subseries": "",
     "name": "Shohei Ohtani",
     "title": "Shohei Ohtani",
@@ -1170,7 +1170,7 @@
     "sortOrder": 89
   },
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "Raptors",
     "name": "The Raptor",
     "title": "Raptors — The Raptor",
@@ -1183,7 +1183,7 @@
     "sortOrder": 90
   },
   {
-    "popNumber": null,
+    "popNumber": 3,
     "subseries": "Bulls",
     "name": "Benny The Bull",
     "title": "Bulls — Benny The Bull",
@@ -1196,7 +1196,7 @@
     "sortOrder": 91
   },
   {
-    "popNumber": null,
+    "popNumber": 6,
     "subseries": "Spyrs",
     "name": "The coyote",
     "title": "Spyrs — The coyote",
@@ -1209,7 +1209,7 @@
     "sortOrder": 92
   },
   {
-    "popNumber": null,
+    "popNumber": 8,
     "subseries": "",
     "name": "Champ",
     "title": "Champ",
@@ -1222,7 +1222,7 @@
     "sortOrder": 93
   },
   {
-    "popNumber": null,
+    "popNumber": 10,
     "subseries": "",
     "name": "Rocky",
     "title": "Rocky",
@@ -1235,7 +1235,7 @@
     "sortOrder": 94
   },
   {
-    "popNumber": null,
+    "popNumber": 11,
     "subseries": "",
     "name": "Grizz",
     "title": "Grizz",
@@ -1248,7 +1248,7 @@
     "sortOrder": 95
   },
   {
-    "popNumber": null,
+    "popNumber": 12,
     "subseries": "",
     "name": "Stuff the Magic Dragon",
     "title": "Stuff the Magic Dragon",
@@ -1261,7 +1261,7 @@
     "sortOrder": 96
   },
   {
-    "popNumber": null,
+    "popNumber": 7,
     "subseries": "",
     "name": "Youppi!",
     "title": "Youppi!",
@@ -1274,7 +1274,7 @@
     "sortOrder": 97
   },
   {
-    "popNumber": null,
+    "popNumber": 4,
     "subseries": "Night Live",
     "name": "Drunk Uncle",
     "title": "Night Live — Drunk Uncle",
@@ -1287,7 +1287,7 @@
     "sortOrder": 98
   },
   {
-    "popNumber": null,
+    "popNumber": 1,
     "subseries": "",
     "name": "Venus Williams",
     "title": "Venus Williams",
@@ -1300,7 +1300,7 @@
     "sortOrder": 99
   },
   {
-    "popNumber": null,
+    "popNumber": 8,
     "subseries": "",
     "name": "Roger Federer",
     "title": "Roger Federer",
@@ -1313,7 +1313,7 @@
     "sortOrder": 100
   },
   {
-    "popNumber": null,
+    "popNumber": 1,
     "subseries": "",
     "name": "Conor McGregor",
     "title": "Conor McGregor",
@@ -1326,7 +1326,7 @@
     "sortOrder": 101
   },
   {
-    "popNumber": null,
+    "popNumber": 7,
     "subseries": "",
     "name": "Conor McGregor",
     "title": "Conor McGregor",
@@ -1339,7 +1339,7 @@
     "sortOrder": 102
   },
   {
-    "popNumber": null,
+    "popNumber": 10,
     "subseries": "",
     "name": "”Macho Man” Randy Savage",
     "title": "”Macho Man” Randy Savage",
@@ -1352,7 +1352,7 @@
     "sortOrder": 103
   },
   {
-    "popNumber": null,
+    "popNumber": 19,
     "subseries": "",
     "name": "Sting",
     "title": "Sting",
@@ -1365,7 +1365,7 @@
     "sortOrder": 104
   },
   {
-    "popNumber": null,
+    "popNumber": 25,
     "subseries": "",
     "name": "Bret Hart",
     "title": "Bret Hart",
@@ -1378,7 +1378,7 @@
     "sortOrder": 105
   },
   {
-    "popNumber": null,
+    "popNumber": 27,
     "subseries": "",
     "name": "Kevin Owens",
     "title": "Kevin Owens",
@@ -1391,7 +1391,7 @@
     "sortOrder": 106
   },
   {
-    "popNumber": null,
+    "popNumber": 34,
     "subseries": "",
     "name": "Finn Bálor",
     "title": "Finn Bálor",
@@ -1404,7 +1404,7 @@
     "sortOrder": 107
   },
   {
-    "popNumber": null,
+    "popNumber": 34,
     "subseries": "",
     "name": "Finn Bálor",
     "title": "Finn Bálor",
@@ -1417,7 +1417,7 @@
     "sortOrder": 108
   },
   {
-    "popNumber": null,
+    "popNumber": 35,
     "subseries": "",
     "name": "Mick Foley",
     "title": "Mick Foley",
@@ -1430,7 +1430,7 @@
     "sortOrder": 109
   },
   {
-    "popNumber": null,
+    "popNumber": 51,
     "subseries": "",
     "name": "Jake “The Snake” Roberts",
     "title": "Jake “The Snake” Roberts",
@@ -1443,7 +1443,7 @@
     "sortOrder": 110
   },
   {
-    "popNumber": null,
+    "popNumber": 54,
     "subseries": "",
     "name": "Sgt. Slaughter",
     "title": "Sgt. Slaughter",
@@ -1456,7 +1456,7 @@
     "sortOrder": 111
   },
   {
-    "popNumber": null,
+    "popNumber": 69,
     "subseries": "",
     "name": "Undertaker",
     "title": "Undertaker",
@@ -1469,7 +1469,7 @@
     "sortOrder": 112
   },
   {
-    "popNumber": null,
+    "popNumber": 74,
     "subseries": "",
     "name": "Diesel",
     "title": "Diesel",
@@ -1482,7 +1482,7 @@
     "sortOrder": 113
   },
   {
-    "popNumber": null,
+    "popNumber": 77,
     "subseries": "",
     "name": "The Fiend Bray Wyatt",
     "title": "The Fiend Bray Wyatt",
@@ -1495,7 +1495,7 @@
     "sortOrder": 114
   },
   {
-    "popNumber": null,
+    "popNumber": 80,
     "subseries": "",
     "name": "MR T.",
     "title": "MR T.",
@@ -1508,7 +1508,7 @@
     "sortOrder": 115
   },
   {
-    "popNumber": null,
+    "popNumber": 84,
     "subseries": "",
     "name": "SC Steve Austin",
     "title": "SC Steve Austin",
@@ -1521,7 +1521,7 @@
     "sortOrder": 116
   },
   {
-    "popNumber": null,
+    "popNumber": 86,
     "subseries": "",
     "name": "Edge",
     "title": "Edge",
@@ -1534,7 +1534,7 @@
     "sortOrder": 117
   },
   {
-    "popNumber": null,
+    "popNumber": 87,
     "subseries": "",
     "name": "Drew McIntyre",
     "title": "Drew McIntyre",
@@ -1547,7 +1547,7 @@
     "sortOrder": 118
   },
   {
-    "popNumber": null,
+    "popNumber": 107,
     "subseries": "",
     "name": "Alexa Bliss",
     "title": "Alexa Bliss",
@@ -1560,7 +1560,7 @@
     "sortOrder": 119
   },
   {
-    "popNumber": null,
+    "popNumber": 108,
     "subseries": "",
     "name": "Bianca Belair",
     "title": "Bianca Belair",
@@ -1573,7 +1573,7 @@
     "sortOrder": 120
   },
   {
-    "popNumber": null,
+    "popNumber": 109,
     "subseries": "",
     "name": "Dude Love",
     "title": "Dude Love",
@@ -1586,7 +1586,7 @@
     "sortOrder": 121
   },
   {
-    "popNumber": null,
+    "popNumber": 135,
     "subseries": "",
     "name": "Big Boss Man",
     "title": "Big Boss Man",

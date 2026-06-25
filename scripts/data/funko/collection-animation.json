@@ -1,6 +1,6 @@
 [
   {
-    "popNumber": null,
+    "popNumber": 9,
     "subseries": "Ball Z",
     "name": "Goku",
     "title": "Ball Z — Goku",
@@ -13,7 +13,7 @@
     "sortOrder": 0
   },
   {
-    "popNumber": null,
+    "popNumber": 10,
     "subseries": "Ball Z",
     "name": "Vegeta",
     "title": "Ball Z — Vegeta",
@@ -26,7 +26,7 @@
     "sortOrder": 1
   },
   {
-    "popNumber": null,
+    "popNumber": 11,
     "subseries": "Ball Z",
     "name": "Piccolo",
     "title": "Ball Z — Piccolo",
@@ -39,7 +39,7 @@
     "sortOrder": 2
   },
   {
-    "popNumber": null,
+    "popNumber": 12,
     "subseries": "Ball Z",
     "name": "Frieza (Final Form)",
     "title": "Ball Z — Frieza (Final Form)",
@@ -52,7 +52,7 @@
     "sortOrder": 3
   },
   {
-    "popNumber": null,
+    "popNumber": 13,
     "subseries": "Ball Z",
     "name": "Perfect Cell",
     "title": "Ball Z — Perfect Cell",
@@ -65,7 +65,7 @@
     "sortOrder": 4
   },
   {
-    "popNumber": null,
+    "popNumber": 14,
     "subseries": "Ball Z",
     "name": "Super Saiyan Goku",
     "title": "Ball Z — Super Saiyan Goku",
@@ -78,7 +78,7 @@
     "sortOrder": 5
   },
   {
-    "popNumber": null,
+    "popNumber": 20,
     "subseries": "Titan",
     "name": "Eren Jaeger",
     "title": "Titan — Eren Jaeger",
@@ -91,7 +91,7 @@
     "sortOrder": 6
   },
   {
-    "popNumber": null,
+    "popNumber": 24,
     "subseries": "Ball Z",
     "name": "Goku (Super Saiyan God)",
     "title": "Ball Z — Goku (Super Saiyan God)",
@@ -104,7 +104,7 @@
     "sortOrder": 7
   },
   {
-    "popNumber": null,
+    "popNumber": 27,
     "subseries": "",
     "name": "Fry",
     "title": "Fry",
@@ -117,7 +117,7 @@
     "sortOrder": 8
   },
   {
-    "popNumber": null,
+    "popNumber": 29,
     "subseries": "",
     "name": "Bender",
     "title": "Bender",
@@ -130,7 +130,7 @@
     "sortOrder": 9
   },
   {
-    "popNumber": null,
+    "popNumber": 29,
     "subseries": "",
     "name": "Bender",
     "title": "Bender",
@@ -143,7 +143,7 @@
     "sortOrder": 10
   },
   {
-    "popNumber": null,
+    "popNumber": 47,
     "subseries": "Ball Z",
     "name": "Golden Frieza",
     "title": "Ball Z — Golden Frieza",
@@ -156,7 +156,7 @@
     "sortOrder": 11
   },
   {
-    "popNumber": null,
+    "popNumber": 52,
     "subseries": "",
     "name": "Sally Brown",
     "title": "Sally Brown",
@@ -169,7 +169,7 @@
     "sortOrder": 12
   },
   {
-    "popNumber": null,
+    "popNumber": 59,
     "subseries": "",
     "name": "Ichigo",
     "title": "Ichigo",
@@ -182,7 +182,7 @@
     "sortOrder": 13
   },
   {
-    "popNumber": null,
+    "popNumber": 60,
     "subseries": "",
     "name": "Rukia",
     "title": "Rukia",
@@ -195,7 +195,7 @@
     "sortOrder": 14
   },
   {
-    "popNumber": null,
+    "popNumber": 61,
     "subseries": "",
     "name": "Ken Kaneki",
     "title": "Ken Kaneki",
@@ -208,7 +208,7 @@
     "sortOrder": 15
   },
   {
-    "popNumber": null,
+    "popNumber": 71,
     "subseries": "Shippuden",
     "name": "Naruto",
     "title": "Shippuden — Naruto",
@@ -221,7 +221,7 @@
     "sortOrder": 16
   },
   {
-    "popNumber": null,
+    "popNumber": 72,
     "subseries": "Shippuden",
     "name": "Sasuke",
     "title": "Shippuden — Sasuke",
@@ -234,7 +234,7 @@
     "sortOrder": 17
   },
   {
-    "popNumber": null,
+    "popNumber": 89,
     "subseries": "",
     "name": "Sailor Moon & Luna",
     "title": "Sailor Moon & Luna",
@@ -247,7 +247,7 @@
     "sortOrder": 18
   },
   {
-    "popNumber": null,
+    "popNumber": 96,
     "subseries": "",
     "name": "Hollow Ichigo",
     "title": "Hollow Ichigo",
@@ -273,7 +273,7 @@
     "sortOrder": 20
   },
   {
-    "popNumber": null,
+    "popNumber": 100,
     "subseries": "",
     "name": "Portgas D. Ace",
     "title": "Portgas D. Ace",
@@ -286,7 +286,7 @@
     "sortOrder": 21
   },
   {
-    "popNumber": null,
+    "popNumber": 101,
     "subseries": "",
     "name": "Trafalgar D. Water Law",
     "title": "Trafalgar D. Water Law",
@@ -299,7 +299,7 @@
     "sortOrder": 22
   },
   {
-    "popNumber": null,
+    "popNumber": 109,
     "subseries": "Ball",
     "name": "Goku & Flying Nimbus",
     "title": "Ball — Goku & Flying Nimbus",
@@ -312,7 +312,7 @@
     "sortOrder": 23
   },
   {
-    "popNumber": null,
+    "popNumber": 111,
     "subseries": "Ball Z",
     "name": "Majin Buu",
     "title": "Ball Z — Majin Buu",
@@ -325,7 +325,7 @@
     "sortOrder": 24
   },
   {
-    "popNumber": null,
+    "popNumber": 112,
     "subseries": "Morty",
     "name": "Rick",
     "title": "Morty — Rick",
@@ -338,7 +338,7 @@
     "sortOrder": 25
   },
   {
-    "popNumber": null,
+    "popNumber": 120,
     "subseries": "Ball Z",
     "name": "Beerus",
     "title": "Ball Z — Beerus",
@@ -351,7 +351,7 @@
     "sortOrder": 26
   },
   {
-    "popNumber": null,
+    "popNumber": 121,
     "subseries": "Ball Z",
     "name": "Super Saiyan God Super Saiyan Goku",
     "title": "Ball Z — Super Saiyan God Super Saiyan Goku",
@@ -364,7 +364,7 @@
     "sortOrder": 27
   },
   {
-    "popNumber": null,
+    "popNumber": 154,
     "subseries": "Ball Z",
     "name": "Super Saiyan Vegeta",
     "title": "Ball Z — Super Saiyan Vegeta",
@@ -377,7 +377,7 @@
     "sortOrder": 28
   },
   {
-    "popNumber": null,
+    "popNumber": 154,
     "subseries": "Ball Z",
     "name": "Super Saiyan Vegeta",
     "title": "Ball Z — Super Saiyan Vegeta",
@@ -390,7 +390,7 @@
     "sortOrder": 29
   },
   {
-    "popNumber": null,
+    "popNumber": 156,
     "subseries": "Ball Z",
     "name": "Super Saiyan God Super Saiyan Vegeta",
     "title": "Ball Z — Super Saiyan God Super Saiyan Vegeta",
@@ -403,7 +403,7 @@
     "sortOrder": 30
   },
   {
-    "popNumber": null,
+    "popNumber": 174,
     "subseries": "Morty",
     "name": "Mr. Meeseeks",
     "title": "Morty — Mr. Meeseeks",
@@ -416,7 +416,7 @@
     "sortOrder": 31
   },
   {
-    "popNumber": null,
+    "popNumber": 179,
     "subseries": "Shippuden",
     "name": "Kaguya",
     "title": "Shippuden — Kaguya",
@@ -429,7 +429,7 @@
     "sortOrder": 32
   },
   {
-    "popNumber": null,
+    "popNumber": 179,
     "subseries": "Shippuden",
     "name": "Kaguya",
     "title": "Shippuden — Kaguya",
@@ -442,7 +442,7 @@
     "sortOrder": 33
   },
   {
-    "popNumber": null,
+    "popNumber": 182,
     "subseries": "Shippuden",
     "name": "Kakashi",
     "title": "Shippuden — Kakashi",
@@ -455,7 +455,7 @@
     "sortOrder": 34
   },
   {
-    "popNumber": null,
+    "popNumber": 183,
     "subseries": "Shippuden",
     "name": "Sakura",
     "title": "Shippuden — Sakura",
@@ -468,7 +468,7 @@
     "sortOrder": 35
   },
   {
-    "popNumber": null,
+    "popNumber": 184,
     "subseries": "Shippuden",
     "name": "Tobi",
     "title": "Shippuden — Tobi",
@@ -481,7 +481,7 @@
     "sortOrder": 36
   },
   {
-    "popNumber": null,
+    "popNumber": 185,
     "subseries": "Shippuden",
     "name": "Naruto (Sage Mode)",
     "title": "Shippuden — Naruto (Sage Mode)",
@@ -494,7 +494,7 @@
     "sortOrder": 37
   },
   {
-    "popNumber": null,
+    "popNumber": 186,
     "subseries": "Shippuden",
     "name": "Naruto (Six Path)",
     "title": "Shippuden — Naruto (Six Path)",
@@ -507,7 +507,7 @@
     "sortOrder": 38
   },
   {
-    "popNumber": null,
+    "popNumber": 217,
     "subseries": "",
     "name": "Ryuk",
     "title": "Ryuk",
@@ -520,7 +520,7 @@
     "sortOrder": 39
   },
   {
-    "popNumber": null,
+    "popNumber": 218,
     "subseries": "",
     "name": "L",
     "title": "L",
@@ -533,7 +533,7 @@
     "sortOrder": 40
   },
   {
-    "popNumber": null,
+    "popNumber": 219,
     "subseries": "",
     "name": "L (with Cake)",
     "title": "L (with Cake)",
@@ -546,7 +546,7 @@
     "sortOrder": 41
   },
   {
-    "popNumber": null,
+    "popNumber": 235,
     "subseries": "Titan",
     "name": "Levi",
     "title": "Titan — Levi",
@@ -559,7 +559,7 @@
     "sortOrder": 42
   },
   {
-    "popNumber": null,
+    "popNumber": 248,
     "subseries": "Academia",
     "name": "All Might",
     "title": "Academia — All Might",
@@ -572,7 +572,7 @@
     "sortOrder": 43
   },
   {
-    "popNumber": null,
+    "popNumber": 249,
     "subseries": "Academia",
     "name": "Katsuki",
     "title": "Academia — Katsuki",
@@ -585,7 +585,7 @@
     "sortOrder": 44
   },
   {
-    "popNumber": null,
+    "popNumber": 251,
     "subseries": "Academia",
     "name": "Ochaco",
     "title": "Academia — Ochaco",
@@ -598,7 +598,7 @@
     "sortOrder": 45
   },
   {
-    "popNumber": null,
+    "popNumber": 260,
     "subseries": "Ball Z",
     "name": "Super Saiyan Rose Goku Black",
     "title": "Ball Z — Super Saiyan Rose Goku Black",
@@ -611,7 +611,7 @@
     "sortOrder": 46
   },
   {
-    "popNumber": null,
+    "popNumber": 301,
     "subseries": "",
     "name": "Beth",
     "title": "Beth",
@@ -624,7 +624,7 @@
     "sortOrder": 47
   },
   {
-    "popNumber": null,
+    "popNumber": 303,
     "subseries": "",
     "name": "Summer",
     "title": "Summer",
@@ -637,7 +637,7 @@
     "sortOrder": 48
   },
   {
-    "popNumber": null,
+    "popNumber": 307,
     "subseries": "Tunes",
     "name": "Bugs Bunny",
     "title": "Tunes — Bugs Bunny",
@@ -650,7 +650,7 @@
     "sortOrder": 49
   },
   {
-    "popNumber": null,
+    "popNumber": 311,
     "subseries": "Tunes",
     "name": "Bugs Bunny (Opera)",
     "title": "Tunes — Bugs Bunny (Opera)",
@@ -663,7 +663,7 @@
     "sortOrder": 50
   },
   {
-    "popNumber": null,
+    "popNumber": 312,
     "subseries": "Tunes",
     "name": "",
     "title": "Tunes",
@@ -676,7 +676,7 @@
     "sortOrder": 51
   },
   {
-    "popNumber": null,
+    "popNumber": 314,
     "subseries": "Ball Z",
     "name": "Goku Black",
     "title": "Ball Z — Goku Black",
@@ -689,7 +689,7 @@
     "sortOrder": 52
   },
   {
-    "popNumber": null,
+    "popNumber": 315,
     "subseries": "Ball Z",
     "name": "HIT",
     "title": "Ball Z — HIT",
@@ -702,7 +702,7 @@
     "sortOrder": 53
   },
   {
-    "popNumber": null,
+    "popNumber": 319,
     "subseries": "Ball Z",
     "name": "Gotenks",
     "title": "Ball Z — Gotenks",
@@ -715,7 +715,7 @@
     "sortOrder": 54
   },
   {
-    "popNumber": null,
+    "popNumber": 321,
     "subseries": "",
     "name": "Heffer",
     "title": "Heffer",
@@ -728,7 +728,7 @@
     "sortOrder": 55
   },
   {
-    "popNumber": null,
+    "popNumber": 327,
     "subseries": "",
     "name": "Roronoa. Zoro",
     "title": "Roronoa. Zoro",
@@ -741,7 +741,7 @@
     "sortOrder": 56
   },
   {
-    "popNumber": null,
+    "popNumber": 330,
     "subseries": "",
     "name": "Boa. Hancock",
     "title": "Boa. Hancock",
@@ -754,7 +754,7 @@
     "sortOrder": 57
   },
   {
-    "popNumber": null,
+    "popNumber": 339,
     "subseries": "Morty",
     "name": "Prison Break Rick",
     "title": "Morty — Prison Break Rick",
@@ -767,7 +767,7 @@
     "sortOrder": 58
   },
   {
-    "popNumber": null,
+    "popNumber": 343,
     "subseries": "Morty",
     "name": "",
     "title": "Morty",
@@ -793,7 +793,7 @@
     "sortOrder": 60
   },
   {
-    "popNumber": null,
+    "popNumber": 351,
     "subseries": "",
     "name": "Cheer Bear",
     "title": "Cheer Bear",
@@ -806,7 +806,7 @@
     "sortOrder": 61
   },
   {
-    "popNumber": null,
+    "popNumber": 353,
     "subseries": "",
     "name": "Grumpy Bear",
     "title": "Grumpy Bear",
@@ -819,7 +819,7 @@
     "sortOrder": 62
   },
   {
-    "popNumber": null,
+    "popNumber": 358,
     "subseries": "",
     "name": "Brook",
     "title": "Brook",
@@ -832,7 +832,7 @@
     "sortOrder": 63
   },
   {
-    "popNumber": null,
+    "popNumber": 372,
     "subseries": "Academia",
     "name": "Todoroki",
     "title": "Academia — Todoroki",
@@ -845,7 +845,7 @@
     "sortOrder": 64
   },
   {
-    "popNumber": null,
+    "popNumber": 373,
     "subseries": "Academia",
     "name": "Deku (Training)",
     "title": "Academia — Deku (Training)",
@@ -858,7 +858,7 @@
     "sortOrder": 65
   },
   {
-    "popNumber": null,
+    "popNumber": 374,
     "subseries": "Academia",
     "name": "Tsuyu",
     "title": "Academia — Tsuyu",
@@ -871,7 +871,7 @@
     "sortOrder": 66
   },
   {
-    "popNumber": null,
+    "popNumber": 383,
     "subseries": "Ball Z",
     "name": "Gohan (Training outfit)",
     "title": "Ball Z — Gohan (Training outfit)",
@@ -884,7 +884,7 @@
     "sortOrder": 67
   },
   {
-    "popNumber": null,
+    "popNumber": 393,
     "subseries": "Alchemist",
     "name": "Roy Mustang",
     "title": "Alchemist — Roy Mustang",
@@ -897,7 +897,7 @@
     "sortOrder": 68
   },
   {
-    "popNumber": null,
+    "popNumber": 397,
     "subseries": "Ball Z",
     "name": "Dead Yamcha",
     "title": "Ball Z — Dead Yamcha",
@@ -910,7 +910,7 @@
     "sortOrder": 69
   },
   {
-    "popNumber": null,
+    "popNumber": 402,
     "subseries": "Ball Z",
     "name": "Super Saiyan Broly",
     "title": "Ball Z — Super Saiyan Broly",
@@ -923,7 +923,7 @@
     "sortOrder": 70
   },
   {
-    "popNumber": null,
+    "popNumber": 430,
     "subseries": "",
     "name": "Matt",
     "title": "Matt",
@@ -936,7 +936,7 @@
     "sortOrder": 71
   },
   {
-    "popNumber": null,
+    "popNumber": 434,
     "subseries": "Ball Z",
     "name": "Great Ape Vegeta",
     "title": "Ball Z — Great Ape Vegeta",
@@ -949,7 +949,7 @@
     "sortOrder": 72
   },
   {
-    "popNumber": null,
+    "popNumber": 445,
     "subseries": "Ball Z",
     "name": "Majin Vegeta",
     "title": "Ball Z — Majin Vegeta",
@@ -962,7 +962,7 @@
     "sortOrder": 73
   },
   {
-    "popNumber": null,
+    "popNumber": 455,
     "subseries": "Shippuden",
     "name": "Sasuke",
     "title": "Shippuden — Sasuke",
@@ -975,7 +975,7 @@
     "sortOrder": 74
   },
   {
-    "popNumber": null,
+    "popNumber": 461,
     "subseries": "Titan (Season 3)",
     "name": "Ymir",
     "title": "Titan (Season 3) — Ymir",
@@ -988,7 +988,7 @@
     "sortOrder": 75
   },
   {
-    "popNumber": null,
+    "popNumber": 462,
     "subseries": "Titan (Season 3)",
     "name": "Erwin",
     "title": "Titan (Season 3) — Erwin",
@@ -1001,7 +1001,7 @@
     "sortOrder": 76
   },
   {
-    "popNumber": null,
+    "popNumber": 464,
     "subseries": "Titan (Season 3)",
     "name": "Hange",
     "title": "Titan (Season 3) — Hange",
@@ -1014,7 +1014,7 @@
     "sortOrder": 77
   },
   {
-    "popNumber": null,
+    "popNumber": 465,
     "subseries": "",
     "name": "Half-Kakuja Kaneki",
     "title": "Half-Kakuja Kaneki",
@@ -1027,7 +1027,7 @@
     "sortOrder": 78
   },
   {
-    "popNumber": null,
+    "popNumber": 483,
     "subseries": "",
     "name": "Pantherlily",
     "title": "Pantherlily",
@@ -1040,7 +1040,7 @@
     "sortOrder": 79
   },
   {
-    "popNumber": null,
+    "popNumber": 491,
     "subseries": "Ball Z",
     "name": "Super Saiyan Vegito",
     "title": "Ball Z — Super Saiyan Vegito",
@@ -1053,7 +1053,7 @@
     "sortOrder": 80
   },
   {
-    "popNumber": null,
+    "popNumber": 515,
     "subseries": "Ball Z",
     "name": "SSGSS Vegito",
     "title": "Ball Z — SSGSS Vegito",
@@ -1066,7 +1066,7 @@
     "sortOrder": 81
   },
   {
-    "popNumber": null,
+    "popNumber": 516,
     "subseries": "Ball Z",
     "name": "Jiren",
     "title": "Ball Z — Jiren",
@@ -1079,7 +1079,7 @@
     "sortOrder": 82
   },
   {
-    "popNumber": null,
+    "popNumber": 533,
     "subseries": "Ball Z",
     "name": "Master Roshi",
     "title": "Ball Z — Master Roshi",
@@ -1092,7 +1092,7 @@
     "sortOrder": 83
   },
   {
-    "popNumber": null,
+    "popNumber": 535,
     "subseries": "Last Airbender",
     "name": "Katara",
     "title": "Last Airbender — Katara",
@@ -1105,7 +1105,7 @@
     "sortOrder": 84
   },
   {
-    "popNumber": null,
+    "popNumber": 538,
     "subseries": "Last Airbender",
     "name": "Zuko",
     "title": "Last Airbender — Zuko",
@@ -1118,7 +1118,7 @@
     "sortOrder": 85
   },
   {
-    "popNumber": null,
+    "popNumber": 542,
     "subseries": "Last Airbender",
     "name": "Azula",
     "title": "Last Airbender — Azula",
@@ -1131,7 +1131,7 @@
     "sortOrder": 86
   },
   {
-    "popNumber": null,
+    "popNumber": 547,
     "subseries": "Yuyu Hakusho",
     "name": "Hiei",
     "title": "Yuyu Hakusho — Hiei",
@@ -1157,7 +1157,7 @@
     "sortOrder": 88
   },
   {
-    "popNumber": null,
+    "popNumber": 553,
     "subseries": "Ball Z",
     "name": "Porunga",
     "title": "Ball Z — Porunga",
@@ -1170,7 +1170,7 @@
     "sortOrder": 89
   },
   {
-    "popNumber": null,
+    "popNumber": 578,
     "subseries": "Shippuden",
     "name": "Itachi",
     "title": "Shippuden — Itachi",
@@ -1183,7 +1183,7 @@
     "sortOrder": 90
   },
   {
-    "popNumber": null,
+    "popNumber": 603,
     "subseries": "Academia",
     "name": "Izuku Midoriya",
     "title": "Academia — Izuku Midoriya",
@@ -1196,7 +1196,7 @@
     "sortOrder": 91
   },
   {
-    "popNumber": null,
+    "popNumber": 605,
     "subseries": "Academia",
     "name": "Momo Yaoyorozu",
     "title": "Academia — Momo Yaoyorozu",
@@ -1209,7 +1209,7 @@
     "sortOrder": 92
   },
   {
-    "popNumber": null,
+    "popNumber": 609,
     "subseries": "Academia",
     "name": "All for one",
     "title": "Academia — All for one",
@@ -1222,7 +1222,7 @@
     "sortOrder": 93
   },
   {
-    "popNumber": null,
+    "popNumber": 615,
     "subseries": "Ball Z S6",
     "name": "Goku",
     "title": "Ball Z S6 — Goku",
@@ -1235,7 +1235,7 @@
     "sortOrder": 94
   },
   {
-    "popNumber": null,
+    "popNumber": 616,
     "subseries": "Ball Z S6",
     "name": "Raditz",
     "title": "Ball Z S6 — Raditz",
@@ -1248,7 +1248,7 @@
     "sortOrder": 95
   },
   {
-    "popNumber": null,
+    "popNumber": 622,
     "subseries": "Ball Z S6",
     "name": "Super Saiyan Gotenks",
     "title": "Ball Z S6 — Super Saiyan Gotenks",
@@ -1261,7 +1261,7 @@
     "sortOrder": 96
   },
   {
-    "popNumber": null,
+    "popNumber": 623,
     "subseries": "Ball Z S6",
     "name": "Legendary Super Saiyan Broly",
     "title": "Ball Z S6 — Legendary Super Saiyan Broly",
@@ -1274,7 +1274,7 @@
     "sortOrder": 97
   },
   {
-    "popNumber": null,
+    "popNumber": 637,
     "subseries": "Academia",
     "name": "Dabi",
     "title": "Academia — Dabi",
@@ -1287,7 +1287,7 @@
     "sortOrder": 98
   },
   {
-    "popNumber": null,
+    "popNumber": 641,
     "subseries": "Ball Z",
     "name": "Super Saiyan Goten",
     "title": "Ball Z — Super Saiyan Goten",
@@ -1300,7 +1300,7 @@
     "sortOrder": 99
   },
   {
-    "popNumber": null,
+    "popNumber": 652,
     "subseries": "x Hunter",
     "name": "Hisoka",
     "title": "x Hunter — Hisoka",
@@ -1313,7 +1313,7 @@
     "sortOrder": 100
   },
   {
-    "popNumber": null,
+    "popNumber": 653,
     "subseries": "x Hunter",
     "name": "Kurapika",
     "title": "x Hunter — Kurapika",
@@ -1326,7 +1326,7 @@
     "sortOrder": 101
   },
   {
-    "popNumber": null,
+    "popNumber": 654,
     "subseries": "x Hunter",
     "name": "Killua Zoldyck",
     "title": "x Hunter — Killua Zoldyck",
@@ -1339,7 +1339,7 @@
     "sortOrder": 102
   },
   {
-    "popNumber": null,
+    "popNumber": 669,
     "subseries": "Ball Z",
     "name": "Vegeta",
     "title": "Ball Z — Vegeta",
@@ -1352,7 +1352,7 @@
     "sortOrder": 103
   },
   {
-    "popNumber": null,
+    "popNumber": 670,
     "subseries": "Ball Z",
     "name": "Piccolo",
     "title": "Ball Z — Piccolo",
@@ -1365,7 +1365,7 @@
     "sortOrder": 104
   },
   {
-    "popNumber": null,
+    "popNumber": 671,
     "subseries": "",
     "name": "Boruto Uzumaki",
     "title": "Boruto Uzumaki",
@@ -1378,7 +1378,7 @@
     "sortOrder": 105
   },
   {
-    "popNumber": null,
+    "popNumber": 700,
     "subseries": "x Hunter",
     "name": "Leorio",
     "title": "x Hunter — Leorio",
@@ -1391,7 +1391,7 @@
     "sortOrder": 106
   },
   {
-    "popNumber": null,
+    "popNumber": 701,
     "subseries": "Ball Z",
     "name": "Vegeta (Training)",
     "title": "Ball Z — Vegeta (Training)",
@@ -1404,7 +1404,7 @@
     "sortOrder": 107
   },
   {
-    "popNumber": null,
+    "popNumber": 702,
     "subseries": "Ball Z",
     "name": "Future Trunks",
     "title": "Ball Z — Future Trunks",
@@ -1417,7 +1417,7 @@
     "sortOrder": 108
   },
   {
-    "popNumber": null,
+    "popNumber": 704,
     "subseries": "Ball Z",
     "name": "Piccolo",
     "title": "Ball Z — Piccolo",
@@ -1430,7 +1430,7 @@
     "sortOrder": 109
   },
   {
-    "popNumber": null,
+    "popNumber": 705,
     "subseries": "Ball Z",
     "name": "Mecha Frieza",
     "title": "Ball Z — Mecha Frieza",
@@ -1443,7 +1443,7 @@
     "sortOrder": 110
   },
   {
-    "popNumber": null,
+    "popNumber": 707,
     "subseries": "Ball Z",
     "name": "Bulma",
     "title": "Ball Z — Bulma",
@@ -1456,7 +1456,7 @@
     "sortOrder": 111
   },
   {
-    "popNumber": null,
+    "popNumber": 717,
     "subseries": "",
     "name": "Joey Wheeler",
     "title": "Joey Wheeler",
@@ -1469,7 +1469,7 @@
     "sortOrder": 112
   },
   {
-    "popNumber": null,
+    "popNumber": 722,
     "subseries": "Shippuden",
     "name": "Madara (Reanimation)",
     "title": "Shippuden — Madara (Reanimation)",
@@ -1482,7 +1482,7 @@
     "sortOrder": 113
   },
   {
-    "popNumber": null,
+    "popNumber": 727,
     "subseries": "Shippuden",
     "name": "Naruto Uzumaki",
     "title": "Shippuden — Naruto Uzumaki",
@@ -1495,7 +1495,7 @@
     "sortOrder": 114
   },
   {
-    "popNumber": null,
+    "popNumber": 728,
     "subseries": "Shippuden",
     "name": "Gaara",
     "title": "Shippuden — Gaara",
@@ -1508,7 +1508,7 @@
     "sortOrder": 115
   },
   {
-    "popNumber": null,
+    "popNumber": 729,
     "subseries": "Shippuden",
     "name": "Orochimaru",
     "title": "Shippuden — Orochimaru",
@@ -1521,7 +1521,7 @@
     "sortOrder": 116
   },
   {
-    "popNumber": null,
+    "popNumber": 730,
     "subseries": "Shippuden",
     "name": "Tsunade",
     "title": "Shippuden — Tsunade",
@@ -1534,7 +1534,7 @@
     "sortOrder": 117
   },
   {
-    "popNumber": null,
+    "popNumber": 738,
     "subseries": "Racer",
     "name": "Racer X",
     "title": "Racer — Racer X",
@@ -1547,7 +1547,7 @@
     "sortOrder": 118
   },
   {
-    "popNumber": null,
+    "popNumber": 762,
     "subseries": "of Korra",
     "name": "Asami",
     "title": "of Korra — Asami",
@@ -1560,7 +1560,7 @@
     "sortOrder": 119
   },
   {
-    "popNumber": null,
+    "popNumber": 769,
     "subseries": "",
     "name": "Sesshomaru",
     "title": "Sesshomaru",
@@ -1573,7 +1573,7 @@
     "sortOrder": 120
   },
   {
-    "popNumber": null,
+    "popNumber": 770,
     "subseries": "",
     "name": "Evil Inuyasha",
     "title": "Evil Inuyasha",
@@ -1586,7 +1586,7 @@
     "sortOrder": 121
   },
   {
-    "popNumber": null,
+    "popNumber": 783,
     "subseries": "Academia",
     "name": "Izuku Midoriya",
     "title": "Academia — Izuku Midoriya",
@@ -1599,7 +1599,7 @@
     "sortOrder": 122
   },
   {
-    "popNumber": null,
+    "popNumber": 786,
     "subseries": "Academia",
     "name": "Best Jeanist",
     "title": "Academia — Best Jeanist",
@@ -1612,7 +1612,7 @@
     "sortOrder": 123
   },
   {
-    "popNumber": null,
+    "popNumber": 788,
     "subseries": "Academia",
     "name": "Overhaul",
     "title": "Academia — Overhaul",
@@ -1625,7 +1625,7 @@
     "sortOrder": 124
   },
   {
-    "popNumber": null,
+    "popNumber": 803,
     "subseries": "Academia",
     "name": "Katsuki Bakugo",
     "title": "Academia — Katsuki Bakugo",
@@ -1638,7 +1638,7 @@
     "sortOrder": 125
   },
   {
-    "popNumber": null,
+    "popNumber": 806,
     "subseries": "",
     "name": "Pegasus Seiya",
     "title": "Pegasus Seiya",
@@ -1651,7 +1651,7 @@
     "sortOrder": 126
   },
   {
-    "popNumber": null,
+    "popNumber": 808,
     "subseries": "",
     "name": "Cygnus Hyoga",
     "title": "Cygnus Hyoga",
@@ -1664,7 +1664,7 @@
     "sortOrder": 127
   },
   {
-    "popNumber": null,
+    "popNumber": 817,
     "subseries": "Ball Z",
     "name": "Future Mai",
     "title": "Ball Z — Future Mai",
@@ -1677,7 +1677,7 @@
     "sortOrder": 128
   },
   {
-    "popNumber": null,
+    "popNumber": 820,
     "subseries": "Academia",
     "name": "Mr. Compress",
     "title": "Academia — Mr. Compress",
@@ -1703,7 +1703,7 @@
     "sortOrder": 130
   },
   {
-    "popNumber": null,
+    "popNumber": 824,
     "subseries": "Shippuden",
     "name": "Might Guy",
     "title": "Shippuden — Might Guy",
@@ -1729,7 +1729,7 @@
     "sortOrder": 132
   },
   {
-    "popNumber": null,
+    "popNumber": 831,
     "subseries": "",
     "name": "Princess Ariel",
     "title": "Princess Ariel",
@@ -1742,7 +1742,7 @@
     "sortOrder": 133
   },
   {
-    "popNumber": null,
+    "popNumber": 840,
     "subseries": "Tunes",
     "name": "Bugs Bunny (In Fruit Hat)",
     "title": "Tunes — Bugs Bunny (In Fruit Hat)",
@@ -1755,7 +1755,7 @@
     "sortOrder": 134
   },
   {
-    "popNumber": null,
+    "popNumber": 848,
     "subseries": "Ball Z",
     "name": "Jackie Chun",
     "title": "Ball Z — Jackie Chun",
@@ -1781,7 +1781,7 @@
     "sortOrder": 136
   },
   {
-    "popNumber": null,
+    "popNumber": 858,
     "subseries": "Ball Z",
     "name": "Super Saiyan Gohan",
     "title": "Ball Z — Super Saiyan Gohan",
@@ -1794,7 +1794,7 @@
     "sortOrder": 137
   },
   {
-    "popNumber": null,
+    "popNumber": 860,
     "subseries": "Ball Z",
     "name": "Super Saiyan Goku",
     "title": "Ball Z — Super Saiyan Goku",
@@ -1807,7 +1807,7 @@
     "sortOrder": 138
   },
   {
-    "popNumber": null,
+    "popNumber": 862,
     "subseries": "Ball Z",
     "name": "Majin Vegeta",
     "title": "Ball Z — Majin Vegeta",
@@ -1820,7 +1820,7 @@
     "sortOrder": 139
   },
   {
-    "popNumber": null,
+    "popNumber": 867,
     "subseries": "Slayer",
     "name": "Tanjiro Kamado",
     "title": "Slayer — Tanjiro Kamado",
@@ -1833,7 +1833,7 @@
     "sortOrder": 140
   },
   {
-    "popNumber": null,
+    "popNumber": 868,
     "subseries": "Slayer",
     "name": "Nezuko Kamado",
     "title": "Slayer — Nezuko Kamado",
@@ -1846,7 +1846,7 @@
     "sortOrder": 141
   },
   {
-    "popNumber": null,
+    "popNumber": 869,
     "subseries": "Slayer",
     "name": "Zenitsu Agatsuma",
     "title": "Slayer — Zenitsu Agatsuma",
@@ -1859,7 +1859,7 @@
     "sortOrder": 142
   },
   {
-    "popNumber": null,
+    "popNumber": 870,
     "subseries": "Slayer",
     "name": "Inosuke Hashibira",
     "title": "Slayer — Inosuke Hashibira",
@@ -1872,7 +1872,7 @@
     "sortOrder": 143
   },
   {
-    "popNumber": null,
+    "popNumber": 871,
     "subseries": "Slayer",
     "name": "Muzan Kibutsuji",
     "title": "Slayer — Muzan Kibutsuji",
@@ -1885,7 +1885,7 @@
     "sortOrder": 144
   },
   {
-    "popNumber": null,
+    "popNumber": 873,
     "subseries": "Slayer",
     "name": "Tanjiro Kamado",
     "title": "Slayer — Tanjiro Kamado",
@@ -1898,7 +1898,7 @@
     "sortOrder": 145
   },
   {
-    "popNumber": null,
+    "popNumber": 874,
     "subseries": "Slayer",
     "name": "Tanjiro Kamado",
     "title": "Slayer — Tanjiro Kamado",
@@ -1911,7 +1911,7 @@
     "sortOrder": 146
   },
   {
-    "popNumber": null,
+    "popNumber": 875,
     "subseries": "Slayer",
     "name": "Inosuke Hashibira",
     "title": "Slayer — Inosuke Hashibira",
@@ -1924,7 +1924,7 @@
     "sortOrder": 147
   },
   {
-    "popNumber": null,
+    "popNumber": 890,
     "subseries": "Tunes",
     "name": "Lola Bunny",
     "title": "Tunes — Lola Bunny",
@@ -1937,7 +1937,7 @@
     "sortOrder": 148
   },
   {
-    "popNumber": null,
+    "popNumber": 894,
     "subseries": "Gadget",
     "name": "Penny",
     "title": "Gadget — Penny",
@@ -1963,7 +1963,7 @@
     "sortOrder": 150
   },
   {
-    "popNumber": null,
+    "popNumber": 923,
     "subseries": "",
     "name": "Rodonoa Zoro",
     "title": "Rodonoa Zoro",
@@ -1976,7 +1976,7 @@
     "sortOrder": 151
   },
   {
-    "popNumber": null,
+    "popNumber": 924,
     "subseries": "",
     "name": "Bonekichi (Brook)",
     "title": "Bonekichi (Brook)",
@@ -1989,7 +1989,7 @@
     "sortOrder": 152
   },
   {
-    "popNumber": null,
+    "popNumber": 925,
     "subseries": "",
     "name": "Crocodile",
     "title": "Crocodile",
@@ -2002,7 +2002,7 @@
     "sortOrder": 153
   },
   {
-    "popNumber": null,
+    "popNumber": 932,
     "subseries": "",
     "name": "Naruto (Six Path Sage)",
     "title": "Naruto (Six Path Sage)",
@@ -2015,7 +2015,7 @@
     "sortOrder": 154
   },
   {
-    "popNumber": null,
+    "popNumber": 932,
     "subseries": "",
     "name": "Naruto (Six Path Sage)",
     "title": "Naruto (Six Path Sage)",
@@ -2028,7 +2028,7 @@
     "sortOrder": 155
   },
   {
-    "popNumber": null,
+    "popNumber": 936,
     "subseries": "",
     "name": "Kabuto Yakushi",
     "title": "Kabuto Yakushi",
@@ -2041,7 +2041,7 @@
     "sortOrder": 156
   },
   {
-    "popNumber": null,
+    "popNumber": 939,
     "subseries": "",
     "name": "Shanks",
     "title": "Shanks",
@@ -2054,7 +2054,7 @@
     "sortOrder": 157
   },
   {
-    "popNumber": null,
+    "popNumber": 940,
     "subseries": "Last Airbender",
     "name": "Aang Spirit",
     "title": "Last Airbender — Aang Spirit",
@@ -2067,7 +2067,7 @@
     "sortOrder": 158
   },
   {
-    "popNumber": null,
+    "popNumber": 944,
     "subseries": "Shippuden",
     "name": "Pain (Almighty Push)",
     "title": "Shippuden — Pain (Almighty Push)",
@@ -2093,7 +2093,7 @@
     "sortOrder": 160
   },
   {
-    "popNumber": null,
+    "popNumber": 949,
     "subseries": "Ball Z S9",
     "name": "Vegito",
     "title": "Ball Z S9 — Vegito",
@@ -2106,7 +2106,7 @@
     "sortOrder": 161
   },
   {
-    "popNumber": null,
+    "popNumber": 950,
     "subseries": "Ball Z S9",
     "name": "Dr. Gero",
     "title": "Ball Z S9 — Dr. Gero",
@@ -2119,7 +2119,7 @@
     "sortOrder": 162
   },
   {
-    "popNumber": null,
+    "popNumber": 951,
     "subseries": "Ball Z S9",
     "name": "Super Saiyan Gohan w/Noodles",
     "title": "Ball Z S9 — Super Saiyan Gohan w/Noodles",
@@ -2132,7 +2132,7 @@
     "sortOrder": 163
   },
   {
-    "popNumber": null,
+    "popNumber": 952,
     "subseries": "Ball Z S9",
     "name": "Kami",
     "title": "Ball Z S9 — Kami",
@@ -2145,7 +2145,7 @@
     "sortOrder": 164
   },
   {
-    "popNumber": null,
+    "popNumber": 954,
     "subseries": "",
     "name": "Morty with Glorzo",
     "title": "Morty with Glorzo",
@@ -2158,7 +2158,7 @@
     "sortOrder": 165
   },
   {
-    "popNumber": null,
+    "popNumber": 955,
     "subseries": "",
     "name": "Queen Summer",
     "title": "Queen Summer",
@@ -2171,7 +2171,7 @@
     "sortOrder": 166
   },
   {
-    "popNumber": null,
+    "popNumber": 956,
     "subseries": "",
     "name": "Rick with Glorzo",
     "title": "Rick with Glorzo",
@@ -2184,7 +2184,7 @@
     "sortOrder": 167
   },
   {
-    "popNumber": null,
+    "popNumber": 966,
     "subseries": "",
     "name": "Dragonoid",
     "title": "Dragonoid",
@@ -2197,7 +2197,7 @@
     "sortOrder": 168
   },
   {
-    "popNumber": null,
+    "popNumber": 978,
     "subseries": "",
     "name": "Arthur with Sword",
     "title": "Arthur with Sword",
@@ -2210,7 +2210,7 @@
     "sortOrder": 169
   },
   {
-    "popNumber": null,
+    "popNumber": 981,
     "subseries": "",
     "name": "Shinra with Fire",
     "title": "Shinra with Fire",
@@ -2223,7 +2223,7 @@
     "sortOrder": 170
   },
   {
-    "popNumber": null,
+    "popNumber": 991,
     "subseries": "Online",
     "name": "Leafa",
     "title": "Online — Leafa",
@@ -2236,7 +2236,7 @@
     "sortOrder": 171
   },
   {
-    "popNumber": null,
+    "popNumber": 997,
     "subseries": "Last Airbender",
     "name": "Ty Lee",
     "title": "Last Airbender — Ty Lee",
@@ -2249,7 +2249,7 @@
     "sortOrder": 172
   },
   {
-    "popNumber": null,
+    "popNumber": 998,
     "subseries": "Last Airbender",
     "name": "Admiral Zhao",
     "title": "Last Airbender — Admiral Zhao",
@@ -2262,7 +2262,7 @@
     "sortOrder": 173
   },
   {
-    "popNumber": null,
+    "popNumber": 999,
     "subseries": "Last Airbender",
     "name": "",
     "title": "Last Airbender",
@@ -2275,7 +2275,7 @@
     "sortOrder": 174
   },
   {
-    "popNumber": null,
+    "popNumber": 1004,
     "subseries": "Academia",
     "name": "Mirio Togata",
     "title": "Academia — Mirio Togata",
@@ -2288,7 +2288,7 @@
     "sortOrder": 175
   },
   {
-    "popNumber": null,
+    "popNumber": 1005,
     "subseries": "Academia",
     "name": "Tamaki Amajiki",
     "title": "Academia — Tamaki Amajiki",
@@ -2301,7 +2301,7 @@
     "sortOrder": 176
   },
   {
-    "popNumber": null,
+    "popNumber": 1006,
     "subseries": "Academia",
     "name": "Sir Nighteye",
     "title": "Academia — Sir Nighteye",
@@ -2314,7 +2314,7 @@
     "sortOrder": 177
   },
   {
-    "popNumber": null,
+    "popNumber": 1007,
     "subseries": "Academia",
     "name": "Ryukyu",
     "title": "Academia — Ryukyu",
@@ -2327,7 +2327,7 @@
     "sortOrder": 178
   },
   {
-    "popNumber": null,
+    "popNumber": 1008,
     "subseries": "Academia",
     "name": "Infinite Deku w/Eri",
     "title": "Academia — Infinite Deku w/Eri",
@@ -2340,7 +2340,7 @@
     "sortOrder": 179
   },
   {
-    "popNumber": null,
+    "popNumber": 1009,
     "subseries": "Academia",
     "name": "Eijiro Unbreakable",
     "title": "Academia — Eijiro Unbreakable",
@@ -2353,7 +2353,7 @@
     "sortOrder": 180
   },
   {
-    "popNumber": null,
+    "popNumber": 1011,
     "subseries": "Academia",
     "name": "Eri",
     "title": "Academia — Eri",
@@ -2366,7 +2366,7 @@
     "sortOrder": 181
   },
   {
-    "popNumber": null,
+    "popNumber": 1012,
     "subseries": "Academia",
     "name": "Overhaul Fused w/Shin",
     "title": "Academia — Overhaul Fused w/Shin",
@@ -2379,7 +2379,7 @@
     "sortOrder": 182
   },
   {
-    "popNumber": null,
+    "popNumber": 1014,
     "subseries": "Academia",
     "name": "Aizawa in sleeping bag",
     "title": "Academia — Aizawa in sleeping bag",
@@ -2392,7 +2392,7 @@
     "sortOrder": 183
   },
   {
-    "popNumber": null,
+    "popNumber": 1022,
     "subseries": "Shippuden",
     "name": "Itachi With Crows",
     "title": "Shippuden — Itachi With Crows",
@@ -2418,7 +2418,7 @@
     "sortOrder": 185
   },
   {
-    "popNumber": null,
+    "popNumber": 1025,
     "subseries": "Shippuden",
     "name": "Jiraiya",
     "title": "Shippuden — Jiraiya",
@@ -2431,7 +2431,7 @@
     "sortOrder": 186
   },
   {
-    "popNumber": null,
+    "popNumber": 1035,
     "subseries": "",
     "name": "Boruto w/Marks",
     "title": "Boruto w/Marks",
@@ -2444,7 +2444,7 @@
     "sortOrder": 187
   },
   {
-    "popNumber": null,
+    "popNumber": 1036,
     "subseries": "",
     "name": "Kawaki",
     "title": "Kawaki",
@@ -2457,7 +2457,7 @@
     "sortOrder": 188
   },
   {
-    "popNumber": null,
+    "popNumber": 1036,
     "subseries": "",
     "name": "Kawaki",
     "title": "Kawaki",
@@ -2470,7 +2470,7 @@
     "sortOrder": 189
   },
   {
-    "popNumber": null,
+    "popNumber": 1037,
     "subseries": "",
     "name": "Cho-cho",
     "title": "Cho-cho",
@@ -2483,7 +2483,7 @@
     "sortOrder": 190
   },
   {
-    "popNumber": null,
+    "popNumber": 1038,
     "subseries": "",
     "name": "Inojin",
     "title": "Inojin",
@@ -2496,7 +2496,7 @@
     "sortOrder": 191
   },
   {
-    "popNumber": null,
+    "popNumber": 1039,
     "subseries": "",
     "name": "Shikadai",
     "title": "Shikadai",
@@ -2509,7 +2509,7 @@
     "sortOrder": 192
   },
   {
-    "popNumber": null,
+    "popNumber": 1040,
     "subseries": "",
     "name": "Sasuke",
     "title": "Sasuke",
@@ -2522,7 +2522,7 @@
     "sortOrder": 193
   },
   {
-    "popNumber": null,
+    "popNumber": 1046,
     "subseries": "",
     "name": "Erza Scarlet",
     "title": "Erza Scarlet",
@@ -2535,7 +2535,7 @@
     "sortOrder": 194
   },
   {
-    "popNumber": null,
+    "popNumber": 1047,
     "subseries": "",
     "name": "Jellal Fernandes",
     "title": "Jellal Fernandes",
@@ -2548,7 +2548,7 @@
     "sortOrder": 195
   },
   {
-    "popNumber": null,
+    "popNumber": 1049,
     "subseries": "",
     "name": "Mavis Vermillion",
     "title": "Mavis Vermillion",
@@ -2561,7 +2561,7 @@
     "sortOrder": 196
   },
   {
-    "popNumber": null,
+    "popNumber": 1050,
     "subseries": "",
     "name": "Mirajane Strauss",
     "title": "Mirajane Strauss",
@@ -2574,7 +2574,7 @@
     "sortOrder": 197
   },
   {
-    "popNumber": null,
+    "popNumber": 1052,
     "subseries": "Jack",
     "name": "Jack (Armored)",
     "title": "Jack — Jack (Armored)",
@@ -2587,7 +2587,7 @@
     "sortOrder": 198
   },
   {
-    "popNumber": null,
+    "popNumber": 1053,
     "subseries": "Jack",
     "name": "Ashi",
     "title": "Jack — Ashi",
@@ -2600,7 +2600,7 @@
     "sortOrder": 199
   },
   {
-    "popNumber": null,
+    "popNumber": 1054,
     "subseries": "Jack",
     "name": "Da Samurai",
     "title": "Jack — Da Samurai",
@@ -2613,7 +2613,7 @@
     "sortOrder": 200
   },
   {
-    "popNumber": null,
+    "popNumber": 1055,
     "subseries": "Jack",
     "name": "The Guardian",
     "title": "Jack — The Guardian",
@@ -2626,7 +2626,7 @@
     "sortOrder": 201
   },
   {
-    "popNumber": null,
+    "popNumber": 1056,
     "subseries": "Jack",
     "name": "High Priestess",
     "title": "Jack — High Priestess",
@@ -2639,7 +2639,7 @@
     "sortOrder": 202
   },
   {
-    "popNumber": null,
+    "popNumber": 1058,
     "subseries": "Last Airbender",
     "name": "Fire Lord Ozai",
     "title": "Last Airbender — Fire Lord Ozai",
@@ -2652,7 +2652,7 @@
     "sortOrder": 203
   },
   {
-    "popNumber": null,
+    "popNumber": 1059,
     "subseries": "",
     "name": "Pharaoh Atem Yugi",
     "title": "Pharaoh Atem Yugi",
@@ -2665,7 +2665,7 @@
     "sortOrder": 204
   },
   {
-    "popNumber": null,
+    "popNumber": 1060,
     "subseries": "",
     "name": "Mai Valentine",
     "title": "Mai Valentine",
@@ -2678,7 +2678,7 @@
     "sortOrder": 205
   },
   {
-    "popNumber": null,
+    "popNumber": 1061,
     "subseries": "",
     "name": "Yami Bakura",
     "title": "Yami Bakura",
@@ -2691,7 +2691,7 @@
     "sortOrder": 206
   },
   {
-    "popNumber": null,
+    "popNumber": 1062,
     "subseries": "",
     "name": "Blue-Eyes Toon Dragon",
     "title": "Blue-Eyes Toon Dragon",
@@ -2704,7 +2704,7 @@
     "sortOrder": 207
   },
   {
-    "popNumber": null,
+    "popNumber": 1067,
     "subseries": "Network",
     "name": "Dexter",
     "title": "Network — Dexter",
@@ -2717,7 +2717,7 @@
     "sortOrder": 208
   },
   {
-    "popNumber": null,
+    "popNumber": 1068,
     "subseries": "Network",
     "name": "Dee Dee",
     "title": "Network — Dee Dee",
@@ -2730,7 +2730,7 @@
     "sortOrder": 209
   },
   {
-    "popNumber": null,
+    "popNumber": 1071,
     "subseries": "Network",
     "name": "Superhero Cow",
     "title": "Network — Superhero Cow",
@@ -2743,7 +2743,7 @@
     "sortOrder": 210
   },
   {
-    "popNumber": null,
+    "popNumber": 1072,
     "subseries": "Network",
     "name": "Chicken",
     "title": "Network — Chicken",
@@ -2756,7 +2756,7 @@
     "sortOrder": 211
   },
   {
-    "popNumber": null,
+    "popNumber": 1075,
     "subseries": "Time",
     "name": "Lumpy Space Princess",
     "title": "Time — Lumpy Space Princess",
@@ -2769,7 +2769,7 @@
     "sortOrder": 212
   },
   {
-    "popNumber": null,
+    "popNumber": 1076,
     "subseries": "Time",
     "name": "Princess Bubblegum",
     "title": "Time — Princess Bubblegum",
@@ -2782,7 +2782,7 @@
     "sortOrder": 213
   },
   {
-    "popNumber": null,
+    "popNumber": 1079,
     "subseries": "Last Airbender",
     "name": "Azula",
     "title": "Last Airbender — Azula",
@@ -2795,7 +2795,7 @@
     "sortOrder": 214
   },
   {
-    "popNumber": null,
+    "popNumber": 1081,
     "subseries": "Girls",
     "name": "Bubbles",
     "title": "Girls — Bubbles",
@@ -2808,7 +2808,7 @@
     "sortOrder": 215
   },
   {
-    "popNumber": null,
+    "popNumber": 1082,
     "subseries": "Girls",
     "name": "Buttercup",
     "title": "Girls — Buttercup",
@@ -2821,7 +2821,7 @@
     "sortOrder": 216
   },
   {
-    "popNumber": null,
+    "popNumber": 1083,
     "subseries": "Girls",
     "name": "Fuzzy Lumpkins",
     "title": "Girls — Fuzzy Lumpkins",
@@ -2834,7 +2834,7 @@
     "sortOrder": 217
   },
   {
-    "popNumber": null,
+    "popNumber": 1085,
     "subseries": "Pig",
     "name": "Peppa Pig",
     "title": "Pig — Peppa Pig",
@@ -2873,7 +2873,7 @@
     "sortOrder": 220
   },
   {
-    "popNumber": null,
+    "popNumber": 1091,
     "subseries": "Slayer",
     "name": "Gyomei Himejima",
     "title": "Slayer — Gyomei Himejima",
@@ -2886,7 +2886,7 @@
     "sortOrder": 221
   },
   {
-    "popNumber": null,
+    "popNumber": 1099,
     "subseries": "",
     "name": "Asta",
     "title": "Asta",
@@ -2899,7 +2899,7 @@
     "sortOrder": 222
   },
   {
-    "popNumber": null,
+    "popNumber": 1100,
     "subseries": "",
     "name": "Noelle",
     "title": "Noelle",
@@ -2912,7 +2912,7 @@
     "sortOrder": 223
   },
   {
-    "popNumber": null,
+    "popNumber": 1101,
     "subseries": "",
     "name": "Yuno",
     "title": "Yuno",
@@ -2925,7 +2925,7 @@
     "sortOrder": 224
   },
   {
-    "popNumber": null,
+    "popNumber": 1111,
     "subseries": "Kaisen",
     "name": "Itadori",
     "title": "Kaisen — Itadori",
@@ -2938,7 +2938,7 @@
     "sortOrder": 225
   },
   {
-    "popNumber": null,
+    "popNumber": 1112,
     "subseries": "Kaisen",
     "name": "Megumi Fushiguro with Divine Dog",
     "title": "Kaisen — Megumi Fushiguro with Divine Dog",
@@ -2951,7 +2951,7 @@
     "sortOrder": 226
   },
   {
-    "popNumber": null,
+    "popNumber": 1113,
     "subseries": "Kaisen",
     "name": "Nobara Kugisaki",
     "title": "Kaisen — Nobara Kugisaki",
@@ -2964,7 +2964,7 @@
     "sortOrder": 227
   },
   {
-    "popNumber": null,
+    "popNumber": 1114,
     "subseries": "Kaisen",
     "name": "Satoru Gojo",
     "title": "Kaisen — Satoru Gojo",
@@ -2977,7 +2977,7 @@
     "sortOrder": 228
   },
   {
-    "popNumber": null,
+    "popNumber": 1115,
     "subseries": "Kaisen",
     "name": "Mahito",
     "title": "Kaisen — Mahito",
@@ -2990,7 +2990,7 @@
     "sortOrder": 229
   },
   {
-    "popNumber": null,
+    "popNumber": 1125,
     "subseries": "",
     "name": "Kuki Urie",
     "title": "Kuki Urie",
@@ -3003,7 +3003,7 @@
     "sortOrder": 230
   },
   {
-    "popNumber": null,
+    "popNumber": 1126,
     "subseries": "",
     "name": "Saiko Yonebayashi",
     "title": "Saiko Yonebayashi",
@@ -3016,7 +3016,7 @@
     "sortOrder": 231
   },
   {
-    "popNumber": null,
+    "popNumber": 1127,
     "subseries": "",
     "name": "Toru Mutsuki",
     "title": "Toru Mutsuki",
@@ -3029,7 +3029,7 @@
     "sortOrder": 232
   },
   {
-    "popNumber": null,
+    "popNumber": 1132,
     "subseries": "x Hunter",
     "name": "Netero",
     "title": "x Hunter — Netero",
@@ -3042,7 +3042,7 @@
     "sortOrder": 233
   },
   {
-    "popNumber": null,
+    "popNumber": 1133,
     "subseries": "x Hunter",
     "name": "Bisky",
     "title": "x Hunter — Bisky",
@@ -3055,7 +3055,7 @@
     "sortOrder": 234
   },
   {
-    "popNumber": null,
+    "popNumber": 1134,
     "subseries": "x Hunter",
     "name": "Kite",
     "title": "x Hunter — Kite",
@@ -3068,7 +3068,7 @@
     "sortOrder": 235
   },
   {
-    "popNumber": null,
+    "popNumber": 1139,
     "subseries": "Academia",
     "name": "Itsuka Kendo",
     "title": "Academia — Itsuka Kendo",
@@ -3081,7 +3081,7 @@
     "sortOrder": 236
   },
   {
-    "popNumber": null,
+    "popNumber": 1140,
     "subseries": "Academia",
     "name": "Izuku Midoriya",
     "title": "Academia — Izuku Midoriya",
@@ -3094,7 +3094,7 @@
     "sortOrder": 237
   },
   {
-    "popNumber": null,
+    "popNumber": 1142,
     "subseries": "Academia",
     "name": "Fatgum (Slim Form)",
     "title": "Academia — Fatgum (Slim Form)",
@@ -3107,7 +3107,7 @@
     "sortOrder": 238
   },
   {
-    "popNumber": null,
+    "popNumber": 1143,
     "subseries": "Academia",
     "name": "Kyoka Jiro",
     "title": "Academia — Kyoka Jiro",
@@ -3120,7 +3120,7 @@
     "sortOrder": 239
   },
   {
-    "popNumber": null,
+    "popNumber": 1144,
     "subseries": "Academia",
     "name": "Yuga Aoyama",
     "title": "Academia — Yuga Aoyama",
@@ -3133,7 +3133,7 @@
     "sortOrder": 240
   },
   {
-    "popNumber": null,
+    "popNumber": 1145,
     "subseries": "Academia",
     "name": "Inasa Yoarashi",
     "title": "Academia — Inasa Yoarashi",
@@ -3146,7 +3146,7 @@
     "sortOrder": 241
   },
   {
-    "popNumber": null,
+    "popNumber": 1147,
     "subseries": "Academia",
     "name": "Hawks",
     "title": "Academia — Hawks",
@@ -3159,7 +3159,7 @@
     "sortOrder": 242
   },
   {
-    "popNumber": null,
+    "popNumber": 1149,
     "subseries": "Academia",
     "name": "Tomura Shigaraki",
     "title": "Academia — Tomura Shigaraki",
@@ -3172,7 +3172,7 @@
     "sortOrder": 243
   },
   {
-    "popNumber": null,
+    "popNumber": 1151,
     "subseries": "Academia",
     "name": "Kyoka Jiro",
     "title": "Academia — Kyoka Jiro",
@@ -3211,7 +3211,7 @@
     "sortOrder": 246
   },
   {
-    "popNumber": null,
+    "popNumber": 1160,
     "subseries": "",
     "name": "Nozel Silva",
     "title": "Nozel Silva",
@@ -3224,7 +3224,7 @@
     "sortOrder": 247
   },
   {
-    "popNumber": null,
+    "popNumber": 1163,
     "subseries": "Kaisen",
     "name": "Yuji Itadori with Slaughter Demon",
     "title": "Kaisen — Yuji Itadori with Slaughter Demon",
@@ -3237,7 +3237,7 @@
     "sortOrder": 248
   },
   {
-    "popNumber": null,
+    "popNumber": 1165,
     "subseries": "Titan (Season 3)",
     "name": "Eren Jaeger",
     "title": "Titan (Season 3) — Eren Jaeger",
@@ -3250,7 +3250,7 @@
     "sortOrder": 249
   },
   {
-    "popNumber": null,
+    "popNumber": 1166,
     "subseries": "Titan (Season 3)",
     "name": "Mikasa Ackermann with Swords",
     "title": "Titan (Season 3) — Mikasa Ackermann with Swords",
@@ -3263,7 +3263,7 @@
     "sortOrder": 250
   },
   {
-    "popNumber": null,
+    "popNumber": 1167,
     "subseries": "Titan (Season 3)",
     "name": "Bertholdt Hoover",
     "title": "Titan (Season 3) — Bertholdt Hoover",
@@ -3276,7 +3276,7 @@
     "sortOrder": 251
   },
   {
-    "popNumber": null,
+    "popNumber": 1168,
     "subseries": "Titan (Season 3)",
     "name": "Ymir's Titan",
     "title": "Titan (Season 3) — Ymir's Titan",
@@ -3289,7 +3289,7 @@
     "sortOrder": 252
   },
   {
-    "popNumber": null,
+    "popNumber": 1170,
     "subseries": "Titan (Season 3)",
     "name": "Queen Historia",
     "title": "Titan (Season 3) — Queen Historia",
@@ -3302,7 +3302,7 @@
     "sortOrder": 253
   },
   {
-    "popNumber": null,
+    "popNumber": 1172,
     "subseries": "Titan (Season 3)",
     "name": "Mikasa Ackermann",
     "title": "Titan (Season 3) — Mikasa Ackermann",
@@ -3315,7 +3315,7 @@
     "sortOrder": 254
   },
   {
-    "popNumber": null,
+    "popNumber": 1176,
     "subseries": "Alchemist Brotherhood",
     "name": "Edward Elric",
     "title": "Alchemist Brotherhood — Edward Elric",
@@ -3328,7 +3328,7 @@
     "sortOrder": 255
   },
   {
-    "popNumber": null,
+    "popNumber": 1177,
     "subseries": "Alchemist Brotherhood",
     "name": "Riza Hawkeye",
     "title": "Alchemist Brotherhood — Riza Hawkeye",
@@ -3341,7 +3341,7 @@
     "sortOrder": 256
   },
   {
-    "popNumber": null,
+    "popNumber": 1178,
     "subseries": "Alchemist Brotherhood",
     "name": "Olivier Armstrong",
     "title": "Alchemist Brotherhood — Olivier Armstrong",
@@ -3354,7 +3354,7 @@
     "sortOrder": 257
   },
   {
-    "popNumber": null,
+    "popNumber": 1179,
     "subseries": "Alchemist Brotherhood",
     "name": "Scar",
     "title": "Alchemist Brotherhood — Scar",
@@ -3367,7 +3367,7 @@
     "sortOrder": 258
   },
   {
-    "popNumber": null,
+    "popNumber": 1180,
     "subseries": "Alchemist Brotherhood",
     "name": "Greed",
     "title": "Alchemist Brotherhood — Greed",
@@ -3393,7 +3393,7 @@
     "sortOrder": 260
   },
   {
-    "popNumber": null,
+    "popNumber": 1194,
     "subseries": "Shippuden",
     "name": "Kiba with Akamaru",
     "title": "Shippuden — Kiba with Akamaru",
@@ -3406,7 +3406,7 @@
     "sortOrder": 261
   },
   {
-    "popNumber": null,
+    "popNumber": 1196,
     "subseries": "Shippuden",
     "name": "Madara Uchiha",
     "title": "Shippuden — Madara Uchiha",
@@ -3419,7 +3419,7 @@
     "sortOrder": 262
   },
   {
-    "popNumber": null,
+    "popNumber": 1198,
     "subseries": "Shippuden",
     "name": "Izumo Kamizuki",
     "title": "Shippuden — Izumo Kamizuki",
@@ -3432,7 +3432,7 @@
     "sortOrder": 263
   },
   {
-    "popNumber": null,
+    "popNumber": 1199,
     "subseries": "Shippuden",
     "name": "Kakashi Hatake",
     "title": "Shippuden — Kakashi Hatake",
@@ -3445,7 +3445,7 @@
     "sortOrder": 264
   },
   {
-    "popNumber": null,
+    "popNumber": 1200,
     "subseries": "Shippuden",
     "name": "Killer Bee",
     "title": "Shippuden — Killer Bee",
@@ -3471,7 +3471,7 @@
     "sortOrder": 266
   },
   {
-    "popNumber": null,
+    "popNumber": 1212,
     "subseries": "Bebop",
     "name": "Spike Spiegel",
     "title": "Bebop — Spike Spiegel",
@@ -3497,7 +3497,7 @@
     "sortOrder": 268
   },
   {
-    "popNumber": null,
+    "popNumber": 1235,
     "subseries": "x Hunter",
     "name": "Kite",
     "title": "x Hunter — Kite",
@@ -3510,7 +3510,7 @@
     "sortOrder": 269
   },
   {
-    "popNumber": null,
+    "popNumber": 1239,
     "subseries": "",
     "name": "Bugs Bunny As Fred Jones",
     "title": "Bugs Bunny As Fred Jones",
@@ -3523,7 +3523,7 @@
     "sortOrder": 270
   },
   {
-    "popNumber": null,
+    "popNumber": 1266,
     "subseries": "",
     "name": "Snake-Man Luffy",
     "title": "Snake-Man Luffy",
@@ -3536,7 +3536,7 @@
     "sortOrder": 271
   },
   {
-    "popNumber": null,
+    "popNumber": 1276,
     "subseries": "",
     "name": "Buggy The Clown",
     "title": "Buggy The Clown",
@@ -3549,7 +3549,7 @@
     "sortOrder": 272
   },
   {
-    "popNumber": null,
+    "popNumber": 1310,
     "subseries": "",
     "name": "Momoshiki",
     "title": "Momoshiki",
@@ -3575,7 +3575,7 @@
     "sortOrder": 274
   },
   {
-    "popNumber": null,
+    "popNumber": 1370,
     "subseries": "Ball Z",
     "name": "Frieza",
     "title": "Ball Z — Frieza",
@@ -3588,7 +3588,7 @@
     "sortOrder": 275
   },
   {
-    "popNumber": null,
+    "popNumber": 1420,
     "subseries": "",
     "name": "Black Asta",
     "title": "Black Asta",
@@ -3601,7 +3601,7 @@
     "sortOrder": 276
   },
   {
-    "popNumber": null,
+    "popNumber": 1421,
     "subseries": "",
     "name": "Noelle (Valkyrie Armor)",
     "title": "Noelle (Valkyrie Armor)",
@@ -3614,7 +3614,7 @@
     "sortOrder": 277
   },
   {
-    "popNumber": null,
+    "popNumber": 1423,
     "subseries": "",
     "name": "Yami",
     "title": "Yami",
@@ -3627,7 +3627,7 @@
     "sortOrder": 278
   },
   {
-    "popNumber": null,
+    "popNumber": 1435,
     "subseries": "Shippuden",
     "name": "Orochimaru (Akatsuki)",
     "title": "Shippuden — Orochimaru (Akatsuki)",
@@ -3640,7 +3640,7 @@
     "sortOrder": 279
   },
   {
-    "popNumber": null,
+    "popNumber": 1436,
     "subseries": "Shippuden",
     "name": "Sasuke Uchiha",
     "title": "Shippuden — Sasuke Uchiha",
@@ -3679,7 +3679,7 @@
     "sortOrder": 282
   },
   {
-    "popNumber": null,
+    "popNumber": 1566,
     "subseries": "x Hunter",
     "name": "Feitan",
     "title": "x Hunter — Feitan",
@@ -3692,7 +3692,7 @@
     "sortOrder": 283
   },
   {
-    "popNumber": null,
+    "popNumber": 1607,
     "subseries": "",
     "name": "Luffy Gear Five",
     "title": "Luffy Gear Five",
@@ -3705,7 +3705,7 @@
     "sortOrder": 284
   },
   {
-    "popNumber": null,
+    "popNumber": 1611,
     "subseries": "",
     "name": "Orihime Inoue",
     "title": "Orihime Inoue",
@@ -3718,7 +3718,7 @@
     "sortOrder": 285
   },
   {
-    "popNumber": null,
+    "popNumber": 1612,
     "subseries": "",
     "name": "Yoruichi Shihoin",
     "title": "Yoruichi Shihoin",
@@ -3731,7 +3731,7 @@
     "sortOrder": 286
   },
   {
-    "popNumber": null,
+    "popNumber": 1614,
     "subseries": "",
     "name": "Yasutora Sado (Chad)",
     "title": "Yasutora Sado (Chad)",
@@ -3757,7 +3757,7 @@
     "sortOrder": 288
   },
   {
-    "popNumber": null,
+    "popNumber": 1654,
     "subseries": "",
     "name": "Himawari Uzumaki",
     "title": "Himawari Uzumaki",
@@ -3770,7 +3770,7 @@
     "sortOrder": 289
   },
   {
-    "popNumber": null,
+    "popNumber": 1655,
     "subseries": "",
     "name": "Isshiki Otsutsuki",
     "title": "Isshiki Otsutsuki",
@@ -3783,7 +3783,7 @@
     "sortOrder": 290
   },
   {
-    "popNumber": null,
+    "popNumber": 1656,
     "subseries": "Shippuden",
     "name": "Itachi Uchiha",
     "title": "Shippuden — Itachi Uchiha",
@@ -3796,7 +3796,7 @@
     "sortOrder": 291
   },
   {
-    "popNumber": null,
+    "popNumber": 1708,
     "subseries": "Ball Z",
     "name": "Gohan in Cape",
     "title": "Ball Z — Gohan in Cape",

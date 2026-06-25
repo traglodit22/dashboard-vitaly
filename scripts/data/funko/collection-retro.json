@@ -1,6 +1,6 @@
 [
   {
-    "popNumber": null,
+    "popNumber": 9,
     "subseries": "Hasbro",
     "name": "Leatherneck",
     "title": "Hasbro — Leatherneck",
@@ -13,7 +13,7 @@
     "sortOrder": 0
   },
   {
-    "popNumber": null,
+    "popNumber": 10,
     "subseries": "Hasbro",
     "name": "Shipwreck",
     "title": "Hasbro — Shipwreck",
@@ -26,7 +26,7 @@
     "sortOrder": 1
   },
   {
-    "popNumber": null,
+    "popNumber": 14,
     "subseries": "SockEm Robots",
     "name": "Blue Bomber",
     "title": "SockEm Robots — Blue Bomber",
@@ -39,7 +39,7 @@
     "sortOrder": 2
   },
   {
-    "popNumber": null,
+    "popNumber": 15,
     "subseries": "SockEm Robots",
     "name": "Red Rocker",
     "title": "SockEm Robots — Red Rocker",
@@ -52,7 +52,7 @@
     "sortOrder": 3
   },
   {
-    "popNumber": null,
+    "popNumber": 39,
     "subseries": "",
     "name": "Skeletor w/Terror Claws",
     "title": "Skeletor w/Terror Claws",
@@ -65,7 +65,7 @@
     "sortOrder": 4
   },
   {
-    "popNumber": null,
+    "popNumber": 61,
     "subseries": "Pony",
     "name": "Cotton Candy",
     "title": "Pony — Cotton Candy",
@@ -78,7 +78,7 @@
     "sortOrder": 5
   },
   {
-    "popNumber": null,
+    "popNumber": 62,
     "subseries": "Pony",
     "name": "Minty",
     "title": "Pony — Minty",
@@ -91,7 +91,7 @@
     "sortOrder": 6
   },
   {
-    "popNumber": null,
+    "popNumber": 63,
     "subseries": "Pony",
     "name": "Blossom",
     "title": "Pony — Blossom",
@@ -104,7 +104,7 @@
     "sortOrder": 7
   },
   {
-    "popNumber": null,
+    "popNumber": 64,
     "subseries": "Pony",
     "name": "Butterscotch",
     "title": "Pony — Butterscotch",
@@ -117,7 +117,7 @@
     "sortOrder": 8
   },
   {
-    "popNumber": null,
+    "popNumber": 97,
     "subseries": "",
     "name": "Polly Pocket Shell",
     "title": "Polly Pocket Shell",
@@ -130,7 +130,7 @@
     "sortOrder": 9
   },
   {
-    "popNumber": null,
+    "popNumber": 98,
     "subseries": "",
     "name": "Trouble Board",
     "title": "Trouble Board",
@@ -143,7 +143,7 @@
     "sortOrder": 10
   },
   {
-    "popNumber": null,
+    "popNumber": 99,
     "subseries": "",
     "name": "Lite-Brite",
     "title": "Lite-Brite",
@@ -156,7 +156,7 @@
     "sortOrder": 11
   },
   {
-    "popNumber": null,
+    "popNumber": 100,
     "subseries": "Monkeys",
     "name": "Barrel & Monkeys",
     "title": "Monkeys — Barrel & Monkeys",
@@ -169,7 +169,7 @@
     "sortOrder": 12
   },
   {
-    "popNumber": null,
+    "popNumber": 101,
     "subseries": "",
     "name": "Play-Doh Container",
     "title": "Play-Doh Container",

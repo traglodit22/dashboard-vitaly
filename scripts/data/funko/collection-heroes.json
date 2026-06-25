@@ -1,6 +1,6 @@
 [
   {
-    "popNumber": null,
+    "popNumber": 1,
     "subseries": "",
     "name": "Retro Batman",
     "title": "Retro Batman",
@@ -13,7 +13,7 @@
     "sortOrder": 0
   },
   {
-    "popNumber": null,
+    "popNumber": 8,
     "subseries": "",
     "name": "Wonder Woman",
     "title": "Wonder Woman",
@@ -26,7 +26,7 @@
     "sortOrder": 1
   },
   {
-    "popNumber": null,
+    "popNumber": 10,
     "subseries": "",
     "name": "The Flash",
     "title": "The Flash",
@@ -52,7 +52,7 @@
     "sortOrder": 3
   },
   {
-    "popNumber": null,
+    "popNumber": 33,
     "subseries": "",
     "name": "Batman Beyond",
     "title": "Batman Beyond",
@@ -65,7 +65,7 @@
     "sortOrder": 4
   },
   {
-    "popNumber": null,
+    "popNumber": 34,
     "subseries": "",
     "name": "Harley Quinn",
     "title": "Harley Quinn",
@@ -78,7 +78,7 @@
     "sortOrder": 5
   },
   {
-    "popNumber": null,
+    "popNumber": 40,
     "subseries": "",
     "name": "Nightwing",
     "title": "Nightwing",
@@ -117,7 +117,7 @@
     "sortOrder": 8
   },
   {
-    "popNumber": null,
+    "popNumber": 62,
     "subseries": "",
     "name": "Earth 2 Batman",
     "title": "Earth 2 Batman",
@@ -143,7 +143,7 @@
     "sortOrder": 10
   },
   {
-    "popNumber": null,
+    "popNumber": 68,
     "subseries": "",
     "name": "Black Lantern Reverse Flash",
     "title": "Black Lantern Reverse Flash",
@@ -169,7 +169,7 @@
     "sortOrder": 12
   },
   {
-    "popNumber": null,
+    "popNumber": 71,
     "subseries": "Arkham Knight",
     "name": "Batman",
     "title": "Arkham Knight — Batman",
@@ -221,7 +221,7 @@
     "sortOrder": 16
   },
   {
-    "popNumber": null,
+    "popNumber": 89,
     "subseries": "v Superman",
     "name": "Knightmare Batman",
     "title": "v Superman — Knightmare Batman",
@@ -234,7 +234,7 @@
     "sortOrder": 17
   },
   {
-    "popNumber": null,
+    "popNumber": 90,
     "subseries": "v Superman",
     "name": "Superman Soldier",
     "title": "v Superman — Superman Soldier",
@@ -247,7 +247,7 @@
     "sortOrder": 18
   },
   {
-    "popNumber": null,
+    "popNumber": 96,
     "subseries": "Squad",
     "name": "The Joker",
     "title": "Squad — The Joker",
@@ -260,7 +260,7 @@
     "sortOrder": 19
   },
   {
-    "popNumber": null,
+    "popNumber": 97,
     "subseries": "Squad",
     "name": "Harley Quinn",
     "title": "Squad — Harley Quinn",
@@ -286,7 +286,7 @@
     "sortOrder": 21
   },
   {
-    "popNumber": null,
+    "popNumber": 142,
     "subseries": "Horoes",
     "name": "Earth 1 Batman",
     "title": "Horoes — Earth 1 Batman",
@@ -299,7 +299,7 @@
     "sortOrder": 22
   },
   {
-    "popNumber": null,
+    "popNumber": 144,
     "subseries": "Horoes",
     "name": "Batman",
     "title": "Horoes — Batman",
@@ -312,7 +312,7 @@
     "sortOrder": 23
   },
   {
-    "popNumber": null,
+    "popNumber": 155,
     "subseries": "The Animated Series",
     "name": "The Joker",
     "title": "The Animated Series — The Joker",
@@ -325,7 +325,7 @@
     "sortOrder": 24
   },
   {
-    "popNumber": null,
+    "popNumber": 166,
     "subseries": "Bombshells",
     "name": "Harley Quinn",
     "title": "Bombshells — Harley Quinn",
@@ -338,7 +338,7 @@
     "sortOrder": 25
   },
   {
-    "popNumber": null,
+    "popNumber": 167,
     "subseries": "DC Comics Awareness Bombshell",
     "name": "Wonder Woman",
     "title": "DC Comics Awareness Bombshell — Wonder Woman",
@@ -351,7 +351,7 @@
     "sortOrder": 26
   },
   {
-    "popNumber": null,
+    "popNumber": 172,
     "subseries": "Woman",
     "name": "Wonder Woman",
     "title": "Woman — Wonder Woman",
@@ -364,7 +364,7 @@
     "sortOrder": 27
   },
   {
-    "popNumber": null,
+    "popNumber": 174,
     "subseries": "Woman",
     "name": "Hippolyta",
     "title": "Woman — Hippolyta",
@@ -377,7 +377,7 @@
     "sortOrder": 28
   },
   {
-    "popNumber": null,
+    "popNumber": 181,
     "subseries": "Woman",
     "name": "Wonder Woman",
     "title": "Woman — Wonder Woman",
@@ -390,7 +390,7 @@
     "sortOrder": 29
   },
   {
-    "popNumber": null,
+    "popNumber": 209,
     "subseries": "League",
     "name": "Cyborg",
     "title": "League — Cyborg",
@@ -403,7 +403,7 @@
     "sortOrder": 30
   },
   {
-    "popNumber": null,
+    "popNumber": 221,
     "subseries": "Bombshells",
     "name": "Batwoman",
     "title": "Bombshells — Batwoman",
@@ -416,7 +416,7 @@
     "sortOrder": 31
   },
   {
-    "popNumber": null,
+    "popNumber": 222,
     "subseries": "Bombshells",
     "name": "Supergirl",
     "title": "Bombshells — Supergirl",
@@ -429,7 +429,7 @@
     "sortOrder": 32
   },
   {
-    "popNumber": null,
+    "popNumber": 223,
     "subseries": "Bombshells",
     "name": "Hawkgirl",
     "title": "Bombshells — Hawkgirl",
@@ -442,7 +442,7 @@
     "sortOrder": 33
   },
   {
-    "popNumber": null,
+    "popNumber": 225,
     "subseries": "Bombshells",
     "name": "Catwoman",
     "title": "Bombshells — Catwoman",
@@ -481,7 +481,7 @@
     "sortOrder": 36
   },
   {
-    "popNumber": null,
+    "popNumber": 263,
     "subseries": "",
     "name": "Eugene",
     "title": "Eugene",
@@ -494,7 +494,7 @@
     "sortOrder": 37
   },
   {
-    "popNumber": null,
+    "popNumber": 264,
     "subseries": "",
     "name": "Darla",
     "title": "Darla",
@@ -507,7 +507,7 @@
     "sortOrder": 38
   },
   {
-    "popNumber": null,
+    "popNumber": 265,
     "subseries": "",
     "name": "Pedro",
     "title": "Pedro",
@@ -520,7 +520,7 @@
     "sortOrder": 39
   },
   {
-    "popNumber": null,
+    "popNumber": 275,
     "subseries": "Horoes",
     "name": "Batman",
     "title": "Horoes — Batman",
@@ -546,7 +546,7 @@
     "sortOrder": 41
   },
   {
-    "popNumber": null,
+    "popNumber": 285,
     "subseries": "Horoes",
     "name": "Huntress",
     "title": "Horoes — Huntress",
@@ -559,7 +559,7 @@
     "sortOrder": 42
   },
   {
-    "popNumber": null,
+    "popNumber": 289,
     "subseries": "80th",
     "name": "Batman (1995)",
     "title": "80th — Batman (1995)",
@@ -572,7 +572,7 @@
     "sortOrder": 43
   },
   {
-    "popNumber": null,
+    "popNumber": 292,
     "subseries": "80th",
     "name": "Batman The Joker is Wild",
     "title": "80th — Batman The Joker is Wild",
@@ -585,7 +585,7 @@
     "sortOrder": 44
   },
   {
-    "popNumber": null,
+    "popNumber": 305,
     "subseries": "Prey",
     "name": "Huntress",
     "title": "Prey — Huntress",
@@ -598,7 +598,7 @@
     "sortOrder": 45
   },
   {
-    "popNumber": null,
+    "popNumber": 307,
     "subseries": "Prey",
     "name": "Harley Quinn",
     "title": "Prey — Harley Quinn",
@@ -611,7 +611,7 @@
     "sortOrder": 46
   },
   {
-    "popNumber": null,
+    "popNumber": 314,
     "subseries": "80th",
     "name": "Batman (1997)",
     "title": "80th — Batman (1997)",
@@ -637,7 +637,7 @@
     "sortOrder": 48
   },
   {
-    "popNumber": null,
+    "popNumber": 327,
     "subseries": "Woman 1984",
     "name": "Barbara Minerva",
     "title": "Woman 1984 — Barbara Minerva",
@@ -650,7 +650,7 @@
     "sortOrder": 49
   },
   {
-    "popNumber": null,
+    "popNumber": 328,
     "subseries": "Woman 1984",
     "name": "The Cheetah",
     "title": "Woman 1984 — The Cheetah",
@@ -663,7 +663,7 @@
     "sortOrder": 50
   },
   {
-    "popNumber": null,
+    "popNumber": 337,
     "subseries": "",
     "name": "The Joker",
     "title": "The Joker",
@@ -689,7 +689,7 @@
     "sortOrder": 52
   },
   {
-    "popNumber": null,
+    "popNumber": 369,
     "subseries": "",
     "name": "Batman",
     "title": "Batman",
@@ -702,7 +702,7 @@
     "sortOrder": 53
   },
   {
-    "popNumber": null,
+    "popNumber": 374,
     "subseries": "",
     "name": "Imperial Palace Batman",
     "title": "Imperial Palace Batman",
@@ -715,7 +715,7 @@
     "sortOrder": 54
   },
   {
-    "popNumber": null,
+    "popNumber": 374,
     "subseries": "",
     "name": "Imperial Palace Batman",
     "title": "Imperial Palace Batman",
@@ -780,7 +780,7 @@
     "sortOrder": 59
   },
   {
-    "popNumber": null,
+    "popNumber": 383,
     "subseries": "Woman 80th",
     "name": "Wonder Woman Golden Age",
     "title": "Woman 80th — Wonder Woman Golden Age",
@@ -806,7 +806,7 @@
     "sortOrder": 61
   },
   {
-    "popNumber": null,
+    "popNumber": 391,
     "subseries": "Woman 80th",
     "name": "Wonder Woman The Contest",
     "title": "Woman 80th — Wonder Woman The Contest",
@@ -819,7 +819,7 @@
     "sortOrder": 62
   },
   {
-    "popNumber": null,
+    "popNumber": 399,
     "subseries": "Palace",
     "name": "Martian Manhunter",
     "title": "Palace — Martian Manhunter",
@@ -832,7 +832,7 @@
     "sortOrder": 63
   },
   {
-    "popNumber": null,
+    "popNumber": 400,
     "subseries": "Palace",
     "name": "Green Lantern",
     "title": "Palace — Green Lantern",
@@ -845,7 +845,7 @@
     "sortOrder": 64
   },
   {
-    "popNumber": null,
+    "popNumber": 401,
     "subseries": "Palace",
     "name": "The Flash",
     "title": "Palace — The Flash",
@@ -858,7 +858,7 @@
     "sortOrder": 65
   },
   {
-    "popNumber": null,
+    "popNumber": 401,
     "subseries": "Palace",
     "name": "The Flash",
     "title": "Palace — The Flash",
@@ -871,7 +871,7 @@
     "sortOrder": 66
   },
   {
-    "popNumber": null,
+    "popNumber": 402,
     "subseries": "Palace",
     "name": "Superman",
     "title": "Palace — Superman",
@@ -884,7 +884,7 @@
     "sortOrder": 67
   },
   {
-    "popNumber": null,
+    "popNumber": 402,
     "subseries": "Palace",
     "name": "Superman",
     "title": "Palace — Superman",
@@ -897,7 +897,7 @@
     "sortOrder": 68
   },
   {
-    "popNumber": null,
+    "popNumber": 402,
     "subseries": "Palace",
     "name": "Superman",
     "title": "Palace — Superman",
@@ -923,7 +923,7 @@
     "sortOrder": 70
   },
   {
-    "popNumber": null,
+    "popNumber": 409,
     "subseries": "De Los DC",
     "name": "Batman",
     "title": "De Los DC — Batman",
@@ -962,7 +962,7 @@
     "sortOrder": 73
   },
   {
-    "popNumber": null,
+    "popNumber": 426,
     "subseries": "Lightning",
     "name": "Black Lightning",
     "title": "Lightning — Black Lightning",
@@ -975,7 +975,7 @@
     "sortOrder": 74
   },
   {
-    "popNumber": null,
+    "popNumber": 427,
     "subseries": "Lightning",
     "name": "Lightning",
     "title": "Lightning — Lightning",
@@ -988,7 +988,7 @@
     "sortOrder": 75
   },
   {
-    "popNumber": null,
+    "popNumber": 428,
     "subseries": "Lightning",
     "name": "Thunder",
     "title": "Lightning — Thunder",
@@ -1001,7 +1001,7 @@
     "sortOrder": 76
   },
   {
-    "popNumber": null,
+    "popNumber": 429,
     "subseries": "Lightning",
     "name": "Tobias Whale",
     "title": "Lightning — Tobias Whale",
@@ -1014,7 +1014,7 @@
     "sortOrder": 77
   },
   {
-    "popNumber": null,
+    "popNumber": 430,
     "subseries": "Woman",
     "name": "Wonder Woman",
     "title": "Woman — Wonder Woman",
@@ -1027,7 +1027,7 @@
     "sortOrder": 78
   },
   {
-    "popNumber": null,
+    "popNumber": 431,
     "subseries": "Woman",
     "name": "Flashpoint",
     "title": "Woman — Flashpoint",
@@ -1040,7 +1040,7 @@
     "sortOrder": 79
   },
   {
-    "popNumber": null,
+    "popNumber": 432,
     "subseries": "",
     "name": "Two-Face",
     "title": "Two-Face",
@@ -1053,7 +1053,7 @@
     "sortOrder": 80
   },
   {
-    "popNumber": null,
+    "popNumber": 433,
     "subseries": "Woman",
     "name": "Wonder Woman Classic With Cape",
     "title": "Woman — Wonder Woman Classic With Cape",
@@ -1066,7 +1066,7 @@
     "sortOrder": 81
   },
   {
-    "popNumber": null,
+    "popNumber": 444,
     "subseries": "",
     "name": "Batman(GB)",
     "title": "Batman(GB)",

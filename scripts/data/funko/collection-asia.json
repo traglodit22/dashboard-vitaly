@@ -1,6 +1,6 @@
 [
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "",
     "name": "Jin Tong & Yu Nu",
     "title": "Jin Tong & Yu Nu",
@@ -13,7 +13,7 @@
     "sortOrder": 0
   },
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "",
     "name": "Jing & Chou",
     "title": "Jing & Chou",
@@ -26,7 +26,7 @@
     "sortOrder": 1
   },
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "",
     "name": "Sheng & Dan",
     "title": "Sheng & Dan",
@@ -39,7 +39,7 @@
     "sortOrder": 2
   },
   {
-    "popNumber": null,
+    "popNumber": 1,
     "subseries": "King",
     "name": "Monkey King",
     "title": "King — Monkey King",
@@ -52,7 +52,7 @@
     "sortOrder": 3
   },
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "King",
     "name": "Monk Tang",
     "title": "King — Monk Tang",
@@ -65,7 +65,7 @@
     "sortOrder": 4
   },
   {
-    "popNumber": null,
+    "popNumber": 3,
     "subseries": "King",
     "name": "Pigsy",
     "title": "King — Pigsy",
@@ -78,7 +78,7 @@
     "sortOrder": 5
   },
   {
-    "popNumber": null,
+    "popNumber": 5,
     "subseries": "King",
     "name": "Monk Sha",
     "title": "King — Monk Sha",
@@ -91,7 +91,7 @@
     "sortOrder": 6
   },
   {
-    "popNumber": null,
+    "popNumber": 37,
     "subseries": "",
     "name": "Manny Pacquiao",
     "title": "Manny Pacquiao",
@@ -104,7 +104,7 @@
     "sortOrder": 7
   },
   {
-    "popNumber": null,
+    "popNumber": 82,
     "subseries": "Creatures & Myths",
     "name": "Kuchisake",
     "title": "Creatures & Myths — Kuchisake",
@@ -169,7 +169,7 @@
     "sortOrder": 12
   },
   {
-    "popNumber": null,
+    "popNumber": 119,
     "subseries": "",
     "name": "Cao Cao",
     "title": "Cao Cao",
@@ -182,7 +182,7 @@
     "sortOrder": 13
   },
   {
-    "popNumber": null,
+    "popNumber": 120,
     "subseries": "",
     "name": "Guan Yu",
     "title": "Guan Yu",
@@ -195,7 +195,7 @@
     "sortOrder": 14
   },
   {
-    "popNumber": null,
+    "popNumber": 121,
     "subseries": "",
     "name": "Lu Bu",
     "title": "Lu Bu",
@@ -247,7 +247,7 @@
     "sortOrder": 18
   },
   {
-    "popNumber": null,
+    "popNumber": 128,
     "subseries": "",
     "name": "Song Jiang",
     "title": "Song Jiang",
@@ -312,7 +312,7 @@
     "sortOrder": 23
   },
   {
-    "popNumber": null,
+    "popNumber": 136,
     "subseries": "Classics",
     "name": "Lady Green Snake",
     "title": "Classics — Lady Green Snake",
@@ -390,7 +390,7 @@
     "sortOrder": 29
   },
   {
-    "popNumber": null,
+    "popNumber": 159,
     "subseries": "Classics",
     "name": "Moon Rabbit",
     "title": "Classics — Moon Rabbit",
@@ -403,7 +403,7 @@
     "sortOrder": 30
   },
   {
-    "popNumber": null,
+    "popNumber": 160,
     "subseries": "Impact",
     "name": "Aether",
     "title": "Impact — Aether",
@@ -455,7 +455,7 @@
     "sortOrder": 34
   },
   {
-    "popNumber": null,
+    "popNumber": 165,
     "subseries": "Armor",
     "name": "Qing",
     "title": "Armor — Qing",
@@ -468,7 +468,7 @@
     "sortOrder": 35
   },
   {
-    "popNumber": null,
+    "popNumber": 166,
     "subseries": "Classics",
     "name": "Jiang Ziya",
     "title": "Classics — Jiang Ziya",
@@ -559,7 +559,7 @@
     "sortOrder": 42
   },
   {
-    "popNumber": null,
+    "popNumber": 174,
     "subseries": "",
     "name": "Chouchou",
     "title": "Chouchou",
@@ -585,7 +585,7 @@
     "sortOrder": 44
   },
   {
-    "popNumber": null,
+    "popNumber": 176,
     "subseries": "",
     "name": "Chouchou",
     "title": "Chouchou",
@@ -598,7 +598,7 @@
     "sortOrder": 45
   },
   {
-    "popNumber": null,
+    "popNumber": 177,
     "subseries": "",
     "name": "Chouchou",
     "title": "Chouchou",
@@ -650,7 +650,7 @@
     "sortOrder": 49
   },
   {
-    "popNumber": null,
+    "popNumber": 185,
     "subseries": "Control",
     "name": "The Operator",
     "title": "Control — The Operator",
@@ -663,7 +663,7 @@
     "sortOrder": 50
   },
   {
-    "popNumber": null,
+    "popNumber": 186,
     "subseries": "Control",
     "name": "Payload Specialist",
     "title": "Control — Payload Specialist",
@@ -676,7 +676,7 @@
     "sortOrder": 51
   },
   {
-    "popNumber": null,
+    "popNumber": 187,
     "subseries": "Control",
     "name": "Flight Engineer",
     "title": "Control — Flight Engineer",
@@ -689,7 +689,7 @@
     "sortOrder": 52
   },
   {
-    "popNumber": null,
+    "popNumber": 188,
     "subseries": "",
     "name": "The Commander",
     "title": "The Commander",
@@ -715,7 +715,7 @@
     "sortOrder": 54
   },
   {
-    "popNumber": null,
+    "popNumber": 196,
     "subseries": "Classics",
     "name": "Chang E",
     "title": "Classics — Chang E",
@@ -728,7 +728,7 @@
     "sortOrder": 55
   },
   {
-    "popNumber": null,
+    "popNumber": 202,
     "subseries": "",
     "name": "Liu Bei",
     "title": "Liu Bei",
@@ -741,7 +741,7 @@
     "sortOrder": 56
   },
   {
-    "popNumber": null,
+    "popNumber": 205,
     "subseries": "",
     "name": "Sun Quan",
     "title": "Sun Quan",
@@ -754,7 +754,7 @@
     "sortOrder": 57
   },
   {
-    "popNumber": null,
+    "popNumber": 207,
     "subseries": "",
     "name": "Smurfette",
     "title": "Smurfette",
@@ -767,7 +767,7 @@
     "sortOrder": 58
   },
   {
-    "popNumber": null,
+    "popNumber": 209,
     "subseries": "",
     "name": "Hefty Smurf",
     "title": "Hefty Smurf",
@@ -897,7 +897,7 @@
     "sortOrder": 68
   },
   {
-    "popNumber": null,
+    "popNumber": 236,
     "subseries": "So",
     "name": "Beggar So",
     "title": "So — Beggar So",

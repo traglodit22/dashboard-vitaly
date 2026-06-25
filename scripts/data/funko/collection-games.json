@@ -13,7 +13,7 @@
     "sortOrder": 0
   },
   {
-    "popNumber": null,
+    "popNumber": 33,
     "subseries": "",
     "name": "Murloc",
     "title": "Murloc",
@@ -26,7 +26,7 @@
     "sortOrder": 1
   },
   {
-    "popNumber": null,
+    "popNumber": 42,
     "subseries": "",
     "name": "Handsome Jack",
     "title": "Handsome Jack",
@@ -39,7 +39,7 @@
     "sortOrder": 2
   },
   {
-    "popNumber": null,
+    "popNumber": 43,
     "subseries": "",
     "name": "Mad Moxxi",
     "title": "Mad Moxxi",
@@ -52,7 +52,7 @@
     "sortOrder": 3
   },
   {
-    "popNumber": null,
+    "popNumber": 45,
     "subseries": "",
     "name": "Psycho",
     "title": "Psycho",
@@ -65,7 +65,7 @@
     "sortOrder": 4
   },
   {
-    "popNumber": null,
+    "popNumber": 47,
     "subseries": "",
     "name": "Lone Wanderer",
     "title": "Lone Wanderer",
@@ -78,7 +78,7 @@
     "sortOrder": 5
   },
   {
-    "popNumber": null,
+    "popNumber": 48,
     "subseries": "",
     "name": "Lone Wanderer",
     "title": "Lone Wanderer",
@@ -91,7 +91,7 @@
     "sortOrder": 6
   },
   {
-    "popNumber": null,
+    "popNumber": 51,
     "subseries": "",
     "name": "Super Mutant",
     "title": "Super Mutant",
@@ -104,7 +104,7 @@
     "sortOrder": 7
   },
   {
-    "popNumber": null,
+    "popNumber": 53,
     "subseries": "",
     "name": "Vault Boy",
     "title": "Vault Boy",
@@ -117,7 +117,7 @@
     "sortOrder": 8
   },
   {
-    "popNumber": null,
+    "popNumber": 89,
     "subseries": "III",
     "name": "Red Knight",
     "title": "III — Red Knight",
@@ -130,7 +130,7 @@
     "sortOrder": 9
   },
   {
-    "popNumber": null,
+    "popNumber": 92,
     "subseries": "",
     "name": "Tracer",
     "title": "Tracer",
@@ -143,7 +143,7 @@
     "sortOrder": 10
   },
   {
-    "popNumber": null,
+    "popNumber": 94,
     "subseries": "",
     "name": "Widowmaker",
     "title": "Widowmaker",
@@ -156,7 +156,7 @@
     "sortOrder": 11
   },
   {
-    "popNumber": null,
+    "popNumber": 97,
     "subseries": "",
     "name": "Winston",
     "title": "Winston",
@@ -182,7 +182,7 @@
     "sortOrder": 13
   },
   {
-    "popNumber": null,
+    "popNumber": 104,
     "subseries": "",
     "name": "Proto Man",
     "title": "Proto Man",
@@ -195,7 +195,7 @@
     "sortOrder": 14
   },
   {
-    "popNumber": null,
+    "popNumber": 113,
     "subseries": "War",
     "name": "Clayton Carmine",
     "title": "War — Clayton Carmine",
@@ -208,7 +208,7 @@
     "sortOrder": 15
   },
   {
-    "popNumber": null,
+    "popNumber": 114,
     "subseries": "War",
     "name": "Jd Fenix",
     "title": "War — Jd Fenix",
@@ -221,7 +221,7 @@
     "sortOrder": 16
   },
   {
-    "popNumber": null,
+    "popNumber": 123,
     "subseries": "2",
     "name": "Outsider",
     "title": "2 — Outsider",
@@ -234,7 +234,7 @@
     "sortOrder": 17
   },
   {
-    "popNumber": null,
+    "popNumber": 140,
     "subseries": "",
     "name": "Blanka",
     "title": "Blanka",
@@ -247,7 +247,7 @@
     "sortOrder": 18
   },
   {
-    "popNumber": null,
+    "popNumber": 150,
     "subseries": "Wild Hunt III",
     "name": "Ciri",
     "title": "Wild Hunt III — Ciri",
@@ -260,7 +260,7 @@
     "sortOrder": 19
   },
   {
-    "popNumber": null,
+    "popNumber": 151,
     "subseries": "Wild Hunt III",
     "name": "Eredin",
     "title": "Wild Hunt III — Eredin",
@@ -273,7 +273,7 @@
     "sortOrder": 20
   },
   {
-    "popNumber": null,
+    "popNumber": 152,
     "subseries": "Wild Hunt III",
     "name": "Yennefer",
     "title": "Wild Hunt III — Yennefer",
@@ -286,7 +286,7 @@
     "sortOrder": 21
   },
   {
-    "popNumber": null,
+    "popNumber": 178,
     "subseries": "",
     "name": "Reinhardt",
     "title": "Reinhardt",
@@ -299,7 +299,7 @@
     "sortOrder": 22
   },
   {
-    "popNumber": null,
+    "popNumber": 181,
     "subseries": "",
     "name": "Symmetra",
     "title": "Symmetra",
@@ -312,7 +312,7 @@
     "sortOrder": 23
   },
   {
-    "popNumber": null,
+    "popNumber": 192,
     "subseries": "",
     "name": "Ryu",
     "title": "Ryu",
@@ -325,7 +325,7 @@
     "sortOrder": 24
   },
   {
-    "popNumber": null,
+    "popNumber": 237,
     "subseries": "",
     "name": "Zavala",
     "title": "Zavala",
@@ -338,7 +338,7 @@
     "sortOrder": 25
   },
   {
-    "popNumber": null,
+    "popNumber": 254,
     "subseries": "X",
     "name": "Raiden",
     "title": "X — Raiden",
@@ -351,7 +351,7 @@
     "sortOrder": 26
   },
   {
-    "popNumber": null,
+    "popNumber": 273,
     "subseries": "",
     "name": "Crash Bandicoot",
     "title": "Crash Bandicoot",
@@ -364,7 +364,7 @@
     "sortOrder": 27
   },
   {
-    "popNumber": null,
+    "popNumber": 278,
     "subseries": "Guardians of The Galaxy",
     "name": "Hala the Accuser",
     "title": "Guardians of The Galaxy — Hala the Accuser",
@@ -377,7 +377,7 @@
     "sortOrder": 28
   },
   {
-    "popNumber": null,
+    "popNumber": 283,
     "subseries": "Hedgehog",
     "name": "Sonic with Ring",
     "title": "Hedgehog — Sonic with Ring",
@@ -390,7 +390,7 @@
     "sortOrder": 29
   },
   {
-    "popNumber": null,
+    "popNumber": 284,
     "subseries": "Hedgehog",
     "name": "Sonic with Emerald",
     "title": "Hedgehog — Sonic with Emerald",
@@ -403,7 +403,7 @@
     "sortOrder": 30
   },
   {
-    "popNumber": null,
+    "popNumber": 285,
     "subseries": "Hedgehog",
     "name": "",
     "title": "Hedgehog",
@@ -416,7 +416,7 @@
     "sortOrder": 31
   },
   {
-    "popNumber": null,
+    "popNumber": 287,
     "subseries": "Hedgehog",
     "name": "",
     "title": "Hedgehog",
@@ -429,7 +429,7 @@
     "sortOrder": 32
   },
   {
-    "popNumber": null,
+    "popNumber": 288,
     "subseries": "Hedgehog",
     "name": "Shadow with Chao",
     "title": "Hedgehog — Shadow with Chao",
@@ -442,7 +442,7 @@
     "sortOrder": 33
   },
   {
-    "popNumber": null,
+    "popNumber": 300,
     "subseries": "Contest of Champions",
     "name": "Venompool",
     "title": "Contest of Champions — Venompool",
@@ -468,7 +468,7 @@
     "sortOrder": 35
   },
   {
-    "popNumber": null,
+    "popNumber": 316,
     "subseries": "",
     "name": "Steve",
     "title": "Steve",
@@ -481,7 +481,7 @@
     "sortOrder": 36
   },
   {
-    "popNumber": null,
+    "popNumber": 319,
     "subseries": "",
     "name": "Skeleton",
     "title": "Skeleton",
@@ -494,7 +494,7 @@
     "sortOrder": 37
   },
   {
-    "popNumber": null,
+    "popNumber": 320,
     "subseries": "",
     "name": "Creeper",
     "title": "Creeper",
@@ -507,7 +507,7 @@
     "sortOrder": 38
   },
   {
-    "popNumber": null,
+    "popNumber": 334,
     "subseries": "",
     "name": "Spider-Man",
     "title": "Spider-Man",
@@ -520,7 +520,7 @@
     "sortOrder": 39
   },
   {
-    "popNumber": null,
+    "popNumber": 353,
     "subseries": "",
     "name": "Pikachu",
     "title": "Pikachu",
@@ -533,7 +533,7 @@
     "sortOrder": 40
   },
   {
-    "popNumber": null,
+    "popNumber": 426,
     "subseries": "",
     "name": "Black Knight",
     "title": "Black Knight",
@@ -546,7 +546,7 @@
     "sortOrder": 41
   },
   {
-    "popNumber": null,
+    "popNumber": 427,
     "subseries": "",
     "name": "Brite Bomber",
     "title": "Brite Bomber",
@@ -559,7 +559,7 @@
     "sortOrder": 42
   },
   {
-    "popNumber": null,
+    "popNumber": 434,
     "subseries": "",
     "name": "Moonwalker",
     "title": "Moonwalker",
@@ -572,7 +572,7 @@
     "sortOrder": 43
   },
   {
-    "popNumber": null,
+    "popNumber": 443,
     "subseries": "",
     "name": "Rex",
     "title": "Rex",
@@ -585,7 +585,7 @@
     "sortOrder": 44
   },
   {
-    "popNumber": null,
+    "popNumber": 453,
     "subseries": "",
     "name": "Bulbasaur",
     "title": "Bulbasaur",
@@ -598,7 +598,7 @@
     "sortOrder": 45
   },
   {
-    "popNumber": null,
+    "popNumber": 455,
     "subseries": "",
     "name": "Charmander",
     "title": "Charmander",
@@ -611,7 +611,7 @@
     "sortOrder": 46
   },
   {
-    "popNumber": null,
+    "popNumber": 462,
     "subseries": "",
     "name": "Tricera Ops",
     "title": "Tricera Ops",
@@ -624,7 +624,7 @@
     "sortOrder": 47
   },
   {
-    "popNumber": null,
+    "popNumber": 463,
     "subseries": "",
     "name": "Valor",
     "title": "Valor",
@@ -637,7 +637,7 @@
     "sortOrder": 48
   },
   {
-    "popNumber": null,
+    "popNumber": 504,
     "subseries": "",
     "name": "Squirtle Silver",
     "title": "Squirtle Silver",
@@ -650,7 +650,7 @@
     "sortOrder": 49
   },
   {
-    "popNumber": null,
+    "popNumber": 510,
     "subseries": "",
     "name": "Loot Llama",
     "title": "Loot Llama",
@@ -663,7 +663,7 @@
     "sortOrder": 50
   },
   {
-    "popNumber": null,
+    "popNumber": 550,
     "subseries": "",
     "name": "Tracer",
     "title": "Tracer",
@@ -676,7 +676,7 @@
     "sortOrder": 51
   },
   {
-    "popNumber": null,
+    "popNumber": 551,
     "subseries": "",
     "name": "Genji",
     "title": "Genji",
@@ -689,7 +689,7 @@
     "sortOrder": 52
   },
   {
-    "popNumber": null,
+    "popNumber": 553,
     "subseries": "",
     "name": "Pikachu",
     "title": "Pikachu",
@@ -715,7 +715,7 @@
     "sortOrder": 54
   },
   {
-    "popNumber": null,
+    "popNumber": 571,
     "subseries": "",
     "name": "Immortal Shrouded",
     "title": "Immortal Shrouded",
@@ -728,7 +728,7 @@
     "sortOrder": 55
   },
   {
-    "popNumber": null,
+    "popNumber": 572,
     "subseries": "",
     "name": "Goon Squad",
     "title": "Goon Squad",
@@ -741,7 +741,7 @@
     "sortOrder": 56
   },
   {
-    "popNumber": null,
+    "popNumber": 577,
     "subseries": "",
     "name": "Eevee",
     "title": "Eevee",
@@ -754,7 +754,7 @@
     "sortOrder": 57
   },
   {
-    "popNumber": null,
+    "popNumber": 580,
     "subseries": "",
     "name": "Vulpix",
     "title": "Vulpix",
@@ -767,7 +767,7 @@
     "sortOrder": 58
   },
   {
-    "popNumber": null,
+    "popNumber": 581,
     "subseries": "",
     "name": "Mewtwo",
     "title": "Mewtwo",
@@ -780,7 +780,7 @@
     "sortOrder": 59
   },
   {
-    "popNumber": null,
+    "popNumber": 582,
     "subseries": "",
     "name": "Mr.Mime",
     "title": "Mr.Mime",
@@ -793,7 +793,7 @@
     "sortOrder": 60
   },
   {
-    "popNumber": null,
+    "popNumber": 590,
     "subseries": "",
     "name": "Johnny Silverhand",
     "title": "Johnny Silverhand",
@@ -819,7 +819,7 @@
     "sortOrder": 62
   },
   {
-    "popNumber": null,
+    "popNumber": 616,
     "subseries": "",
     "name": "Blackheart",
     "title": "Blackheart",
@@ -832,7 +832,7 @@
     "sortOrder": 63
   },
   {
-    "popNumber": null,
+    "popNumber": 618,
     "subseries": "",
     "name": "The Scientist",
     "title": "The Scientist",
@@ -845,7 +845,7 @@
     "sortOrder": 64
   },
   {
-    "popNumber": null,
+    "popNumber": 620,
     "subseries": "",
     "name": "Joel",
     "title": "Joel",
@@ -858,7 +858,7 @@
     "sortOrder": 65
   },
   {
-    "popNumber": null,
+    "popNumber": 627,
     "subseries": "",
     "name": "Vaporeon",
     "title": "Vaporeon",
@@ -871,7 +871,7 @@
     "sortOrder": 66
   },
   {
-    "popNumber": null,
+    "popNumber": 628,
     "subseries": "",
     "name": "Jolteon",
     "title": "Jolteon",
@@ -884,7 +884,7 @@
     "sortOrder": 67
   },
   {
-    "popNumber": null,
+    "popNumber": 631,
     "subseries": "",
     "name": "Clicker",
     "title": "Clicker",
@@ -897,7 +897,7 @@
     "sortOrder": 68
   },
   {
-    "popNumber": null,
+    "popNumber": 632,
     "subseries": "Hedgehog",
     "name": "Classic Sonic",
     "title": "Hedgehog — Classic Sonic",
@@ -910,7 +910,7 @@
     "sortOrder": 69
   },
   {
-    "popNumber": null,
+    "popNumber": 633,
     "subseries": "Hedgehog",
     "name": "Silver",
     "title": "Hedgehog — Silver",
@@ -923,7 +923,7 @@
     "sortOrder": 70
   },
   {
-    "popNumber": null,
+    "popNumber": 644,
     "subseries": "",
     "name": "Ponyta",
     "title": "Ponyta",
@@ -936,7 +936,7 @@
     "sortOrder": 71
   },
   {
-    "popNumber": null,
+    "popNumber": 781,
     "subseries": "",
     "name": "Psyduck",
     "title": "Psyduck",
@@ -949,7 +949,7 @@
     "sortOrder": 72
   },
   {
-    "popNumber": null,
+    "popNumber": 783,
     "subseries": "",
     "name": "Sly Cooper",
     "title": "Sly Cooper",
@@ -962,7 +962,7 @@
     "sortOrder": 73
   },
   {
-    "popNumber": null,
+    "popNumber": 843,
     "subseries": "",
     "name": "Charizard",
     "title": "Charizard",
@@ -975,7 +975,7 @@
     "sortOrder": 74
   },
   {
-    "popNumber": null,
+    "popNumber": 854,
     "subseries": "Hedgehog",
     "name": "Knuckles",
     "title": "Hedgehog — Knuckles",
@@ -988,7 +988,7 @@
     "sortOrder": 75
   },
   {
-    "popNumber": null,
+    "popNumber": 855,
     "subseries": "",
     "name": "Alakazam",
     "title": "Alakazam",
@@ -1001,7 +1001,7 @@
     "sortOrder": 76
   },
   {
-    "popNumber": null,
+    "popNumber": 856,
     "subseries": "",
     "name": "Lucario",
     "title": "Lucario",
@@ -1014,7 +1014,7 @@
     "sortOrder": 77
   },
   {
-    "popNumber": null,
+    "popNumber": 858,
     "subseries": "Wonderland",
     "name": "Tiny Tina",
     "title": "Wonderland — Tiny Tina",
@@ -1027,7 +1027,7 @@
     "sortOrder": 78
   },
   {
-    "popNumber": null,
+    "popNumber": 859,
     "subseries": "Wonderland",
     "name": "Butt Stallion",
     "title": "Wonderland — Butt Stallion",
@@ -1040,7 +1040,7 @@
     "sortOrder": 79
   },
   {
-    "popNumber": null,
+    "popNumber": 860,
     "subseries": "Wonderland",
     "name": "Dragon Lord",
     "title": "Wonderland — Dragon Lord",
@@ -1053,7 +1053,7 @@
     "sortOrder": 80
   },
   {
-    "popNumber": null,
+    "popNumber": 861,
     "subseries": "Wonderland",
     "name": "Paladin Mike",
     "title": "Wonderland — Paladin Mike",
@@ -1066,7 +1066,7 @@
     "sortOrder": 81
   },
   {
-    "popNumber": null,
+    "popNumber": 864,
     "subseries": "",
     "name": "Lapras",
     "title": "Lapras",
@@ -1079,7 +1079,7 @@
     "sortOrder": 82
   },
   {
-    "popNumber": null,
+    "popNumber": 874,
     "subseries": "",
     "name": "Ashley",
     "title": "Ashley",
@@ -1092,7 +1092,7 @@
     "sortOrder": 83
   },
   {
-    "popNumber": null,
+    "popNumber": 886,
     "subseries": "",
     "name": "Oshawott",
     "title": "Oshawott",
@@ -1105,7 +1105,7 @@
     "sortOrder": 84
   },
   {
-    "popNumber": null,
+    "popNumber": 891,
     "subseries": "Knights",
     "name": "Red Hood",
     "title": "Knights — Red Hood",
@@ -1118,7 +1118,7 @@
     "sortOrder": 85
   },
   {
-    "popNumber": null,
+    "popNumber": 893,
     "subseries": "Knights",
     "name": "Batgirl",
     "title": "Knights — Batgirl",
@@ -1131,7 +1131,7 @@
     "sortOrder": 86
   },
   {
-    "popNumber": null,
+    "popNumber": 901,
     "subseries": "Creed",
     "name": "Altair",
     "title": "Creed — Altair",
@@ -1144,7 +1144,7 @@
     "sortOrder": 87
   },
   {
-    "popNumber": null,
+    "popNumber": 902,
     "subseries": "",
     "name": "Reaper",
     "title": "Reaper",
@@ -1157,7 +1157,7 @@
     "sortOrder": 88
   },
   {
-    "popNumber": null,
+    "popNumber": 903,
     "subseries": "",
     "name": "Echo",
     "title": "Echo",
@@ -1170,7 +1170,7 @@
     "sortOrder": 89
   },
   {
-    "popNumber": null,
+    "popNumber": 904,
     "subseries": "",
     "name": "Cassidy",
     "title": "Cassidy",
@@ -1222,7 +1222,7 @@
     "sortOrder": 93
   },
   {
-    "popNumber": null,
+    "popNumber": 3,
     "subseries": "",
     "name": "Dark Wanderer",
     "title": "Dark Wanderer",

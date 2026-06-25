@@ -1,6 +1,6 @@
 [
   {
-    "popNumber": null,
+    "popNumber": 1,
     "subseries": "Thrones",
     "name": "Tyrion Lannister",
     "title": "Thrones — Tyrion Lannister",
@@ -13,7 +13,7 @@
     "sortOrder": 0
   },
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "Thrones",
     "name": "Ned Stark",
     "title": "Thrones — Ned Stark",
@@ -26,7 +26,7 @@
     "sortOrder": 1
   },
   {
-    "popNumber": null,
+    "popNumber": 3,
     "subseries": "Thrones",
     "name": "Daenerys Targaryen",
     "title": "Thrones — Daenerys Targaryen",
@@ -39,7 +39,7 @@
     "sortOrder": 2
   },
   {
-    "popNumber": null,
+    "popNumber": 4,
     "subseries": "Thrones",
     "name": "Khal Drogo",
     "title": "Thrones — Khal Drogo",
@@ -52,7 +52,7 @@
     "sortOrder": 3
   },
   {
-    "popNumber": null,
+    "popNumber": 6,
     "subseries": "Thrones",
     "name": "White Walker",
     "title": "Thrones — White Walker",
@@ -65,7 +65,7 @@
     "sortOrder": 4
   },
   {
-    "popNumber": null,
+    "popNumber": 9,
     "subseries": "Thrones",
     "name": "Arya Stark",
     "title": "Thrones — Arya Stark",
@@ -91,7 +91,7 @@
     "sortOrder": 6
   },
   {
-    "popNumber": null,
+    "popNumber": 16,
     "subseries": "Thrones",
     "name": "Drogon",
     "title": "Thrones — Drogon",
@@ -104,7 +104,7 @@
     "sortOrder": 7
   },
   {
-    "popNumber": null,
+    "popNumber": 16,
     "subseries": "Thrones",
     "name": "Drogon (Iron)",
     "title": "Thrones — Drogon (Iron)",
@@ -130,7 +130,7 @@
     "sortOrder": 9
   },
   {
-    "popNumber": null,
+    "popNumber": 19,
     "subseries": "Thrones",
     "name": "Ghost",
     "title": "Thrones — Ghost",
@@ -143,7 +143,7 @@
     "sortOrder": 10
   },
   {
-    "popNumber": null,
+    "popNumber": 21,
     "subseries": "Thrones",
     "name": "Tyrion Lannister",
     "title": "Thrones — Tyrion Lannister",
@@ -169,7 +169,7 @@
     "sortOrder": 12
   },
   {
-    "popNumber": null,
+    "popNumber": 24,
     "subseries": "Thrones",
     "name": "Daenerys Targaryen",
     "title": "Thrones — Daenerys Targaryen",
@@ -182,7 +182,7 @@
     "sortOrder": 13
   },
   {
-    "popNumber": null,
+    "popNumber": 34,
     "subseries": "Thrones",
     "name": "Viserion",
     "title": "Thrones — Viserion",
@@ -195,7 +195,7 @@
     "sortOrder": 14
   },
   {
-    "popNumber": null,
+    "popNumber": 38,
     "subseries": "Thrones БОЛЬШОЙ",
     "name": "Iron Throne",
     "title": "Thrones БОЛЬШОЙ — Iron Throne",
@@ -208,7 +208,7 @@
     "sortOrder": 15
   },
   {
-    "popNumber": null,
+    "popNumber": 44,
     "subseries": "Thrones",
     "name": "Night King",
     "title": "Thrones — Night King",
@@ -221,7 +221,7 @@
     "sortOrder": 16
   },
   {
-    "popNumber": null,
+    "popNumber": 47,
     "subseries": "Thrones",
     "name": "Rhaegal",
     "title": "Thrones — Rhaegal",
@@ -247,7 +247,7 @@
     "sortOrder": 18
   },
   {
-    "popNumber": null,
+    "popNumber": 58,
     "subseries": "Thrones БОЛЬШОЙ",
     "name": "Night King & Icy Viserion",
     "title": "Thrones БОЛЬШОЙ — Night King & Icy Viserion",
@@ -260,7 +260,7 @@
     "sortOrder": 19
   },
   {
-    "popNumber": null,
+    "popNumber": 66,
     "subseries": "Thrones",
     "name": "Yara Greyjoy",
     "title": "Thrones — Yara Greyjoy",
@@ -286,7 +286,7 @@
     "sortOrder": 21
   },
   {
-    "popNumber": null,
+    "popNumber": 71,
     "subseries": "Thrones БОЛЬШОЙ",
     "name": "Tyrion Lannister",
     "title": "Thrones БОЛЬШОЙ — Tyrion Lannister",
@@ -299,7 +299,7 @@
     "sortOrder": 22
   },
   {
-    "popNumber": null,
+    "popNumber": 75,
     "subseries": "Thrones БОЛЬШОЙ",
     "name": "Daenerys Targaryen",
     "title": "Thrones БОЛЬШОЙ — Daenerys Targaryen",
@@ -312,7 +312,7 @@
     "sortOrder": 23
   },
   {
-    "popNumber": null,
+    "popNumber": 76,
     "subseries": "Thrones",
     "name": "Arya Stark",
     "title": "Thrones — Arya Stark",
@@ -325,7 +325,7 @@
     "sortOrder": 24
   },
   {
-    "popNumber": null,
+    "popNumber": 76,
     "subseries": "Thrones",
     "name": "Nymeria",
     "title": "Thrones — Nymeria",
@@ -338,7 +338,7 @@
     "sortOrder": 25
   },
   {
-    "popNumber": null,
+    "popNumber": 77,
     "subseries": "Thrones",
     "name": "Missandei",
     "title": "Thrones — Missandei",
@@ -351,7 +351,7 @@
     "sortOrder": 26
   },
   {
-    "popNumber": null,
+    "popNumber": 84,
     "subseries": "Thrones",
     "name": "Night King",
     "title": "Thrones — Night King",
@@ -364,7 +364,7 @@
     "sortOrder": 27
   },
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "the Dragon",
     "name": "Viserys Targaryen",
     "title": "the Dragon — Viserys Targaryen",
@@ -377,7 +377,7 @@
     "sortOrder": 28
   },
   {
-    "popNumber": null,
+    "popNumber": 3,
     "subseries": "the Dragon",
     "name": "Alicent Hightower",
     "title": "the Dragon — Alicent Hightower",
@@ -390,7 +390,7 @@
     "sortOrder": 29
   },
   {
-    "popNumber": null,
+    "popNumber": 4,
     "subseries": "the Dragon",
     "name": "Corlys Velaryon",
     "title": "the Dragon — Corlys Velaryon",
@@ -403,7 +403,7 @@
     "sortOrder": 30
   },
   {
-    "popNumber": null,
+    "popNumber": 7,
     "subseries": "the Dragon",
     "name": "Syrax",
     "title": "the Dragon — Syrax",
@@ -416,7 +416,7 @@
     "sortOrder": 31
   },
   {
-    "popNumber": null,
+    "popNumber": 8,
     "subseries": "the Dragon",
     "name": "Otto Hightower",
     "title": "the Dragon — Otto Hightower",
@@ -429,7 +429,7 @@
     "sortOrder": 32
   },
   {
-    "popNumber": null,
+    "popNumber": 10,
     "subseries": "the Dragon",
     "name": "Caraxes",
     "title": "the Dragon — Caraxes",

@@ -70,9 +70,19 @@ export async function listFunkoItems(
     clauses.push('i.in_transit = true')
   }
   if (options.search?.trim()) {
-    clauses.push(`(i.title ILIKE $${idx} OR i.handle ILIKE $${idx} OR i.notes ILIKE $${idx})`)
-    params.push(`%${options.search.trim()}%`)
-    idx++
+    const term = options.search.trim()
+    const pattern = `%${term}%`
+    if (/^\d+$/.test(term)) {
+      clauses.push(
+        `(i.pop_number = $${idx} OR i.title ILIKE $${idx + 1} OR i.handle ILIKE $${idx + 1} OR i.notes ILIKE $${idx + 1})`,
+      )
+      params.push(Number(term), pattern)
+      idx += 2
+    } else {
+      clauses.push(`(i.title ILIKE $${idx} OR i.handle ILIKE $${idx} OR i.notes ILIKE $${idx})`)
+      params.push(pattern)
+      idx++
+    }
   }
 
   const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : ''

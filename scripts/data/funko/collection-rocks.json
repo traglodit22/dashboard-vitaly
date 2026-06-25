@@ -1,6 +1,6 @@
 [
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "",
     "name": "1950's Elvis",
     "title": "1950's Elvis",
@@ -13,7 +13,7 @@
     "sortOrder": 0
   },
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "",
     "name": "1950's Elvis",
     "title": "1950's Elvis",
@@ -26,7 +26,7 @@
     "sortOrder": 1
   },
   {
-    "popNumber": null,
+    "popNumber": 3,
     "subseries": "",
     "name": "1970's Elvis",
     "title": "1970's Elvis",
@@ -39,7 +39,7 @@
     "sortOrder": 2
   },
   {
-    "popNumber": null,
+    "popNumber": 3,
     "subseries": "",
     "name": "1970's Elvis",
     "title": "1970's Elvis",
@@ -104,7 +104,7 @@
     "sortOrder": 7
   },
   {
-    "popNumber": null,
+    "popNumber": 28,
     "subseries": "",
     "name": "Paul McCartney",
     "title": "Paul McCartney",
@@ -117,7 +117,7 @@
     "sortOrder": 8
   },
   {
-    "popNumber": null,
+    "popNumber": 30,
     "subseries": "",
     "name": "Ringo Star",
     "title": "Ringo Star",
@@ -130,7 +130,7 @@
     "sortOrder": 9
   },
   {
-    "popNumber": null,
+    "popNumber": 31,
     "subseries": "",
     "name": "Blue Meanie",
     "title": "Blue Meanie",
@@ -195,7 +195,7 @@
     "sortOrder": 14
   },
   {
-    "popNumber": null,
+    "popNumber": 85,
     "subseries": "",
     "name": "Mariah Carey",
     "title": "Mariah Carey",
@@ -208,7 +208,7 @@
     "sortOrder": 15
   },
   {
-    "popNumber": null,
+    "popNumber": 91,
     "subseries": "",
     "name": "Angus Young",
     "title": "Angus Young",
@@ -221,7 +221,7 @@
     "sortOrder": 16
   },
   {
-    "popNumber": null,
+    "popNumber": 92,
     "subseries": "",
     "name": "Freddie Mercury",
     "title": "Freddie Mercury",
@@ -234,7 +234,7 @@
     "sortOrder": 17
   },
   {
-    "popNumber": null,
+    "popNumber": 96,
     "subseries": "",
     "name": "Freddie Mercury",
     "title": "Freddie Mercury",
@@ -247,7 +247,7 @@
     "sortOrder": 18
   },
   {
-    "popNumber": null,
+    "popNumber": 97,
     "subseries": "",
     "name": "Queen",
     "title": "Queen",
@@ -260,7 +260,7 @@
     "sortOrder": 19
   },
   {
-    "popNumber": null,
+    "popNumber": 108,
     "subseries": "",
     "name": "Offset",
     "title": "Offset",
@@ -273,7 +273,7 @@
     "sortOrder": 20
   },
   {
-    "popNumber": null,
+    "popNumber": 111,
     "subseries": "",
     "name": "Justin Timberlake",
     "title": "Justin Timberlake",
@@ -286,7 +286,7 @@
     "sortOrder": 21
   },
   {
-    "popNumber": null,
+    "popNumber": 121,
     "subseries": "",
     "name": "The Demon",
     "title": "The Demon",
@@ -299,7 +299,7 @@
     "sortOrder": 22
   },
   {
-    "popNumber": null,
+    "popNumber": 122,
     "subseries": "",
     "name": "The Starchild",
     "title": "The Starchild",
@@ -312,7 +312,7 @@
     "sortOrder": 23
   },
   {
-    "popNumber": null,
+    "popNumber": 123,
     "subseries": "",
     "name": "The Spaceman",
     "title": "The Spaceman",
@@ -338,7 +338,7 @@
     "sortOrder": 25
   },
   {
-    "popNumber": null,
+    "popNumber": 158,
     "subseries": "",
     "name": "Tupac Shakur",
     "title": "Tupac Shakur",
@@ -351,7 +351,7 @@
     "sortOrder": 26
   },
   {
-    "popNumber": null,
+    "popNumber": 166,
     "subseries": "",
     "name": "Frank Beard",
     "title": "Frank Beard",
@@ -364,7 +364,7 @@
     "sortOrder": 27
   },
   {
-    "popNumber": null,
+    "popNumber": 184,
     "subseries": "",
     "name": "Freddie Mercury",
     "title": "Freddie Mercury",
@@ -377,7 +377,7 @@
     "sortOrder": 28
   },
   {
-    "popNumber": null,
+    "popNumber": 187,
     "subseries": "",
     "name": "Elvis Blue Hawaii",
     "title": "Elvis Blue Hawaii",
@@ -403,7 +403,7 @@
     "sortOrder": 30
   },
   {
-    "popNumber": null,
+    "popNumber": 194,
     "subseries": "",
     "name": "Chilli",
     "title": "Chilli",
@@ -416,7 +416,7 @@
     "sortOrder": 31
   },
   {
-    "popNumber": null,
+    "popNumber": 202,
     "subseries": "",
     "name": "Willie Nelson",
     "title": "Willie Nelson",
@@ -429,7 +429,7 @@
     "sortOrder": 32
   },
   {
-    "popNumber": null,
+    "popNumber": 207,
     "subseries": "",
     "name": "Bret Michaels with Chase",
     "title": "Bret Michaels with Chase",
@@ -442,7 +442,7 @@
     "sortOrder": 33
   },
   {
-    "popNumber": null,
+    "popNumber": 211,
     "subseries": "Boy",
     "name": "Pete Wentz",
     "title": "Boy — Pete Wentz",
@@ -455,7 +455,7 @@
     "sortOrder": 34
   },
   {
-    "popNumber": null,
+    "popNumber": 218,
     "subseries": "",
     "name": "RM",
     "title": "RM",
@@ -468,7 +468,7 @@
     "sortOrder": 35
   },
   {
-    "popNumber": null,
+    "popNumber": 220,
     "subseries": "",
     "name": "Suga",
     "title": "Suga",
@@ -481,7 +481,7 @@
     "sortOrder": 36
   },
   {
-    "popNumber": null,
+    "popNumber": 221,
     "subseries": "",
     "name": "J-Hope",
     "title": "J-Hope",
@@ -494,7 +494,7 @@
     "sortOrder": 37
   },
   {
-    "popNumber": null,
+    "popNumber": 222,
     "subseries": "",
     "name": "Jimin",
     "title": "Jimin",
@@ -520,7 +520,7 @@
     "sortOrder": 39
   },
   {
-    "popNumber": null,
+    "popNumber": 225,
     "subseries": "",
     "name": "Yungblud",
     "title": "Yungblud",
@@ -533,7 +533,7 @@
     "sortOrder": 40
   },
   {
-    "popNumber": null,
+    "popNumber": 228,
     "subseries": "",
     "name": "T-Boz",
     "title": "T-Boz",
@@ -546,7 +546,7 @@
     "sortOrder": 41
   },
   {
-    "popNumber": null,
+    "popNumber": 229,
     "subseries": "",
     "name": "Left Eye",
     "title": "Left Eye",
@@ -559,7 +559,7 @@
     "sortOrder": 42
   },
   {
-    "popNumber": null,
+    "popNumber": 230,
     "subseries": "",
     "name": "Chilli",
     "title": "Chilli",
@@ -572,7 +572,7 @@
     "sortOrder": 43
   },
   {
-    "popNumber": null,
+    "popNumber": 231,
     "subseries": "Men",
     "name": "Nathan Morris",
     "title": "Men — Nathan Morris",
@@ -585,7 +585,7 @@
     "sortOrder": 44
   },
   {
-    "popNumber": null,
+    "popNumber": 232,
     "subseries": "Men",
     "name": "Shawn Stockman",
     "title": "Men — Shawn Stockman",
@@ -598,7 +598,7 @@
     "sortOrder": 45
   },
   {
-    "popNumber": null,
+    "popNumber": 233,
     "subseries": "Men",
     "name": "Wanya Morris",
     "title": "Men — Wanya Morris",
@@ -611,7 +611,7 @@
     "sortOrder": 46
   },
   {
-    "popNumber": null,
+    "popNumber": 236,
     "subseries": "",
     "name": "Tre Cool",
     "title": "Tre Cool",
@@ -702,7 +702,7 @@
     "sortOrder": 53
   },
   {
-    "popNumber": null,
+    "popNumber": 254,
     "subseries": "",
     "name": "Post Malone",
     "title": "Post Malone",
@@ -715,7 +715,7 @@
     "sortOrder": 54
   },
   {
-    "popNumber": null,
+    "popNumber": 255,
     "subseries": "Gun Kelly",
     "name": "Machine Gun Kelly",
     "title": "Gun Kelly — Machine Gun Kelly",
@@ -728,7 +728,7 @@
     "sortOrder": 55
   },
   {
-    "popNumber": null,
+    "popNumber": 256,
     "subseries": "",
     "name": "Liam Gallager",
     "title": "Liam Gallager",
@@ -780,7 +780,7 @@
     "sortOrder": 59
   },
   {
-    "popNumber": null,
+    "popNumber": 270,
     "subseries": "",
     "name": "Adam",
     "title": "Adam",
@@ -793,7 +793,7 @@
     "sortOrder": 60
   },
   {
-    "popNumber": null,
+    "popNumber": 272,
     "subseries": "",
     "name": "The Edge",
     "title": "The Edge",
@@ -806,7 +806,7 @@
     "sortOrder": 61
   },
   {
-    "popNumber": null,
+    "popNumber": 273,
     "subseries": "",
     "name": "Larry",
     "title": "Larry",
@@ -845,7 +845,7 @@
     "sortOrder": 64
   },
   {
-    "popNumber": null,
+    "popNumber": 279,
     "subseries": "",
     "name": "RM",
     "title": "RM",
@@ -858,7 +858,7 @@
     "sortOrder": 65
   },
   {
-    "popNumber": null,
+    "popNumber": 280,
     "subseries": "",
     "name": "Jin",
     "title": "Jin",
@@ -871,7 +871,7 @@
     "sortOrder": 66
   },
   {
-    "popNumber": null,
+    "popNumber": 281,
     "subseries": "",
     "name": "Suga",
     "title": "Suga",
@@ -884,7 +884,7 @@
     "sortOrder": 67
   },
   {
-    "popNumber": null,
+    "popNumber": 282,
     "subseries": "",
     "name": "J-Hope",
     "title": "J-Hope",
@@ -897,7 +897,7 @@
     "sortOrder": 68
   },
   {
-    "popNumber": null,
+    "popNumber": 283,
     "subseries": "",
     "name": "Jimin",
     "title": "Jimin",
@@ -923,7 +923,7 @@
     "sortOrder": 70
   },
   {
-    "popNumber": null,
+    "popNumber": 291,
     "subseries": "",
     "name": "Bella Poarch",
     "title": "Bella Poarch",
@@ -949,7 +949,7 @@
     "sortOrder": 72
   },
   {
-    "popNumber": null,
+    "popNumber": 298,
     "subseries": "",
     "name": "Jay",
     "title": "Jay",
@@ -962,7 +962,7 @@
     "sortOrder": 73
   },
   {
-    "popNumber": null,
+    "popNumber": 301,
     "subseries": "Dogg",
     "name": "Snoop Dogg",
     "title": "Dogg — Snoop Dogg",

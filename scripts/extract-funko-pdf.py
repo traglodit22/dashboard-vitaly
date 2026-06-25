@@ -48,6 +48,20 @@ PAGE_CATEGORY_MAP: list[tuple[int, str]] = [
 CHECK_MARKS = ("✓", "✔")
 
 
+def parse_pop_number(raw: str) -> int | None:
+    raw = raw.strip()
+    if not raw:
+        return None
+    if raw.isdigit():
+        n = int(raw)
+        return n if n > 0 else None
+    m = re.search(r"\d+", raw)
+    if m:
+        n = int(m.group())
+        return n if n > 0 else None
+    return None
+
+
 def build_title(subseries: str, name: str, pop_number: int | None) -> str:
     parts = [p for p in (subseries.strip(), name.strip()) if p]
     if parts:
@@ -202,7 +216,7 @@ def parse_table_page(page: fitz.Page, *, starwars: bool = False) -> list[dict]:
             pending = None
 
         if num or series or name or feat:
-            pop = int(num) if num.isdigit() and int(num) > 0 else None
+            pop = parse_pop_number(num)
             pending = {
                 "popNumber": pop,
                 "subseries": series,
@@ -212,11 +226,11 @@ def parse_table_page(page: fitz.Page, *, starwars: bool = False) -> list[dict]:
                 "dupCount": dup,
                 "y": y,
             }
-        elif num.isdigit() and int(num) > 0:
+        elif parse_pop_number(num) is not None:
             if pending is not None:
                 raw_rows.append(pending)
             pending = {
-                "popNumber": int(num),
+                "popNumber": parse_pop_number(num),
                 "subseries": "",
                 "name": "",
                 "features": feat,

@@ -1,6 +1,6 @@
 [
   {
-    "popNumber": null,
+    "popNumber": 1,
     "subseries": "S1",
     "name": "Harry Potter",
     "title": "S1 — Harry Potter",
@@ -13,7 +13,7 @@
     "sortOrder": 0
   },
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "S1",
     "name": "Ron Weasley",
     "title": "S1 — Ron Weasley",
@@ -26,7 +26,7 @@
     "sortOrder": 1
   },
   {
-    "popNumber": null,
+    "popNumber": 3,
     "subseries": "S1",
     "name": "Hermione Granger",
     "title": "S1 — Hermione Granger",
@@ -39,7 +39,7 @@
     "sortOrder": 2
   },
   {
-    "popNumber": null,
+    "popNumber": 4,
     "subseries": "S1",
     "name": "Albus Dumbledore",
     "title": "S1 — Albus Dumbledore",
@@ -52,7 +52,7 @@
     "sortOrder": 3
   },
   {
-    "popNumber": null,
+    "popNumber": 5,
     "subseries": "S1",
     "name": "Severus Snape",
     "title": "S1 — Severus Snape",
@@ -65,7 +65,7 @@
     "sortOrder": 4
   },
   {
-    "popNumber": null,
+    "popNumber": 6,
     "subseries": "S1",
     "name": "Lord Voldemort",
     "title": "S1 — Lord Voldemort",
@@ -78,7 +78,7 @@
     "sortOrder": 5
   },
   {
-    "popNumber": null,
+    "popNumber": 8,
     "subseries": "",
     "name": "Harry Potter",
     "title": "Harry Potter",
@@ -91,7 +91,7 @@
     "sortOrder": 6
   },
   {
-    "popNumber": null,
+    "popNumber": 10,
     "subseries": "",
     "name": "Harry Potter",
     "title": "Harry Potter",
@@ -104,7 +104,7 @@
     "sortOrder": 7
   },
   {
-    "popNumber": null,
+    "popNumber": 11,
     "subseries": "S2",
     "name": "Hermione Granger",
     "title": "S2 — Hermione Granger",
@@ -117,7 +117,7 @@
     "sortOrder": 8
   },
   {
-    "popNumber": null,
+    "popNumber": 14,
     "subseries": "S2",
     "name": "Luna Lovegood",
     "title": "S2 — Luna Lovegood",
@@ -130,7 +130,7 @@
     "sortOrder": 9
   },
   {
-    "popNumber": null,
+    "popNumber": 15,
     "subseries": "",
     "name": "Albus Dumbledore",
     "title": "Albus Dumbledore",
@@ -143,7 +143,7 @@
     "sortOrder": 10
   },
   {
-    "popNumber": null,
+    "popNumber": 17,
     "subseries": "",
     "name": "Dobby",
     "title": "Dobby",
@@ -156,7 +156,7 @@
     "sortOrder": 11
   },
   {
-    "popNumber": null,
+    "popNumber": 18,
     "subseries": "",
     "name": "Dementor",
     "title": "Dementor",
@@ -169,7 +169,7 @@
     "sortOrder": 12
   },
   {
-    "popNumber": null,
+    "popNumber": 19,
     "subseries": "",
     "name": "Draco Malfoy",
     "title": "Draco Malfoy",
@@ -182,7 +182,7 @@
     "sortOrder": 13
   },
   {
-    "popNumber": null,
+    "popNumber": 21,
     "subseries": "",
     "name": "Harry Potter",
     "title": "Harry Potter",
@@ -195,7 +195,7 @@
     "sortOrder": 14
   },
   {
-    "popNumber": null,
+    "popNumber": 26,
     "subseries": "",
     "name": "Harry Potter",
     "title": "Harry Potter",
@@ -208,7 +208,7 @@
     "sortOrder": 15
   },
   {
-    "popNumber": null,
+    "popNumber": 31,
     "subseries": "",
     "name": "Harry Potter",
     "title": "Harry Potter",
@@ -221,7 +221,7 @@
     "sortOrder": 16
   },
   {
-    "popNumber": null,
+    "popNumber": 32,
     "subseries": "",
     "name": "Harry Potter",
     "title": "Harry Potter",
@@ -234,7 +234,7 @@
     "sortOrder": 17
   },
   {
-    "popNumber": null,
+    "popNumber": 33,
     "subseries": "",
     "name": "Fred Weasley",
     "title": "Fred Weasley",
@@ -247,7 +247,7 @@
     "sortOrder": 18
   },
   {
-    "popNumber": null,
+    "popNumber": 34,
     "subseries": "",
     "name": "George Weasley",
     "title": "George Weasley",
@@ -260,7 +260,7 @@
     "sortOrder": 19
   },
   {
-    "popNumber": null,
+    "popNumber": 35,
     "subseries": "",
     "name": "Bellatrix",
     "title": "Bellatrix",
@@ -273,7 +273,7 @@
     "sortOrder": 20
   },
   {
-    "popNumber": null,
+    "popNumber": 38,
     "subseries": "",
     "name": "Mad-eye Moody",
     "title": "Mad-eye Moody",
@@ -286,7 +286,7 @@
     "sortOrder": 21
   },
   {
-    "popNumber": null,
+    "popNumber": 41,
     "subseries": "",
     "name": "Luna Lovegood",
     "title": "Luna Lovegood",
@@ -299,7 +299,7 @@
     "sortOrder": 22
   },
   {
-    "popNumber": null,
+    "popNumber": 42,
     "subseries": "",
     "name": "Harry Potter",
     "title": "Harry Potter",
@@ -312,7 +312,7 @@
     "sortOrder": 23
   },
   {
-    "popNumber": null,
+    "popNumber": 43,
     "subseries": "",
     "name": "Hermione Granger",
     "title": "Hermione Granger",
@@ -325,7 +325,7 @@
     "sortOrder": 24
   },
   {
-    "popNumber": null,
+    "popNumber": 45,
     "subseries": "",
     "name": "Remus Lupin",
     "title": "Remus Lupin",
@@ -351,7 +351,7 @@
     "sortOrder": 26
   },
   {
-    "popNumber": null,
+    "popNumber": 51,
     "subseries": "",
     "name": "Harry Potter",
     "title": "Harry Potter",
@@ -364,7 +364,7 @@
     "sortOrder": 27
   },
   {
-    "popNumber": null,
+    "popNumber": 52,
     "subseries": "",
     "name": "Boggart As Snape",
     "title": "Boggart As Snape",
@@ -377,7 +377,7 @@
     "sortOrder": 28
   },
   {
-    "popNumber": null,
+    "popNumber": 61,
     "subseries": "",
     "name": "Myrtle",
     "title": "Myrtle",
@@ -390,7 +390,7 @@
     "sortOrder": 29
   },
   {
-    "popNumber": null,
+    "popNumber": 62,
     "subseries": "",
     "name": "Nearly Headless Nick",
     "title": "Nearly Headless Nick",
@@ -403,7 +403,7 @@
     "sortOrder": 30
   },
   {
-    "popNumber": null,
+    "popNumber": 71,
     "subseries": "",
     "name": "Ron Weasley",
     "title": "Ron Weasley",
@@ -416,7 +416,7 @@
     "sortOrder": 31
   },
   {
-    "popNumber": null,
+    "popNumber": 74,
     "subseries": "",
     "name": "Bloody Baron",
     "title": "Bloody Baron",
@@ -429,7 +429,7 @@
     "sortOrder": 32
   },
   {
-    "popNumber": null,
+    "popNumber": 75,
     "subseries": "",
     "name": "Dobby",
     "title": "Dobby",
@@ -442,7 +442,7 @@
     "sortOrder": 33
   },
   {
-    "popNumber": null,
+    "popNumber": 76,
     "subseries": "",
     "name": "Hedwig",
     "title": "Hedwig",
@@ -455,7 +455,7 @@
     "sortOrder": 34
   },
   {
-    "popNumber": null,
+    "popNumber": 77,
     "subseries": "S5",
     "name": "Hermione Granger as Cat",
     "title": "S5 — Hermione Granger as Cat",
@@ -468,7 +468,7 @@
     "sortOrder": 35
   },
   {
-    "popNumber": null,
+    "popNumber": 80,
     "subseries": "S5",
     "name": "Hermione Granger",
     "title": "S5 — Hermione Granger",
@@ -481,7 +481,7 @@
     "sortOrder": 36
   },
   {
-    "popNumber": null,
+    "popNumber": 87,
     "subseries": "",
     "name": "Fawkes",
     "title": "Fawkes",
@@ -494,7 +494,7 @@
     "sortOrder": 37
   },
   {
-    "popNumber": null,
+    "popNumber": 91,
     "subseries": "",
     "name": "Harry Potter",
     "title": "Harry Potter",
@@ -507,7 +507,7 @@
     "sortOrder": 38
   },
   {
-    "popNumber": null,
+    "popNumber": 93,
     "subseries": "",
     "name": "Minerva Mcgonagall",
     "title": "Minerva Mcgonagall",
@@ -533,7 +533,7 @@
     "sortOrder": 40
   },
   {
-    "popNumber": null,
+    "popNumber": 104,
     "subseries": "",
     "name": "Patronus",
     "title": "Patronus",
@@ -546,7 +546,7 @@
     "sortOrder": 41
   },
   {
-    "popNumber": null,
+    "popNumber": 105,
     "subseries": "",
     "name": "Patronus",
     "title": "Patronus",
@@ -559,7 +559,7 @@
     "sortOrder": 42
   },
   {
-    "popNumber": null,
+    "popNumber": 106,
     "subseries": "",
     "name": "Patronus Hermione Granger",
     "title": "Patronus Hermione Granger",
@@ -572,7 +572,7 @@
     "sortOrder": 43
   },
   {
-    "popNumber": null,
+    "popNumber": 107,
     "subseries": "",
     "name": "Nymphadora Tonks",
     "title": "Nymphadora Tonks",
@@ -585,7 +585,7 @@
     "sortOrder": 44
   },
   {
-    "popNumber": null,
+    "popNumber": 112,
     "subseries": "",
     "name": "Harry Potter",
     "title": "Harry Potter",
@@ -598,7 +598,7 @@
     "sortOrder": 45
   },
   {
-    "popNumber": null,
+    "popNumber": 113,
     "subseries": "",
     "name": "Hermione Granger with Feather",
     "title": "Hermione Granger with Feather",
@@ -611,7 +611,7 @@
     "sortOrder": 46
   },
   {
-    "popNumber": null,
+    "popNumber": 114,
     "subseries": "S10",
     "name": "Ron Weasley",
     "title": "S10 — Ron Weasley",
@@ -624,7 +624,7 @@
     "sortOrder": 47
   },
   {
-    "popNumber": null,
+    "popNumber": 115,
     "subseries": "S10",
     "name": "Albus Dumbledore",
     "title": "S10 — Albus Dumbledore",
@@ -637,7 +637,7 @@
     "sortOrder": 48
   },
   {
-    "popNumber": null,
+    "popNumber": 116,
     "subseries": "",
     "name": "Neville Longbottom",
     "title": "Neville Longbottom",
@@ -650,7 +650,7 @@
     "sortOrder": 49
   },
   {
-    "popNumber": null,
+    "popNumber": 120,
     "subseries": "",
     "name": "Harry Potter",
     "title": "Harry Potter",
@@ -663,7 +663,7 @@
     "sortOrder": 50
   },
   {
-    "popNumber": null,
+    "popNumber": 121,
     "subseries": "",
     "name": "Ron Weasley",
     "title": "Ron Weasley",
@@ -676,7 +676,7 @@
     "sortOrder": 51
   },
   {
-    "popNumber": null,
+    "popNumber": 122,
     "subseries": "",
     "name": "Harry Potter",
     "title": "Harry Potter",
@@ -689,7 +689,7 @@
     "sortOrder": 52
   },
   {
-    "popNumber": null,
+    "popNumber": 123,
     "subseries": "S11",
     "name": "Hermione Granger",
     "title": "S11 — Hermione Granger",
@@ -702,7 +702,7 @@
     "sortOrder": 53
   },
   {
-    "popNumber": null,
+    "popNumber": 124,
     "subseries": "S11",
     "name": "Ron Weasley",
     "title": "S11 — Ron Weasley",
@@ -715,7 +715,7 @@
     "sortOrder": 54
   },
   {
-    "popNumber": null,
+    "popNumber": 125,
     "subseries": "S11",
     "name": "Holiday Albus Dumbledore",
     "title": "S11 — Holiday Albus Dumbledore",
@@ -728,7 +728,7 @@
     "sortOrder": 55
   },
   {
-    "popNumber": null,
+    "popNumber": 129,
     "subseries": "",
     "name": "Patronus Minerva McGonagall",
     "title": "Patronus Minerva McGonagall",
@@ -741,7 +741,7 @@
     "sortOrder": 56
   },
   {
-    "popNumber": null,
+    "popNumber": 132,
     "subseries": "",
     "name": "Harry Potter",
     "title": "Harry Potter",
@@ -754,7 +754,7 @@
     "sortOrder": 57
   },
   {
-    "popNumber": null,
+    "popNumber": 134,
     "subseries": "",
     "name": "Ron Weasley",
     "title": "Ron Weasley",
@@ -767,7 +767,7 @@
     "sortOrder": 58
   },
   {
-    "popNumber": null,
+    "popNumber": 149,
     "subseries": "",
     "name": "Harry Potter",
     "title": "Harry Potter",
@@ -780,7 +780,7 @@
     "sortOrder": 59
   },
   {
-    "popNumber": null,
+    "popNumber": 150,
     "subseries": "",
     "name": "Hermione Granger",
     "title": "Hermione Granger",
@@ -793,7 +793,7 @@
     "sortOrder": 60
   },
   {
-    "popNumber": null,
+    "popNumber": 151,
     "subseries": "",
     "name": "Dobby",
     "title": "Dobby",
@@ -806,7 +806,7 @@
     "sortOrder": 61
   },
   {
-    "popNumber": null,
+    "popNumber": 152,
     "subseries": "",
     "name": "Gilderoy Lockhart",
     "title": "Gilderoy Lockhart",
@@ -819,7 +819,7 @@
     "sortOrder": 62
   },
   {
-    "popNumber": null,
+    "popNumber": 1,
     "subseries": "Bits",
     "name": "Newt Scamander",
     "title": "Bits — Newt Scamander",
@@ -832,7 +832,7 @@
     "sortOrder": 63
   },
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "Bits",
     "name": "Newt Scamander",
     "title": "Bits — Newt Scamander",
@@ -845,7 +845,7 @@
     "sortOrder": 64
   },
   {
-    "popNumber": null,
+    "popNumber": 5,
     "subseries": "Bits",
     "name": "Jacob Kowalski",
     "title": "Bits — Jacob Kowalski",
@@ -858,7 +858,7 @@
     "sortOrder": 65
   },
   {
-    "popNumber": null,
+    "popNumber": 7,
     "subseries": "Bits",
     "name": "",
     "title": "Bits",
@@ -871,7 +871,7 @@
     "sortOrder": 66
   },
   {
-    "popNumber": null,
+    "popNumber": 10,
     "subseries": "Bits",
     "name": "Newt Scamander & Pickett",
     "title": "Bits — Newt Scamander & Pickett",
@@ -884,7 +884,7 @@
     "sortOrder": 67
   },
   {
-    "popNumber": null,
+    "popNumber": 14,
     "subseries": "Bits",
     "name": "Newt Scamander",
     "title": "Bits — Newt Scamander",
@@ -897,7 +897,7 @@
     "sortOrder": 68
   },
   {
-    "popNumber": null,
+    "popNumber": 14,
     "subseries": "Bits",
     "name": "Newt Scamander",
     "title": "Bits — Newt Scamander",
@@ -910,7 +910,7 @@
     "sortOrder": 69
   },
   {
-    "popNumber": null,
+    "popNumber": 15,
     "subseries": "Bits",
     "name": "Albus Dumbledore",
     "title": "Bits — Albus Dumbledore",
@@ -923,7 +923,7 @@
     "sortOrder": 70
   },
   {
-    "popNumber": null,
+    "popNumber": 17,
     "subseries": "Bits",
     "name": "Thestral",
     "title": "Bits — Thestral",
@@ -936,7 +936,7 @@
     "sortOrder": 71
   },
   {
-    "popNumber": null,
+    "popNumber": 19,
     "subseries": "Bits",
     "name": "Pickett",
     "title": "Bits — Pickett",
@@ -949,7 +949,7 @@
     "sortOrder": 72
   },
   {
-    "popNumber": null,
+    "popNumber": 25,
     "subseries": "Bits",
     "name": "Augurey",
     "title": "Bits — Augurey",
@@ -1014,7 +1014,7 @@
     "sortOrder": 77
   },
   {
-    "popNumber": null,
+    "popNumber": 112,
     "subseries": "",
     "name": "Ron Weasley in Flying Car",
     "title": "Ron Weasley in Flying Car",
@@ -1027,7 +1027,7 @@
     "sortOrder": 78
   },
   {
-    "popNumber": null,
+    "popNumber": 123,
     "subseries": "",
     "name": "Harry Potter and Buckbeak",
     "title": "Harry Potter and Buckbeak",
@@ -1040,7 +1040,7 @@
     "sortOrder": 79
   },
   {
-    "popNumber": null,
+    "popNumber": 135,
     "subseries": "",
     "name": "Harry Potter Puching Trolley",
     "title": "Harry Potter Puching Trolley",

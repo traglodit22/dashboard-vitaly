@@ -1,6 +1,6 @@
 [
   {
-    "popNumber": null,
+    "popNumber": 13,
     "subseries": "Dead",
     "name": "Rick Grimes",
     "title": "Dead — Rick Grimes",
@@ -13,7 +13,7 @@
     "sortOrder": 0
   },
   {
-    "popNumber": null,
+    "popNumber": 26,
     "subseries": "",
     "name": "Patrick",
     "title": "Patrick",
@@ -26,7 +26,7 @@
     "sortOrder": 1
   },
   {
-    "popNumber": null,
+    "popNumber": 63,
     "subseries": "",
     "name": "Leonardo",
     "title": "Leonardo",
@@ -39,7 +39,7 @@
     "sortOrder": 2
   },
   {
-    "popNumber": null,
+    "popNumber": 93,
     "subseries": "",
     "name": "Sam",
     "title": "Sam",
@@ -52,7 +52,7 @@
     "sortOrder": 3
   },
   {
-    "popNumber": null,
+    "popNumber": 93,
     "subseries": "",
     "name": "Sam",
     "title": "Sam",
@@ -65,7 +65,7 @@
     "sortOrder": 4
   },
   {
-    "popNumber": null,
+    "popNumber": 94,
     "subseries": "",
     "name": "Dean",
     "title": "Dean",
@@ -78,7 +78,7 @@
     "sortOrder": 5
   },
   {
-    "popNumber": null,
+    "popNumber": 94,
     "subseries": "",
     "name": "Dean",
     "title": "Dean",
@@ -91,7 +91,7 @@
     "sortOrder": 6
   },
   {
-    "popNumber": null,
+    "popNumber": 95,
     "subseries": "",
     "name": "Castiel",
     "title": "Castiel",
@@ -104,7 +104,7 @@
     "sortOrder": 7
   },
   {
-    "popNumber": null,
+    "popNumber": 95,
     "subseries": "",
     "name": "Castiel",
     "title": "Castiel",
@@ -117,7 +117,7 @@
     "sortOrder": 8
   },
   {
-    "popNumber": null,
+    "popNumber": 95,
     "subseries": "",
     "name": "Castiel",
     "title": "Castiel",
@@ -130,7 +130,7 @@
     "sortOrder": 9
   },
   {
-    "popNumber": null,
+    "popNumber": 100,
     "subseries": "Dead",
     "name": "Injured Daryl",
     "title": "Dead — Injured Daryl",
@@ -143,7 +143,7 @@
     "sortOrder": 10
   },
   {
-    "popNumber": null,
+    "popNumber": 136,
     "subseries": "",
     "name": "Zoe Washburne",
     "title": "Zoe Washburne",
@@ -156,7 +156,7 @@
     "sortOrder": 11
   },
   {
-    "popNumber": null,
+    "popNumber": 158,
     "subseries": "Bad",
     "name": "Walter White",
     "title": "Bad — Walter White",
@@ -169,7 +169,7 @@
     "sortOrder": 12
   },
   {
-    "popNumber": null,
+    "popNumber": 159,
     "subseries": "Bad",
     "name": "Jesse Pinkman",
     "title": "Bad — Jesse Pinkman",
@@ -182,7 +182,7 @@
     "sortOrder": 13
   },
   {
-    "popNumber": null,
+    "popNumber": 159,
     "subseries": "Bad",
     "name": "Jesse Pinkman",
     "title": "Bad — Jesse Pinkman",
@@ -195,7 +195,7 @@
     "sortOrder": 14
   },
   {
-    "popNumber": null,
+    "popNumber": 160,
     "subseries": "Bad",
     "name": "Walter White",
     "title": "Bad — Walter White",
@@ -208,7 +208,7 @@
     "sortOrder": 15
   },
   {
-    "popNumber": null,
+    "popNumber": 160,
     "subseries": "Bad",
     "name": "Walter White",
     "title": "Bad — Walter White",
@@ -221,7 +221,7 @@
     "sortOrder": 16
   },
   {
-    "popNumber": null,
+    "popNumber": 160,
     "subseries": "Bad",
     "name": "Walter White",
     "title": "Bad — Walter White",
@@ -234,7 +234,7 @@
     "sortOrder": 17
   },
   {
-    "popNumber": null,
+    "popNumber": 161,
     "subseries": "Bad",
     "name": "Jesse Pinkman",
     "title": "Bad — Jesse Pinkman",
@@ -247,7 +247,7 @@
     "sortOrder": 18
   },
   {
-    "popNumber": null,
+    "popNumber": 161,
     "subseries": "Bad",
     "name": "Jesse Pinkman",
     "title": "Bad — Jesse Pinkman",
@@ -260,7 +260,7 @@
     "sortOrder": 19
   },
   {
-    "popNumber": null,
+    "popNumber": 162,
     "subseries": "Bad",
     "name": "Heisenberg",
     "title": "Bad — Heisenberg",
@@ -273,7 +273,7 @@
     "sortOrder": 20
   },
   {
-    "popNumber": null,
+    "popNumber": 162,
     "subseries": "Bad",
     "name": "Heisenberg",
     "title": "Bad — Heisenberg",
@@ -286,7 +286,7 @@
     "sortOrder": 21
   },
   {
-    "popNumber": null,
+    "popNumber": 163,
     "subseries": "Bad",
     "name": "Saul Goodman",
     "title": "Bad — Saul Goodman",
@@ -299,7 +299,7 @@
     "sortOrder": 22
   },
   {
-    "popNumber": null,
+    "popNumber": 165,
     "subseries": "Bad",
     "name": "Mike Ehrmantraut",
     "title": "Bad — Mike Ehrmantraut",
@@ -312,7 +312,7 @@
     "sortOrder": 23
   },
   {
-    "popNumber": null,
+    "popNumber": 166,
     "subseries": "Bad",
     "name": "Gus Fring",
     "title": "Bad — Gus Fring",
@@ -325,7 +325,7 @@
     "sortOrder": 24
   },
   {
-    "popNumber": null,
+    "popNumber": 167,
     "subseries": "Bad",
     "name": "Gus Fring",
     "title": "Bad — Gus Fring",
@@ -338,7 +338,7 @@
     "sortOrder": 25
   },
   {
-    "popNumber": null,
+    "popNumber": 179,
     "subseries": "Kid",
     "name": "Mr. Miyagi",
     "title": "Kid — Mr. Miyagi",
@@ -351,7 +351,7 @@
     "sortOrder": 26
   },
   {
-    "popNumber": null,
+    "popNumber": 200,
     "subseries": "",
     "name": "Crowley",
     "title": "Crowley",
@@ -364,7 +364,7 @@
     "sortOrder": 27
   },
   {
-    "popNumber": null,
+    "popNumber": 200,
     "subseries": "",
     "name": "Crowley",
     "title": "Crowley",
@@ -377,7 +377,7 @@
     "sortOrder": 28
   },
   {
-    "popNumber": null,
+    "popNumber": 209,
     "subseries": "",
     "name": "Black Canary",
     "title": "Black Canary",
@@ -390,7 +390,7 @@
     "sortOrder": 29
   },
   {
-    "popNumber": null,
+    "popNumber": 215,
     "subseries": "",
     "name": "Reverse Flash",
     "title": "Reverse Flash",
@@ -403,7 +403,7 @@
     "sortOrder": 30
   },
   {
-    "popNumber": null,
+    "popNumber": 216,
     "subseries": "",
     "name": "Captain Cold",
     "title": "Captain Cold",
@@ -416,7 +416,7 @@
     "sortOrder": 31
   },
   {
-    "popNumber": null,
+    "popNumber": 241,
     "subseries": "",
     "name": "Elsa Mars & Ma Petite",
     "title": "Elsa Mars & Ma Petite",
@@ -429,7 +429,7 @@
     "sortOrder": 32
   },
   {
-    "popNumber": null,
+    "popNumber": 242,
     "subseries": "",
     "name": "Tattler Twins",
     "title": "Tattler Twins",
@@ -442,7 +442,7 @@
     "sortOrder": 33
   },
   {
-    "popNumber": null,
+    "popNumber": 243,
     "subseries": "",
     "name": "Twisty",
     "title": "Twisty",
@@ -455,7 +455,7 @@
     "sortOrder": 34
   },
   {
-    "popNumber": null,
+    "popNumber": 244,
     "subseries": "",
     "name": "Pepper",
     "title": "Pepper",
@@ -468,7 +468,7 @@
     "sortOrder": 35
   },
   {
-    "popNumber": null,
+    "popNumber": 255,
     "subseries": "Galactica",
     "name": "Lt. Starbuck",
     "title": "Galactica — Lt. Starbuck",
@@ -481,7 +481,7 @@
     "sortOrder": 36
   },
   {
-    "popNumber": null,
+    "popNumber": 256,
     "subseries": "Galactica",
     "name": "Six",
     "title": "Galactica — Six",
@@ -494,7 +494,7 @@
     "sortOrder": 37
   },
   {
-    "popNumber": null,
+    "popNumber": 257,
     "subseries": "Galactica",
     "name": "Celon Centurion (Cylon Centurian)",
     "title": "Galactica — Celon Centurion (Cylon Centurian)",
@@ -507,7 +507,7 @@
     "sortOrder": 38
   },
   {
-    "popNumber": null,
+    "popNumber": 261,
     "subseries": "",
     "name": "Rachel Green",
     "title": "Rachel Green",
@@ -520,7 +520,7 @@
     "sortOrder": 39
   },
   {
-    "popNumber": null,
+    "popNumber": 262,
     "subseries": "",
     "name": "Ross Geller",
     "title": "Ross Geller",
@@ -533,7 +533,7 @@
     "sortOrder": 40
   },
   {
-    "popNumber": null,
+    "popNumber": 263,
     "subseries": "",
     "name": "Monica Geller",
     "title": "Monica Geller",
@@ -546,7 +546,7 @@
     "sortOrder": 41
   },
   {
-    "popNumber": null,
+    "popNumber": 265,
     "subseries": "",
     "name": "Joey Tribbiani",
     "title": "Joey Tribbiani",
@@ -559,7 +559,7 @@
     "sortOrder": 42
   },
   {
-    "popNumber": null,
+    "popNumber": 266,
     "subseries": "",
     "name": "Phoebe Buffay",
     "title": "Phoebe Buffay",
@@ -572,7 +572,7 @@
     "sortOrder": 43
   },
   {
-    "popNumber": null,
+    "popNumber": 268,
     "subseries": "",
     "name": "Regina",
     "title": "Regina",
@@ -585,7 +585,7 @@
     "sortOrder": 44
   },
   {
-    "popNumber": null,
+    "popNumber": 322,
     "subseries": "Saul",
     "name": "Jimmy Mcgill",
     "title": "Saul — Jimmy Mcgill",
@@ -611,7 +611,7 @@
     "sortOrder": 46
   },
   {
-    "popNumber": null,
+    "popNumber": 375,
     "subseries": "",
     "name": "Elvira",
     "title": "Elvira",
@@ -624,7 +624,7 @@
     "sortOrder": 47
   },
   {
-    "popNumber": null,
+    "popNumber": 398,
     "subseries": "Evil Dead (2015)",
     "name": "Ruby",
     "title": "Evil Dead (2015) — Ruby",
@@ -637,7 +637,7 @@
     "sortOrder": 48
   },
   {
-    "popNumber": null,
+    "popNumber": 421,
     "subseries": "Things",
     "name": "Eleven With Eggos",
     "title": "Things — Eleven With Eggos",
@@ -650,7 +650,7 @@
     "sortOrder": 49
   },
   {
-    "popNumber": null,
+    "popNumber": 421,
     "subseries": "Things",
     "name": "Eleven With Eggos",
     "title": "Things — Eleven With Eggos",
@@ -663,7 +663,7 @@
     "sortOrder": 50
   },
   {
-    "popNumber": null,
+    "popNumber": 424,
     "subseries": "Things",
     "name": "Dustin",
     "title": "Things — Dustin",
@@ -676,7 +676,7 @@
     "sortOrder": 51
   },
   {
-    "popNumber": null,
+    "popNumber": 424,
     "subseries": "Things",
     "name": "Dustin",
     "title": "Things — Dustin",
@@ -689,7 +689,7 @@
     "sortOrder": 52
   },
   {
-    "popNumber": null,
+    "popNumber": 425,
     "subseries": "Things",
     "name": "Lucas",
     "title": "Things — Lucas",
@@ -702,7 +702,7 @@
     "sortOrder": 53
   },
   {
-    "popNumber": null,
+    "popNumber": 426,
     "subseries": "Things",
     "name": "",
     "title": "Things",
@@ -715,7 +715,7 @@
     "sortOrder": 54
   },
   {
-    "popNumber": null,
+    "popNumber": 428,
     "subseries": "Things",
     "name": "Demogorgon",
     "title": "Things — Demogorgon",
@@ -741,7 +741,7 @@
     "sortOrder": 56
   },
   {
-    "popNumber": null,
+    "popNumber": 446,
     "subseries": "",
     "name": "C. J. Parker",
     "title": "C. J. Parker",
@@ -754,7 +754,7 @@
     "sortOrder": 57
   },
   {
-    "popNumber": null,
+    "popNumber": 466,
     "subseries": "",
     "name": "Jim With Gnome",
     "title": "Jim With Gnome",
@@ -767,7 +767,7 @@
     "sortOrder": 58
   },
   {
-    "popNumber": null,
+    "popNumber": 475,
     "subseries": "Things",
     "name": "Steve",
     "title": "Things — Steve",
@@ -793,7 +793,7 @@
     "sortOrder": 60
   },
   {
-    "popNumber": null,
+    "popNumber": 511,
     "subseries": "Things",
     "name": "Eleven (Hospital Gown)",
     "title": "Things — Eleven (Hospital Gown)",
@@ -806,7 +806,7 @@
     "sortOrder": 61
   },
   {
-    "popNumber": null,
+    "popNumber": 512,
     "subseries": "Things",
     "name": "",
     "title": "Things",
@@ -819,7 +819,7 @@
     "sortOrder": 62
   },
   {
-    "popNumber": null,
+    "popNumber": 512,
     "subseries": "Things",
     "name": "",
     "title": "Things",
@@ -832,7 +832,7 @@
     "sortOrder": 63
   },
   {
-    "popNumber": null,
+    "popNumber": 513,
     "subseries": "Things",
     "name": "",
     "title": "Things",
@@ -845,7 +845,7 @@
     "sortOrder": 64
   },
   {
-    "popNumber": null,
+    "popNumber": 523,
     "subseries": "Things",
     "name": "",
     "title": "Things",
@@ -858,7 +858,7 @@
     "sortOrder": 65
   },
   {
-    "popNumber": null,
+    "popNumber": 526,
     "subseries": "Things",
     "name": "",
     "title": "Things",
@@ -871,7 +871,7 @@
     "sortOrder": 66
   },
   {
-    "popNumber": null,
+    "popNumber": 548,
     "subseries": "Things",
     "name": "Ghostbuster Lucas",
     "title": "Things — Ghostbuster Lucas",
@@ -884,7 +884,7 @@
     "sortOrder": 67
   },
   {
-    "popNumber": null,
+    "popNumber": 549,
     "subseries": "Things",
     "name": "Ghostbuster Dustin",
     "title": "Things — Ghostbuster Dustin",
@@ -897,7 +897,7 @@
     "sortOrder": 68
   },
   {
-    "popNumber": null,
+    "popNumber": 550,
     "subseries": "Things",
     "name": "Joyce",
     "title": "Things — Joyce",
@@ -910,7 +910,7 @@
     "sortOrder": 69
   },
   {
-    "popNumber": null,
+    "popNumber": 552,
     "subseries": "Things",
     "name": "Max (Costume)",
     "title": "Things — Max (Costume)",
@@ -923,7 +923,7 @@
     "sortOrder": 70
   },
   {
-    "popNumber": null,
+    "popNumber": 578,
     "subseries": "Dead",
     "name": "Daryi Dixon",
     "title": "Dead — Daryi Dixon",
@@ -936,7 +936,7 @@
     "sortOrder": 71
   },
   {
-    "popNumber": null,
+    "popNumber": 581,
     "subseries": "Go",
     "name": "Starfire as Batgirl",
     "title": "Go — Starfire as Batgirl",
@@ -949,7 +949,7 @@
     "sortOrder": 72
   },
   {
-    "popNumber": null,
+    "popNumber": 583,
     "subseries": "Go",
     "name": "Robin as Red X",
     "title": "Go — Robin as Red X",
@@ -962,7 +962,7 @@
     "sortOrder": 73
   },
   {
-    "popNumber": null,
+    "popNumber": 593,
     "subseries": "Things",
     "name": "",
     "title": "Things",
@@ -975,7 +975,7 @@
     "sortOrder": 74
   },
   {
-    "popNumber": null,
+    "popNumber": 607,
     "subseries": "Go",
     "name": "",
     "title": "Go",
@@ -988,7 +988,7 @@
     "sortOrder": 75
   },
   {
-    "popNumber": null,
+    "popNumber": 608,
     "subseries": "Go",
     "name": "Bear",
     "title": "Go — Bear",
@@ -1001,7 +1001,7 @@
     "sortOrder": 76
   },
   {
-    "popNumber": null,
+    "popNumber": 615,
     "subseries": "Go",
     "name": "Raven as Lady Legasus",
     "title": "Go — Raven as Lady Legasus",
@@ -1014,7 +1014,7 @@
     "sortOrder": 77
   },
   {
-    "popNumber": null,
+    "popNumber": 617,
     "subseries": "Things",
     "name": "Dustin (Snowball Dance)",
     "title": "Things — Dustin (Snowball Dance)",
@@ -1027,7 +1027,7 @@
     "sortOrder": 78
   },
   {
-    "popNumber": null,
+    "popNumber": 638,
     "subseries": "Things",
     "name": "",
     "title": "Things",
@@ -1040,7 +1040,7 @@
     "sortOrder": 79
   },
   {
-    "popNumber": null,
+    "popNumber": 642,
     "subseries": "Things",
     "name": "",
     "title": "Things",
@@ -1053,7 +1053,7 @@
     "sortOrder": 80
   },
   {
-    "popNumber": null,
+    "popNumber": 664,
     "subseries": "",
     "name": "Pudgy Pig",
     "title": "Pudgy Pig",
@@ -1066,7 +1066,7 @@
     "sortOrder": 81
   },
   {
-    "popNumber": null,
+    "popNumber": 674,
     "subseries": "Things",
     "name": "Robin",
     "title": "Things — Robin",
@@ -1079,7 +1079,7 @@
     "sortOrder": 82
   },
   {
-    "popNumber": null,
+    "popNumber": 675,
     "subseries": "Things",
     "name": "Steve",
     "title": "Things — Steve",
@@ -1092,7 +1092,7 @@
     "sortOrder": 83
   },
   {
-    "popNumber": null,
+    "popNumber": 688,
     "subseries": "with children",
     "name": "Al bundy",
     "title": "with children — Al bundy",
@@ -1105,7 +1105,7 @@
     "sortOrder": 84
   },
   {
-    "popNumber": null,
+    "popNumber": 689,
     "subseries": "with children",
     "name": "Peggy Bundy",
     "title": "with children — Peggy Bundy",
@@ -1118,7 +1118,7 @@
     "sortOrder": 85
   },
   {
-    "popNumber": null,
+    "popNumber": 700,
     "subseries": "The TV Series",
     "name": "Chandler Bing",
     "title": "The TV Series — Chandler Bing",
@@ -1131,7 +1131,7 @@
     "sortOrder": 86
   },
   {
-    "popNumber": null,
+    "popNumber": 701,
     "subseries": "The TV Series",
     "name": "Joey Tribbiani",
     "title": "The TV Series — Joey Tribbiani",
@@ -1144,7 +1144,7 @@
     "sortOrder": 87
   },
   {
-    "popNumber": null,
+    "popNumber": 702,
     "subseries": "The TV Series",
     "name": "Ross Geller",
     "title": "The TV Series — Ross Geller",
@@ -1157,7 +1157,7 @@
     "sortOrder": 88
   },
   {
-    "popNumber": null,
+    "popNumber": 703,
     "subseries": "The TV Series",
     "name": "Rachel Green",
     "title": "The TV Series — Rachel Green",
@@ -1170,7 +1170,7 @@
     "sortOrder": 89
   },
   {
-    "popNumber": null,
+    "popNumber": 704,
     "subseries": "The TV Series",
     "name": "Monica Geller",
     "title": "The TV Series — Monica Geller",
@@ -1183,7 +1183,7 @@
     "sortOrder": 90
   },
   {
-    "popNumber": null,
+    "popNumber": 705,
     "subseries": "The TV Series",
     "name": "Phoebe Buffay",
     "title": "The TV Series — Phoebe Buffay",
@@ -1196,7 +1196,7 @@
     "sortOrder": 91
   },
   {
-    "popNumber": null,
+    "popNumber": 734,
     "subseries": "",
     "name": "Kevin Keller",
     "title": "Kevin Keller",
@@ -1209,7 +1209,7 @@
     "sortOrder": 92
   },
   {
-    "popNumber": null,
+    "popNumber": 741,
     "subseries": "de Papel",
     "name": "Tokio",
     "title": "de Papel — Tokio",
@@ -1222,7 +1222,7 @@
     "sortOrder": 93
   },
   {
-    "popNumber": null,
+    "popNumber": 752,
     "subseries": "",
     "name": "El Chaplin Colorado",
     "title": "El Chaplin Colorado",
@@ -1235,7 +1235,7 @@
     "sortOrder": 94
   },
   {
-    "popNumber": null,
+    "popNumber": 803,
     "subseries": "Things",
     "name": "Steve",
     "title": "Things — Steve",
@@ -1248,7 +1248,7 @@
     "sortOrder": 95
   },
   {
-    "popNumber": null,
+    "popNumber": 804,
     "subseries": "Things",
     "name": "Dustin in Camp Knowhere Shirt",
     "title": "Things — Dustin in Camp Knowhere Shirt",
@@ -1274,7 +1274,7 @@
     "sortOrder": 97
   },
   {
-    "popNumber": null,
+    "popNumber": 806,
     "subseries": "Things",
     "name": "Max",
     "title": "Things — Max",
@@ -1287,7 +1287,7 @@
     "sortOrder": 98
   },
   {
-    "popNumber": null,
+    "popNumber": 808,
     "subseries": "Things",
     "name": "Erica",
     "title": "Things — Erica",
@@ -1300,7 +1300,7 @@
     "sortOrder": 99
   },
   {
-    "popNumber": null,
+    "popNumber": 809,
     "subseries": "Family",
     "name": "Morticia Addams",
     "title": "Family — Morticia Addams",
@@ -1313,7 +1313,7 @@
     "sortOrder": 100
   },
   {
-    "popNumber": null,
+    "popNumber": 810,
     "subseries": "Family",
     "name": "Gomez Addams",
     "title": "Family — Gomez Addams",
@@ -1326,7 +1326,7 @@
     "sortOrder": 101
   },
   {
-    "popNumber": null,
+    "popNumber": 811,
     "subseries": "Family",
     "name": "Wednesday Addams",
     "title": "Family — Wednesday Addams",
@@ -1339,7 +1339,7 @@
     "sortOrder": 102
   },
   {
-    "popNumber": null,
+    "popNumber": 816,
     "subseries": "Family",
     "name": "Wednesday Addams",
     "title": "Family — Wednesday Addams",
@@ -1352,7 +1352,7 @@
     "sortOrder": 103
   },
   {
-    "popNumber": null,
+    "popNumber": 822,
     "subseries": "",
     "name": "King Homer",
     "title": "King Homer",
@@ -1365,7 +1365,7 @@
     "sortOrder": 104
   },
   {
-    "popNumber": null,
+    "popNumber": 826,
     "subseries": "Things",
     "name": "Battle Eleven",
     "title": "Things — Battle Eleven",
@@ -1378,7 +1378,7 @@
     "sortOrder": 105
   },
   {
-    "popNumber": null,
+    "popNumber": 827,
     "subseries": "Things",
     "name": "Eleven",
     "title": "Things — Eleven",
@@ -1391,7 +1391,7 @@
     "sortOrder": 106
   },
   {
-    "popNumber": null,
+    "popNumber": 828,
     "subseries": "Things",
     "name": "",
     "title": "Things",
@@ -1404,7 +1404,7 @@
     "sortOrder": 107
   },
   {
-    "popNumber": null,
+    "popNumber": 843,
     "subseries": "Things",
     "name": "Eleven",
     "title": "Things — Eleven",
@@ -1417,7 +1417,7 @@
     "sortOrder": 108
   },
   {
-    "popNumber": null,
+    "popNumber": 854,
     "subseries": "Things",
     "name": "Eleven",
     "title": "Things — Eleven",
@@ -1430,7 +1430,7 @@
     "sortOrder": 109
   },
   {
-    "popNumber": null,
+    "popNumber": 856,
     "subseries": "Horner",
     "name": "Kato",
     "title": "Horner — Kato",
@@ -1443,7 +1443,7 @@
     "sortOrder": 110
   },
   {
-    "popNumber": null,
+    "popNumber": 861,
     "subseries": "Crystal",
     "name": "Hup",
     "title": "Crystal — Hup",
@@ -1456,7 +1456,7 @@
     "sortOrder": 111
   },
   {
-    "popNumber": null,
+    "popNumber": 905,
     "subseries": "(2005)",
     "name": "Dwight Schrute",
     "title": "(2005) — Dwight Schrute",
@@ -1469,7 +1469,7 @@
     "sortOrder": 112
   },
   {
-    "popNumber": null,
+    "popNumber": 906,
     "subseries": "",
     "name": "Lard Lad",
     "title": "Lard Lad",
@@ -1482,7 +1482,7 @@
     "sortOrder": 113
   },
   {
-    "popNumber": null,
+    "popNumber": 913,
     "subseries": "de Papel",
     "name": "Helsinki",
     "title": "de Papel — Helsinki",
@@ -1495,7 +1495,7 @@
     "sortOrder": 114
   },
   {
-    "popNumber": null,
+    "popNumber": 917,
     "subseries": "de Papel",
     "name": "RIO",
     "title": "de Papel — RIO",
@@ -1508,7 +1508,7 @@
     "sortOrder": 115
   },
   {
-    "popNumber": null,
+    "popNumber": 918,
     "subseries": "de Papel",
     "name": "Moscu",
     "title": "de Papel — Moscu",
@@ -1521,7 +1521,7 @@
     "sortOrder": 116
   },
   {
-    "popNumber": null,
+    "popNumber": 922,
     "subseries": "Things",
     "name": "",
     "title": "Things",
@@ -1534,7 +1534,7 @@
     "sortOrder": 117
   },
   {
-    "popNumber": null,
+    "popNumber": 931,
     "subseries": "Academy",
     "name": "Klaus",
     "title": "Academy — Klaus",
@@ -1547,7 +1547,7 @@
     "sortOrder": 118
   },
   {
-    "popNumber": null,
+    "popNumber": 934,
     "subseries": "Academy",
     "name": "Vanya",
     "title": "Academy — Vanya",
@@ -1560,7 +1560,7 @@
     "sortOrder": 119
   },
   {
-    "popNumber": null,
+    "popNumber": 936,
     "subseries": "Academy",
     "name": "Cha Cha",
     "title": "Academy — Cha Cha",
@@ -1573,7 +1573,7 @@
     "sortOrder": 120
   },
   {
-    "popNumber": null,
+    "popNumber": 940,
     "subseries": "",
     "name": "Tubbs",
     "title": "Tubbs",
@@ -1586,7 +1586,7 @@
     "sortOrder": 121
   },
   {
-    "popNumber": null,
+    "popNumber": 945,
     "subseries": "",
     "name": "Ashley Too",
     "title": "Ashley Too",
@@ -1599,7 +1599,7 @@
     "sortOrder": 122
   },
   {
-    "popNumber": null,
+    "popNumber": 958,
     "subseries": "Place",
     "name": "Jason Mendoza",
     "title": "Place — Jason Mendoza",
@@ -1612,7 +1612,7 @@
     "sortOrder": 123
   },
   {
-    "popNumber": null,
+    "popNumber": 980,
     "subseries": "",
     "name": "Starlight",
     "title": "Starlight",
@@ -1625,7 +1625,7 @@
     "sortOrder": 124
   },
   {
-    "popNumber": null,
+    "popNumber": 996,
     "subseries": "",
     "name": "Mosquitor",
     "title": "Mosquitor",
@@ -2704,7 +2704,7 @@
     "sortOrder": 207
   },
   {
-    "popNumber": null,
+    "popNumber": 24,
     "subseries": "",
     "name": "Gomez & Morticia Addams",
     "title": "Gomez & Morticia Addams",
@@ -2717,7 +2717,7 @@
     "sortOrder": 208
   },
   {
-    "popNumber": null,
+    "popNumber": 3,
     "subseries": "",
     "name": "Back in Black",
     "title": "Back in Black",
@@ -2730,7 +2730,7 @@
     "sortOrder": 209
   },
   {
-    "popNumber": null,
+    "popNumber": 6,
     "subseries": "",
     "name": "News of the World",
     "title": "News of the World",
@@ -2743,7 +2743,7 @@
     "sortOrder": 210
   },
   {
-    "popNumber": null,
+    "popNumber": 12,
     "subseries": "",
     "name": "Diary of a Madman",
     "title": "Diary of a Madman",
@@ -2756,7 +2756,7 @@
     "sortOrder": 211
   },
   {
-    "popNumber": null,
+    "popNumber": 16,
     "subseries": "",
     "name": "Powerslave",
     "title": "Powerslave",
@@ -2769,7 +2769,7 @@
     "sortOrder": 212
   },
   {
-    "popNumber": null,
+    "popNumber": 24,
     "subseries": "",
     "name": "Are You Experienced",
     "title": "Are You Experienced",
@@ -2782,7 +2782,7 @@
     "sortOrder": 213
   },
   {
-    "popNumber": null,
+    "popNumber": 26,
     "subseries": "Spears",
     "name": "Oops! I did it again",
     "title": "Spears — Oops! I did it again",
@@ -2795,7 +2795,7 @@
     "sortOrder": 214
   },
   {
-    "popNumber": null,
+    "popNumber": 27,
     "subseries": "",
     "name": "Reanimation",
     "title": "Reanimation",
@@ -2808,7 +2808,7 @@
     "sortOrder": 215
   },
   {
-    "popNumber": null,
+    "popNumber": 30,
     "subseries": "",
     "name": "Freddie Mercury",
     "title": "Freddie Mercury",
@@ -2821,7 +2821,7 @@
     "sortOrder": 216
   },
   {
-    "popNumber": null,
+    "popNumber": 9,
     "subseries": "Before Christmas",
     "name": "Oogi",
     "title": "Before Christmas — Oogi",
@@ -2834,7 +2834,7 @@
     "sortOrder": 217
   },
   {
-    "popNumber": null,
+    "popNumber": 10,
     "subseries": "",
     "name": "Mayor",
     "title": "Mayor",
@@ -2847,7 +2847,7 @@
     "sortOrder": 218
   },
   {
-    "popNumber": null,
+    "popNumber": 34,
     "subseries": "Captain Marvel",
     "name": "Captain Marvel",
     "title": "Captain Marvel — Captain Marvel",
@@ -2860,7 +2860,7 @@
     "sortOrder": 219
   },
   {
-    "popNumber": null,
+    "popNumber": 46,
     "subseries": "Infinity Saga",
     "name": "Captain America Blue",
     "title": "Infinity Saga — Captain America Blue",
@@ -2873,7 +2873,7 @@
     "sortOrder": 220
   },
   {
-    "popNumber": null,
+    "popNumber": 47,
     "subseries": "Infinity Saga",
     "name": "Iron Man Yellow",
     "title": "Infinity Saga — Iron Man Yellow",
@@ -2886,7 +2886,7 @@
     "sortOrder": 221
   },
   {
-    "popNumber": null,
+    "popNumber": 48,
     "subseries": "Infinity Saga",
     "name": "Hulk Green",
     "title": "Infinity Saga — Hulk Green",
@@ -2899,7 +2899,7 @@
     "sortOrder": 222
   },
   {
-    "popNumber": null,
+    "popNumber": 49,
     "subseries": "Infinity Saga",
     "name": "Thor Purpple",
     "title": "Infinity Saga — Thor Purpple",
@@ -2912,7 +2912,7 @@
     "sortOrder": 223
   },
   {
-    "popNumber": null,
+    "popNumber": 50,
     "subseries": "Infinity Saga",
     "name": "Black Widow Red",
     "title": "Infinity Saga — Black Widow Red",
@@ -2925,7 +2925,7 @@
     "sortOrder": 224
   },
   {
-    "popNumber": null,
+    "popNumber": 51,
     "subseries": "Infinity Saga",
     "name": "Hawkeye Orange",
     "title": "Infinity Saga — Hawkeye Orange",
@@ -2938,7 +2938,7 @@
     "sortOrder": 225
   },
   {
-    "popNumber": null,
+    "popNumber": 58,
     "subseries": "",
     "name": "Splinter",
     "title": "Splinter",
@@ -2951,7 +2951,7 @@
     "sortOrder": 226
   },
   {
-    "popNumber": null,
+    "popNumber": 5,
     "subseries": "",
     "name": "Jean-Michel Basquiat",
     "title": "Jean-Michel Basquiat",
@@ -2964,7 +2964,7 @@
     "sortOrder": 227
   },
   {
-    "popNumber": null,
+    "popNumber": 3,
     "subseries": "",
     "name": "Cthulhu",
     "title": "Cthulhu",
@@ -2977,7 +2977,7 @@
     "sortOrder": 228
   },
   {
-    "popNumber": null,
+    "popNumber": 1,
     "subseries": "",
     "name": "Alexander Hamilton",
     "title": "Alexander Hamilton",
@@ -2990,7 +2990,7 @@
     "sortOrder": 229
   },
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "",
     "name": "Aaron Burr",
     "title": "Aaron Burr",
@@ -3003,7 +3003,7 @@
     "sortOrder": 230
   },
   {
-    "popNumber": null,
+    "popNumber": 3,
     "subseries": "",
     "name": "Angelica Schuyler",
     "title": "Angelica Schuyler",
@@ -3016,7 +3016,7 @@
     "sortOrder": 231
   },
   {
-    "popNumber": null,
+    "popNumber": 4,
     "subseries": "",
     "name": "Eliza Hamilton",
     "title": "Eliza Hamilton",
@@ -3029,7 +3029,7 @@
     "sortOrder": 232
   },
   {
-    "popNumber": null,
+    "popNumber": 5,
     "subseries": "",
     "name": "George Washington",
     "title": "George Washington",
@@ -3042,7 +3042,7 @@
     "sortOrder": 233
   },
   {
-    "popNumber": null,
+    "popNumber": 6,
     "subseries": "",
     "name": "Peggy",
     "title": "Peggy",
@@ -3055,7 +3055,7 @@
     "sortOrder": 234
   },
   {
-    "popNumber": null,
+    "popNumber": 9,
     "subseries": "",
     "name": "Alexander Act 2",
     "title": "Alexander Act 2",
@@ -3068,7 +3068,7 @@
     "sortOrder": 235
   },
   {
-    "popNumber": null,
+    "popNumber": 10,
     "subseries": "",
     "name": "James Madison",
     "title": "James Madison",
@@ -3081,7 +3081,7 @@
     "sortOrder": 236
   },
   {
-    "popNumber": null,
+    "popNumber": 11,
     "subseries": "",
     "name": "King George",
     "title": "King George",
@@ -3094,7 +3094,7 @@
     "sortOrder": 237
   },
   {
-    "popNumber": null,
+    "popNumber": 12,
     "subseries": "",
     "name": "Thomas Jefferson",
     "title": "Thomas Jefferson",
@@ -3107,7 +3107,7 @@
     "sortOrder": 238
   },
   {
-    "popNumber": null,
+    "popNumber": 1,
     "subseries": "",
     "name": "Superman",
     "title": "Superman",
@@ -3120,7 +3120,7 @@
     "sortOrder": 239
   },
   {
-    "popNumber": null,
+    "popNumber": 3,
     "subseries": "Woman",
     "name": "Wonder Woman",
     "title": "Woman — Wonder Woman",
@@ -3133,7 +3133,7 @@
     "sortOrder": 240
   },
   {
-    "popNumber": null,
+    "popNumber": 6,
     "subseries": "",
     "name": "Green Lantern",
     "title": "Green Lantern",
@@ -3146,7 +3146,7 @@
     "sortOrder": 241
   },
   {
-    "popNumber": null,
+    "popNumber": 8,
     "subseries": "",
     "name": "Black Adam",
     "title": "Black Adam",
@@ -3159,7 +3159,7 @@
     "sortOrder": 242
   },
   {
-    "popNumber": null,
+    "popNumber": 8,
     "subseries": "",
     "name": "Moon Knight",
     "title": "Moon Knight",
@@ -3172,7 +3172,7 @@
     "sortOrder": 243
   },
   {
-    "popNumber": null,
+    "popNumber": 14,
     "subseries": "",
     "name": "Elektra",
     "title": "Elektra",
@@ -3185,7 +3185,7 @@
     "sortOrder": 244
   },
   {
-    "popNumber": null,
+    "popNumber": 18,
     "subseries": "",
     "name": "Black Panther",
     "title": "Black Panther",
@@ -3198,7 +3198,7 @@
     "sortOrder": 245
   },
   {
-    "popNumber": null,
+    "popNumber": 1,
     "subseries": "",
     "name": "Hellboy",
     "title": "Hellboy",
@@ -3211,7 +3211,7 @@
     "sortOrder": 246
   },
   {
-    "popNumber": null,
+    "popNumber": 8,
     "subseries": "",
     "name": "Alana",
     "title": "Alana",
@@ -3224,7 +3224,7 @@
     "sortOrder": 247
   },
   {
-    "popNumber": null,
+    "popNumber": 10,
     "subseries": "",
     "name": "The Will",
     "title": "The Will",
@@ -3237,7 +3237,7 @@
     "sortOrder": 248
   },
   {
-    "popNumber": null,
+    "popNumber": 25,
     "subseries": "",
     "name": "Betty Coop",
     "title": "Betty Coop",
@@ -3250,7 +3250,7 @@
     "sortOrder": 249
   },
   {
-    "popNumber": null,
+    "popNumber": 33,
     "subseries": "",
     "name": "Donatello",
     "title": "Donatello",
@@ -3276,7 +3276,7 @@
     "sortOrder": 251
   },
   {
-    "popNumber": null,
+    "popNumber": 3,
     "subseries": "",
     "name": "Spike Lee",
     "title": "Spike Lee",
@@ -3289,7 +3289,7 @@
     "sortOrder": 252
   },
   {
-    "popNumber": null,
+    "popNumber": 4,
     "subseries": "",
     "name": "Jordan Peele",
     "title": "Jordan Peele",
@@ -3302,7 +3302,7 @@
     "sortOrder": 253
   },
   {
-    "popNumber": null,
+    "popNumber": 22,
     "subseries": "",
     "name": "Edgar Allan Poe",
     "title": "Edgar Allan Poe",
@@ -3315,7 +3315,7 @@
     "sortOrder": 254
   },
   {
-    "popNumber": null,
+    "popNumber": 66,
     "subseries": "",
     "name": "John Waters",
     "title": "John Waters",
@@ -3328,7 +3328,7 @@
     "sortOrder": 255
   },
   {
-    "popNumber": null,
+    "popNumber": 70,
     "subseries": "Houston",
     "name": "Whitney Houston How Will I Know",
     "title": "Houston — Whitney Houston How Will I Know",
@@ -3341,7 +3341,7 @@
     "sortOrder": 256
   },
   {
-    "popNumber": null,
+    "popNumber": 73,
     "subseries": "Houston",
     "name": "Whitney Houston (IWDWS)",
     "title": "Houston — Whitney Houston (IWDWS)",
@@ -3354,7 +3354,7 @@
     "sortOrder": 257
   },
   {
-    "popNumber": null,
+    "popNumber": 55,
     "subseries": "",
     "name": "Wally Warheads",
     "title": "Wally Warheads",
@@ -3406,7 +3406,7 @@
     "sortOrder": 261
   },
   {
-    "popNumber": null,
+    "popNumber": 8,
     "subseries": "",
     "name": "Sgt. Johnson",
     "title": "Sgt. Johnson",
@@ -3419,7 +3419,7 @@
     "sortOrder": 262
   },
   {
-    "popNumber": null,
+    "popNumber": 20,
     "subseries": "",
     "name": "Grunt Conscript",
     "title": "Grunt Conscript",
@@ -3432,7 +3432,7 @@
     "sortOrder": 263
   },
   {
-    "popNumber": null,
+    "popNumber": 21,
     "subseries": "",
     "name": "Spartan MarkV B",
     "title": "Spartan MarkV B",
@@ -3445,7 +3445,7 @@
     "sortOrder": 264
   },
   {
-    "popNumber": null,
+    "popNumber": 22,
     "subseries": "",
     "name": "Escharum With Gravity Axe 6",
     "title": "Escharum With Gravity Axe 6",
@@ -3458,7 +3458,7 @@
     "sortOrder": 265
   },
   {
-    "popNumber": null,
+    "popNumber": 18,
     "subseries": "",
     "name": "Loch Ness Monster",
     "title": "Loch Ness Monster",
@@ -3471,7 +3471,7 @@
     "sortOrder": 266
   },
   {
-    "popNumber": null,
+    "popNumber": 22,
     "subseries": "",
     "name": "Medusa",
     "title": "Medusa",
@@ -3536,7 +3536,7 @@
     "sortOrder": 271
   },
   {
-    "popNumber": null,
+    "popNumber": 13,
     "subseries": "Ant-Man",
     "name": "Deadpool on Unicorn",
     "title": "Ant-Man — Deadpool on Unicorn",
@@ -3549,7 +3549,7 @@
     "sortOrder": 272
   },
   {
-    "popNumber": null,
+    "popNumber": 13,
     "subseries": "",
     "name": "Ant-Man",
     "title": "Ant-Man",
@@ -3562,7 +3562,7 @@
     "sortOrder": 273
   },
   {
-    "popNumber": null,
+    "popNumber": 15,
     "subseries": "the Thrones",
     "name": "Daenerys & Drogon",
     "title": "the Thrones — Daenerys & Drogon",
@@ -3575,7 +3575,7 @@
     "sortOrder": 274
   },
   {
-    "popNumber": null,
+    "popNumber": 48,
     "subseries": "",
     "name": "Deadpool",
     "title": "Deadpool",
@@ -3588,7 +3588,7 @@
     "sortOrder": 275
   },
   {
-    "popNumber": null,
+    "popNumber": 72,
     "subseries": "of the Rings",
     "name": "Gandalf of Gwaihir",
     "title": "of the Rings — Gandalf of Gwaihir",
@@ -3640,7 +3640,7 @@
     "sortOrder": 279
   },
   {
-    "popNumber": null,
+    "popNumber": 1,
     "subseries": "",
     "name": "Martian",
     "title": "Martian",
@@ -3653,7 +3653,7 @@
     "sortOrder": 280
   },
   {
-    "popNumber": null,
+    "popNumber": 37,
     "subseries": "",
     "name": "Boyband Cartman",
     "title": "Boyband Cartman",
@@ -3666,7 +3666,7 @@
     "sortOrder": 281
   },
   {
-    "popNumber": null,
+    "popNumber": 38,
     "subseries": "",
     "name": "Boyband Kenny",
     "title": "Boyband Kenny",
@@ -3679,7 +3679,7 @@
     "sortOrder": 282
   },
   {
-    "popNumber": null,
+    "popNumber": 93,
     "subseries": "",
     "name": "Donutella",
     "title": "Donutella",
@@ -3692,7 +3692,7 @@
     "sortOrder": 283
   },
   {
-    "popNumber": null,
+    "popNumber": 96,
     "subseries": "",
     "name": "Stellina",
     "title": "Stellina",
@@ -3705,7 +3705,7 @@
     "sortOrder": 284
   },
   {
-    "popNumber": null,
+    "popNumber": 5,
     "subseries": "",
     "name": "Woody",
     "title": "Woody",

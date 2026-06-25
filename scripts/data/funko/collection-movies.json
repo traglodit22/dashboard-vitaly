@@ -1,6 +1,6 @@
 [
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "",
     "name": "Freddy Krueger",
     "title": "Freddy Krueger",
@@ -13,7 +13,7 @@
     "sortOrder": 0
   },
   {
-    "popNumber": null,
+    "popNumber": 3,
     "subseries": "",
     "name": "Michael Myers",
     "title": "Michael Myers",
@@ -26,7 +26,7 @@
     "sortOrder": 1
   },
   {
-    "popNumber": null,
+    "popNumber": 4,
     "subseries": "",
     "name": "Gizmo as Gremlin",
     "title": "Gizmo as Gremlin",
@@ -39,7 +39,7 @@
     "sortOrder": 2
   },
   {
-    "popNumber": null,
+    "popNumber": 4,
     "subseries": "",
     "name": "Gizmo as Gremlin",
     "title": "Gizmo as Gremlin",
@@ -52,7 +52,7 @@
     "sortOrder": 3
   },
   {
-    "popNumber": null,
+    "popNumber": 5,
     "subseries": "",
     "name": "Beetlejuice",
     "title": "Beetlejuice",
@@ -65,7 +65,7 @@
     "sortOrder": 4
   },
   {
-    "popNumber": null,
+    "popNumber": 6,
     "subseries": "",
     "name": "Gremlins",
     "title": "Gremlins",
@@ -78,7 +78,7 @@
     "sortOrder": 5
   },
   {
-    "popNumber": null,
+    "popNumber": 10,
     "subseries": "",
     "name": "V for Vendetta",
     "title": "V for Vendetta",
@@ -91,7 +91,7 @@
     "sortOrder": 6
   },
   {
-    "popNumber": null,
+    "popNumber": 11,
     "subseries": "Chain Saw Massacre",
     "name": "Leatherface",
     "title": "Chain Saw Massacre — Leatherface",
@@ -143,7 +143,7 @@
     "sortOrder": 10
   },
   {
-    "popNumber": null,
+    "popNumber": 39,
     "subseries": "of Oz",
     "name": "Scarecrow",
     "title": "of Oz — Scarecrow",
@@ -156,7 +156,7 @@
     "sortOrder": 11
   },
   {
-    "popNumber": null,
+    "popNumber": 54,
     "subseries": "Darkness",
     "name": "Deadite",
     "title": "Darkness — Deadite",
@@ -182,7 +182,7 @@
     "sortOrder": 13
   },
   {
-    "popNumber": null,
+    "popNumber": 56,
     "subseries": "2",
     "name": "Chucky",
     "title": "2 — Chucky",
@@ -195,7 +195,7 @@
     "sortOrder": 14
   },
   {
-    "popNumber": null,
+    "popNumber": 60,
     "subseries": "Game",
     "name": "Petra",
     "title": "Game — Petra",
@@ -208,7 +208,7 @@
     "sortOrder": 15
   },
   {
-    "popNumber": null,
+    "popNumber": 69,
     "subseries": "",
     "name": "Bill",
     "title": "Bill",
@@ -221,7 +221,7 @@
     "sortOrder": 16
   },
   {
-    "popNumber": null,
+    "popNumber": 85,
     "subseries": "",
     "name": "The Jesus",
     "title": "The Jesus",
@@ -234,7 +234,7 @@
     "sortOrder": 17
   },
   {
-    "popNumber": null,
+    "popNumber": 100,
     "subseries": "Train Your Dragon 2",
     "name": "Toothless",
     "title": "Train Your Dragon 2 — Toothless",
@@ -247,7 +247,7 @@
     "sortOrder": 18
   },
   {
-    "popNumber": null,
+    "popNumber": 109,
     "subseries": "",
     "name": "Stay Puft Marshmallow Man",
     "title": "Stay Puft Marshmallow Man",
@@ -260,7 +260,7 @@
     "sortOrder": 19
   },
   {
-    "popNumber": null,
+    "popNumber": 115,
     "subseries": "",
     "name": "The Mummy",
     "title": "The Mummy",
@@ -273,7 +273,7 @@
     "sortOrder": 20
   },
   {
-    "popNumber": null,
+    "popNumber": 165,
     "subseries": "",
     "name": "Short Fuse",
     "title": "Short Fuse",
@@ -286,7 +286,7 @@
     "sortOrder": 21
   },
   {
-    "popNumber": null,
+    "popNumber": 166,
     "subseries": "",
     "name": "Bored Silly Kevin",
     "title": "Bored Silly Kevin",
@@ -299,7 +299,7 @@
     "sortOrder": 22
   },
   {
-    "popNumber": null,
+    "popNumber": 167,
     "subseries": "",
     "name": "Au Naturel",
     "title": "Au Naturel",
@@ -312,7 +312,7 @@
     "sortOrder": 23
   },
   {
-    "popNumber": null,
+    "popNumber": 169,
     "subseries": "",
     "name": "Cro-Minion",
     "title": "Cro-Minion",
@@ -325,7 +325,7 @@
     "sortOrder": 24
   },
   {
-    "popNumber": null,
+    "popNumber": 170,
     "subseries": "",
     "name": "Eye, Matie",
     "title": "Eye, Matie",
@@ -338,7 +338,7 @@
     "sortOrder": 25
   },
   {
-    "popNumber": null,
+    "popNumber": 224,
     "subseries": "",
     "name": "Freddy Krueger",
     "title": "Freddy Krueger",
@@ -351,7 +351,7 @@
     "sortOrder": 26
   },
   {
-    "popNumber": null,
+    "popNumber": 245,
     "subseries": "The Future II",
     "name": "Marty McFly",
     "title": "The Future II — Marty McFly",
@@ -364,7 +364,7 @@
     "sortOrder": 27
   },
   {
-    "popNumber": null,
+    "popNumber": 270,
     "subseries": "Prejudice Zombies",
     "name": "Lady Catherine",
     "title": "Prejudice Zombies — Lady Catherine",
@@ -377,7 +377,7 @@
     "sortOrder": 28
   },
   {
-    "popNumber": null,
+    "popNumber": 278,
     "subseries": "",
     "name": "Shrek",
     "title": "Shrek",
@@ -403,7 +403,7 @@
     "sortOrder": 30
   },
   {
-    "popNumber": null,
+    "popNumber": 356,
     "subseries": "Beyond",
     "name": "Jaylah",
     "title": "Beyond — Jaylah",
@@ -416,7 +416,7 @@
     "sortOrder": 31
   },
   {
-    "popNumber": null,
+    "popNumber": 377,
     "subseries": "Creed",
     "name": "Ojeda",
     "title": "Creed — Ojeda",
@@ -429,7 +429,7 @@
     "sortOrder": 32
   },
   {
-    "popNumber": null,
+    "popNumber": 389,
     "subseries": "",
     "name": "Vito Corleone",
     "title": "Vito Corleone",
@@ -442,7 +442,7 @@
     "sortOrder": 33
   },
   {
-    "popNumber": null,
+    "popNumber": 413,
     "subseries": "",
     "name": "Bugs",
     "title": "Bugs",
@@ -455,7 +455,7 @@
     "sortOrder": 34
   },
   {
-    "popNumber": null,
+    "popNumber": 420,
     "subseries": "ME",
     "name": "Fluffy",
     "title": "ME — Fluffy",
@@ -468,7 +468,7 @@
     "sortOrder": 35
   },
   {
-    "popNumber": null,
+    "popNumber": 440,
     "subseries": "",
     "name": "Comm. Arun Filitt",
     "title": "Comm. Arun Filitt",
@@ -481,7 +481,7 @@
     "sortOrder": 36
   },
   {
-    "popNumber": null,
+    "popNumber": 443,
     "subseries": "the Rings",
     "name": "Gandalf",
     "title": "the Rings — Gandalf",
@@ -494,7 +494,7 @@
     "sortOrder": 37
   },
   {
-    "popNumber": null,
+    "popNumber": 444,
     "subseries": "the Rings",
     "name": "Frodo Baggins",
     "title": "the Rings — Frodo Baggins",
@@ -507,7 +507,7 @@
     "sortOrder": 38
   },
   {
-    "popNumber": null,
+    "popNumber": 448,
     "subseries": "the Rings",
     "name": "Balrog",
     "title": "the Rings — Balrog",
@@ -520,7 +520,7 @@
     "sortOrder": 39
   },
   {
-    "popNumber": null,
+    "popNumber": 466,
     "subseries": "",
     "name": "Norman Bates",
     "title": "Norman Bates",
@@ -533,7 +533,7 @@
     "sortOrder": 40
   },
   {
-    "popNumber": null,
+    "popNumber": 469,
     "subseries": "",
     "name": "Annabelle",
     "title": "Annabelle",
@@ -546,7 +546,7 @@
     "sortOrder": 41
   },
   {
-    "popNumber": null,
+    "popNumber": 472,
     "subseries": "",
     "name": "Pennywise with Boat",
     "title": "Pennywise with Boat",
@@ -559,7 +559,7 @@
     "sortOrder": 42
   },
   {
-    "popNumber": null,
+    "popNumber": 473,
     "subseries": "",
     "name": "Pennywise with Teeth",
     "title": "Pennywise with Teeth",
@@ -572,7 +572,7 @@
     "sortOrder": 43
   },
   {
-    "popNumber": null,
+    "popNumber": 485,
     "subseries": "",
     "name": "Jovie",
     "title": "Jovie",
@@ -585,7 +585,7 @@
     "sortOrder": 44
   },
   {
-    "popNumber": null,
+    "popNumber": 500,
     "subseries": "One",
     "name": "Sho",
     "title": "One — Sho",
@@ -598,7 +598,7 @@
     "sortOrder": 45
   },
   {
-    "popNumber": null,
+    "popNumber": 501,
     "subseries": "One",
     "name": "Sorrento",
     "title": "One — Sorrento",
@@ -611,7 +611,7 @@
     "sortOrder": 46
   },
   {
-    "popNumber": null,
+    "popNumber": 502,
     "subseries": "One",
     "name": "I-R0k",
     "title": "One — I-R0k",
@@ -624,7 +624,7 @@
     "sortOrder": 47
   },
   {
-    "popNumber": null,
+    "popNumber": 503,
     "subseries": "One",
     "name": "Sixer",
     "title": "One — Sixer",
@@ -637,7 +637,7 @@
     "sortOrder": 48
   },
   {
-    "popNumber": null,
+    "popNumber": 520,
     "subseries": "",
     "name": "Oddjob",
     "title": "Oddjob",
@@ -650,7 +650,7 @@
     "sortOrder": 49
   },
   {
-    "popNumber": null,
+    "popNumber": 532,
     "subseries": "the Rings",
     "name": "Gollum",
     "title": "the Rings — Gollum",
@@ -663,7 +663,7 @@
     "sortOrder": 50
   },
   {
-    "popNumber": null,
+    "popNumber": 542,
     "subseries": "",
     "name": "Pennywise with Spider Legs",
     "title": "Pennywise with Spider Legs",
@@ -676,7 +676,7 @@
     "sortOrder": 51
   },
   {
-    "popNumber": null,
+    "popNumber": 543,
     "subseries": "",
     "name": "Pennywise with Severed Arm",
     "title": "Pennywise with Severed Arm",
@@ -689,7 +689,7 @@
     "sortOrder": 52
   },
   {
-    "popNumber": null,
+    "popNumber": 544,
     "subseries": "",
     "name": "Pennywise",
     "title": "Pennywise",
@@ -702,7 +702,7 @@
     "sortOrder": 53
   },
   {
-    "popNumber": null,
+    "popNumber": 545,
     "subseries": "park",
     "name": "Dr. Alan Grant",
     "title": "park — Dr. Alan Grant",
@@ -715,7 +715,7 @@
     "sortOrder": 54
   },
   {
-    "popNumber": null,
+    "popNumber": 548,
     "subseries": "park",
     "name": "Tyrannosaurus Rex",
     "title": "park — Tyrannosaurus Rex",
@@ -728,7 +728,7 @@
     "sortOrder": 55
   },
   {
-    "popNumber": null,
+    "popNumber": 549,
     "subseries": "park",
     "name": "",
     "title": "park",
@@ -741,7 +741,7 @@
     "sortOrder": 56
   },
   {
-    "popNumber": null,
+    "popNumber": 553,
     "subseries": "",
     "name": "Danny Zuko",
     "title": "Danny Zuko",
@@ -793,7 +793,7 @@
     "sortOrder": 60
   },
   {
-    "popNumber": null,
+    "popNumber": 590,
     "subseries": "World",
     "name": "Claire Dearing",
     "title": "World — Claire Dearing",
@@ -806,7 +806,7 @@
     "sortOrder": 61
   },
   {
-    "popNumber": null,
+    "popNumber": 592,
     "subseries": "",
     "name": "Bruce Lee",
     "title": "Bruce Lee",
@@ -819,7 +819,7 @@
     "sortOrder": 62
   },
   {
-    "popNumber": null,
+    "popNumber": 598,
     "subseries": "",
     "name": "Migo",
     "title": "Migo",
@@ -832,7 +832,7 @@
     "sortOrder": 63
   },
   {
-    "popNumber": null,
+    "popNumber": 599,
     "subseries": "",
     "name": "Fleem",
     "title": "Fleem",
@@ -845,7 +845,7 @@
     "sortOrder": 64
   },
   {
-    "popNumber": null,
+    "popNumber": 600,
     "subseries": "",
     "name": "Percy",
     "title": "Percy",
@@ -858,7 +858,7 @@
     "sortOrder": 65
   },
   {
-    "popNumber": null,
+    "popNumber": 607,
     "subseries": "Monsters",
     "name": "Frankenstein with Flower",
     "title": "Monsters — Frankenstein with Flower",
@@ -884,7 +884,7 @@
     "sortOrder": 67
   },
   {
-    "popNumber": null,
+    "popNumber": 621,
     "subseries": "",
     "name": "Predator Hound",
     "title": "Predator Hound",
@@ -897,7 +897,7 @@
     "sortOrder": 68
   },
   {
-    "popNumber": null,
+    "popNumber": 621,
     "subseries": "",
     "name": "Predator Hound",
     "title": "Predator Hound",
@@ -910,7 +910,7 @@
     "sortOrder": 69
   },
   {
-    "popNumber": null,
+    "popNumber": 628,
     "subseries": "the Rings",
     "name": "Legolas",
     "title": "the Rings — Legolas",
@@ -923,7 +923,7 @@
     "sortOrder": 70
   },
   {
-    "popNumber": null,
+    "popNumber": 637,
     "subseries": "of Water",
     "name": "Amphibian Man",
     "title": "of Water — Amphibian Man",
@@ -936,7 +936,7 @@
     "sortOrder": 71
   },
   {
-    "popNumber": null,
+    "popNumber": 643,
     "subseries": "",
     "name": "Austin Powers",
     "title": "Austin Powers",
@@ -949,7 +949,7 @@
     "sortOrder": 72
   },
   {
-    "popNumber": null,
+    "popNumber": 656,
     "subseries": "of Horrors",
     "name": "Audrey Fulquard",
     "title": "of Horrors — Audrey Fulquard",
@@ -975,7 +975,7 @@
     "sortOrder": 74
   },
   {
-    "popNumber": null,
+    "popNumber": 682,
     "subseries": "",
     "name": "Thaddeus Valentine",
     "title": "Thaddeus Valentine",
@@ -988,7 +988,7 @@
     "sortOrder": 75
   },
   {
-    "popNumber": null,
+    "popNumber": 690,
     "subseries": "",
     "name": "Honey Ryder from Dr. No",
     "title": "Honey Ryder from Dr. No",
@@ -1001,7 +1001,7 @@
     "sortOrder": 76
   },
   {
-    "popNumber": null,
+    "popNumber": 710,
     "subseries": "",
     "name": "Peter Gibbons",
     "title": "Peter Gibbons",
@@ -1014,7 +1014,7 @@
     "sortOrder": 77
   },
   {
-    "popNumber": null,
+    "popNumber": 717,
     "subseries": "Black",
     "name": "Edgar",
     "title": "Black — Edgar",
@@ -1027,7 +1027,7 @@
     "sortOrder": 78
   },
   {
-    "popNumber": null,
+    "popNumber": 718,
     "subseries": "Black",
     "name": "Agent J",
     "title": "Black — Agent J",
@@ -1040,7 +1040,7 @@
     "sortOrder": 79
   },
   {
-    "popNumber": null,
+    "popNumber": 729,
     "subseries": "",
     "name": "Gage & Church",
     "title": "Gage & Church",
@@ -1053,7 +1053,7 @@
     "sortOrder": 80
   },
   {
-    "popNumber": null,
+    "popNumber": 738,
     "subseries": "",
     "name": "Agent H",
     "title": "Agent H",
@@ -1066,7 +1066,7 @@
     "sortOrder": 81
   },
   {
-    "popNumber": null,
+    "popNumber": 739,
     "subseries": "",
     "name": "Agent M",
     "title": "Agent M",
@@ -1079,7 +1079,7 @@
     "sortOrder": 82
   },
   {
-    "popNumber": null,
+    "popNumber": 740,
     "subseries": "",
     "name": "Pawny",
     "title": "Pawny",
@@ -1092,7 +1092,7 @@
     "sortOrder": 83
   },
   {
-    "popNumber": null,
+    "popNumber": 741,
     "subseries": "",
     "name": "Alien Twins",
     "title": "Alien Twins",
@@ -1105,7 +1105,7 @@
     "sortOrder": 84
   },
   {
-    "popNumber": null,
+    "popNumber": 750,
     "subseries": "",
     "name": "Hellboy",
     "title": "Hellboy",
@@ -1118,7 +1118,7 @@
     "sortOrder": 85
   },
   {
-    "popNumber": null,
+    "popNumber": 751,
     "subseries": "",
     "name": "Sarah",
     "title": "Sarah",
@@ -1131,7 +1131,7 @@
     "sortOrder": 86
   },
   {
-    "popNumber": null,
+    "popNumber": 780,
     "subseries": "2",
     "name": "Pennywise with Balloon",
     "title": "2 — Pennywise with Balloon",
@@ -1144,7 +1144,7 @@
     "sortOrder": 87
   },
   {
-    "popNumber": null,
+    "popNumber": 781,
     "subseries": "2",
     "name": "Pennywise Funhouse",
     "title": "2 — Pennywise Funhouse",
@@ -1157,7 +1157,7 @@
     "sortOrder": 88
   },
   {
-    "popNumber": null,
+    "popNumber": 790,
     "subseries": "Comes Home",
     "name": "Annabelle",
     "title": "Comes Home — Annabelle",
@@ -1183,7 +1183,7 @@
     "sortOrder": 90
   },
   {
-    "popNumber": null,
+    "popNumber": 831,
     "subseries": "",
     "name": "Michael Myers",
     "title": "Michael Myers",
@@ -1196,7 +1196,7 @@
     "sortOrder": 91
   },
   {
-    "popNumber": null,
+    "popNumber": 838,
     "subseries": "",
     "name": "Umbrae",
     "title": "Umbrae",
@@ -1209,7 +1209,7 @@
     "sortOrder": 92
   },
   {
-    "popNumber": null,
+    "popNumber": 840,
     "subseries": "",
     "name": "Jason Wilson",
     "title": "Jason Wilson",
@@ -1222,7 +1222,7 @@
     "sortOrder": 93
   },
   {
-    "popNumber": null,
+    "popNumber": 844,
     "subseries": "",
     "name": "Alan Parrish",
     "title": "Alan Parrish",
@@ -1235,7 +1235,7 @@
     "sortOrder": 94
   },
   {
-    "popNumber": null,
+    "popNumber": 879,
     "subseries": "Tour",
     "name": "Queen Barb",
     "title": "Tour — Queen Barb",
@@ -1248,7 +1248,7 @@
     "sortOrder": 95
   },
   {
-    "popNumber": null,
+    "popNumber": 880,
     "subseries": "Tour",
     "name": "Branch",
     "title": "Tour — Branch",
@@ -1261,7 +1261,7 @@
     "sortOrder": 96
   },
   {
-    "popNumber": null,
+    "popNumber": 887,
     "subseries": "",
     "name": "Jake Taylor",
     "title": "Jake Taylor",
@@ -1274,7 +1274,7 @@
     "sortOrder": 97
   },
   {
-    "popNumber": null,
+    "popNumber": 889,
     "subseries": "Gilmore",
     "name": "Happy Gilmore",
     "title": "Gilmore — Happy Gilmore",
@@ -1287,7 +1287,7 @@
     "sortOrder": 98
   },
   {
-    "popNumber": null,
+    "popNumber": 892,
     "subseries": "Gilmore",
     "name": "Otto",
     "title": "Gilmore — Otto",
@@ -1300,7 +1300,7 @@
     "sortOrder": 99
   },
   {
-    "popNumber": null,
+    "popNumber": 895,
     "subseries": "",
     "name": "Billy Madison",
     "title": "Billy Madison",
@@ -1313,7 +1313,7 @@
     "sortOrder": 100
   },
   {
-    "popNumber": null,
+    "popNumber": 900,
     "subseries": "",
     "name": "Young Gru",
     "title": "Young Gru",
@@ -1326,7 +1326,7 @@
     "sortOrder": 101
   },
   {
-    "popNumber": null,
+    "popNumber": 921,
     "subseries": "And Shaw",
     "name": "Hobbs",
     "title": "And Shaw — Hobbs",
@@ -1339,7 +1339,7 @@
     "sortOrder": 102
   },
   {
-    "popNumber": null,
+    "popNumber": 922,
     "subseries": "And Shaw",
     "name": "Brixton",
     "title": "And Shaw — Brixton",
@@ -1352,7 +1352,7 @@
     "sortOrder": 103
   },
   {
-    "popNumber": null,
+    "popNumber": 925,
     "subseries": "Afterlife",
     "name": "Phoebe",
     "title": "Afterlife — Phoebe",
@@ -1365,7 +1365,7 @@
     "sortOrder": 104
   },
   {
-    "popNumber": null,
+    "popNumber": 926,
     "subseries": "Afterlife",
     "name": "Lucky",
     "title": "Afterlife — Lucky",
@@ -1378,7 +1378,7 @@
     "sortOrder": 105
   },
   {
-    "popNumber": null,
+    "popNumber": 927,
     "subseries": "Afterlife",
     "name": "Podcast",
     "title": "Afterlife — Podcast",
@@ -1391,7 +1391,7 @@
     "sortOrder": 106
   },
   {
-    "popNumber": null,
+    "popNumber": 928,
     "subseries": "Afterlife",
     "name": "Mr. Grooberson",
     "title": "Afterlife — Mr. Grooberson",
@@ -1404,7 +1404,7 @@
     "sortOrder": 107
   },
   {
-    "popNumber": null,
+    "popNumber": 929,
     "subseries": "Afterlife",
     "name": "Muncher",
     "title": "Afterlife — Muncher",
@@ -1417,7 +1417,7 @@
     "sortOrder": 108
   },
   {
-    "popNumber": null,
+    "popNumber": 932,
     "subseries": "",
     "name": "Shorty",
     "title": "Shorty",
@@ -1430,7 +1430,7 @@
     "sortOrder": 109
   },
   {
-    "popNumber": null,
+    "popNumber": 936,
     "subseries": "Afterlife",
     "name": "Mini Puft On Fire",
     "title": "Afterlife — Mini Puft On Fire",
@@ -1443,7 +1443,7 @@
     "sortOrder": 110
   },
   {
-    "popNumber": null,
+    "popNumber": 961,
     "subseries": "The Future",
     "name": "Marty in Puffy Vest",
     "title": "The Future — Marty in Puffy Vest",
@@ -1456,7 +1456,7 @@
     "sortOrder": 111
   },
   {
-    "popNumber": null,
+    "popNumber": 989,
     "subseries": "",
     "name": "John Winger",
     "title": "John Winger",
@@ -1469,7 +1469,7 @@
     "sortOrder": 112
   },
   {
-    "popNumber": null,
+    "popNumber": 991,
     "subseries": "",
     "name": "Ox",
     "title": "Ox",
@@ -1833,7 +1833,7 @@
     "sortOrder": 140
   },
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "",
     "name": "Donatello",
     "title": "Donatello",
@@ -1846,7 +1846,7 @@
     "sortOrder": 141
   },
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "",
     "name": "Raphael",
     "title": "Raphael",
@@ -1859,7 +1859,7 @@
     "sortOrder": 142
   },
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "",
     "name": "Rahzar",
     "title": "Rahzar",
@@ -1872,7 +1872,7 @@
     "sortOrder": 143
   },
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "",
     "name": "Super Shredder",
     "title": "Super Shredder",
@@ -1885,7 +1885,7 @@
     "sortOrder": 144
   },
   {
-    "popNumber": null,
+    "popNumber": 2,
     "subseries": "",
     "name": "Tokka",
     "title": "Tokka",
@@ -1963,7 +1963,7 @@
     "sortOrder": 150
   },
   {
-    "popNumber": null,
+    "popNumber": 45,
     "subseries": "",
     "name": "Rocky Balboa",
     "title": "Rocky Balboa",
@@ -1976,7 +1976,7 @@
     "sortOrder": 151
   },
   {
-    "popNumber": null,
+    "popNumber": 45,
     "subseries": "",
     "name": "Apollo Creed",
     "title": "Apollo Creed",
@@ -2379,7 +2379,7 @@
     "sortOrder": 182
   },
   {
-    "popNumber": null,
+    "popNumber": 40,
     "subseries": "",
     "name": "Elliott & E.T. In Bike Basket",
     "title": "Elliott & E.T. In Bike Basket",
@@ -2392,7 +2392,7 @@
     "sortOrder": 183
   },
   {
-    "popNumber": null,
+    "popNumber": 40,
     "subseries": "",
     "name": "E.T. In Disguise",
     "title": "E.T. In Disguise",
@@ -2405,7 +2405,7 @@
     "sortOrder": 184
   },
   {
-    "popNumber": null,
+    "popNumber": 40,
     "subseries": "",
     "name": "E.T. In Robe",
     "title": "E.T. In Robe",
@@ -2418,7 +2418,7 @@
     "sortOrder": 185
   },
   {
-    "popNumber": null,
+    "popNumber": 40,
     "subseries": "",
     "name": "E.T. with Flowers",
     "title": "E.T. with Flowers",
@@ -2431,7 +2431,7 @@
     "sortOrder": 186
   },
   {
-    "popNumber": null,
+    "popNumber": 40,
     "subseries": "",
     "name": "Elliott",
     "title": "Elliott",
@@ -2444,7 +2444,7 @@
     "sortOrder": 187
   },
   {
-    "popNumber": null,
+    "popNumber": 40,
     "subseries": "",
     "name": "Gertie",
     "title": "Gertie",

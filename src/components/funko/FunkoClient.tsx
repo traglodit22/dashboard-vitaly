@@ -205,7 +205,7 @@ function FunkoClientInner() {
           <Input
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Поиск…"
+            placeholder="№ или название…"
             className="h-9 pl-9 text-sm"
           />
         </div>
@@ -372,12 +372,12 @@ function FunkoCard({
           </button>
         )}
         {item.popNumber != null && (
-          <Badge className="absolute top-1.5 right-1.5 tabular-nums" variant="secondary">
-            #{item.popNumber}
+          <Badge className="absolute top-1.5 left-1.5 tabular-nums text-xs font-semibold" variant="default">
+            №{item.popNumber}
           </Badge>
         )}
         {item.hasDuplicates && (
-          <Badge className="absolute top-1.5 left-1.5 text-[10px]" variant="destructive">
+          <Badge className="absolute top-1.5 right-1.5 text-[10px]" variant="destructive">
             дубли{item.quantity > 1 ? ` ×${item.quantity}` : ""}
           </Badge>
         )}
@@ -401,6 +401,11 @@ function FunkoCard({
           </p>
         )}
         <h3 className="line-clamp-2 min-h-[2.5rem] text-xs leading-snug font-medium">
+          {item.popNumber != null && (
+            <span className="mr-1 font-semibold text-primary tabular-nums">
+              №{item.popNumber}
+            </span>
+          )}
           {item.title}
         </h3>
 

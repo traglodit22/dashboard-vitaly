@@ -1,6 +1,6 @@
 [
   {
-    "popNumber": null,
+    "popNumber": 15,
     "subseries": "Carey",
     "name": "Mariah Carey",
     "title": "Carey — Mariah Carey",
@@ -13,7 +13,7 @@
     "sortOrder": 0
   },
   {
-    "popNumber": null,
+    "popNumber": 45,
     "subseries": "",
     "name": "Notorious B.I.G.",
     "title": "Notorious B.I.G.",
@@ -26,7 +26,7 @@
     "sortOrder": 1
   },
   {
-    "popNumber": null,
+    "popNumber": 6,
     "subseries": "",
     "name": "The Queen of Blood",
     "title": "The Queen of Blood",
@@ -39,7 +39,7 @@
     "sortOrder": 2
   },
   {
-    "popNumber": null,
+    "popNumber": 1,
     "subseries": "Elizabeth II",
     "name": "Queen Elizabeth II Wedding Outfit",
     "title": "Elizabeth II — Queen Elizabeth II Wedding Outfit",
@@ -52,7 +52,7 @@
     "sortOrder": 3
   },
   {
-    "popNumber": null,
+    "popNumber": 1,
     "subseries": "Elizabeth II",
     "name": "Queen Elizabeth II Wedding Outfit",
     "title": "Elizabeth II — Queen Elizabeth II Wedding Outfit",

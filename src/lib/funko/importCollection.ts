@@ -129,8 +129,9 @@ export async function importFunkoCollectionForCategory(
            notes = $6,
            series = $7,
            sort_order = $8,
+           pop_number = COALESCE($9, pop_number),
            updated_at = NOW(),
-           image_url = COALESCE(image_url, $9)
+           image_url = COALESCE(image_url, $10)
          WHERE id = $1`,
         [
           match.id,
@@ -141,6 +142,7 @@ export async function importFunkoCollectionForCategory(
           row.notes,
           series,
           row.sortOrder ?? i,
+          row.popNumber,
           imageUrl,
         ],
       )
@@ -165,6 +167,7 @@ export async function importFunkoCollectionForCategory(
          notes = EXCLUDED.notes,
          series = EXCLUDED.series,
          sort_order = EXCLUDED.sort_order,
+         pop_number = COALESCE(EXCLUDED.pop_number, funko_items.pop_number),
          image_url = COALESCE(funko_items.image_url, EXCLUDED.image_url),
          updated_at = NOW()`,
       [

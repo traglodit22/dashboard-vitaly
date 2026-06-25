@@ -26,7 +26,7 @@
     "sortOrder": 1
   },
   {
-    "popNumber": null,
+    "popNumber": 3,
     "subseries": "",
     "name": "Spider-Man",
     "title": "Spider-Man",
@@ -39,7 +39,7 @@
     "sortOrder": 2
   },
   {
-    "popNumber": null,
+    "popNumber": 4,
     "subseries": "Universe",
     "name": "Iron Man",
     "title": "Universe — Iron Man",
@@ -52,7 +52,7 @@
     "sortOrder": 3
   },
   {
-    "popNumber": null,
+    "popNumber": 5,
     "subseries": "Universe",
     "name": "Wolverine",
     "title": "Universe — Wolverine",
@@ -104,7 +104,7 @@
     "sortOrder": 7
   },
   {
-    "popNumber": null,
+    "popNumber": 24,
     "subseries": "3",
     "name": "War Machine",
     "title": "3 — War Machine",
@@ -117,7 +117,7 @@
     "sortOrder": 8
   },
   {
-    "popNumber": null,
+    "popNumber": 31,
     "subseries": "",
     "name": "Red Hulk",
     "title": "Red Hulk",
@@ -143,7 +143,7 @@
     "sortOrder": 10
   },
   {
-    "popNumber": null,
+    "popNumber": 44,
     "subseries": "America: The Winter Soldier",
     "name": "Winter Soldier",
     "title": "America: The Winter Soldier — Winter Soldier",
@@ -156,7 +156,7 @@
     "sortOrder": 11
   },
   {
-    "popNumber": null,
+    "popNumber": 47,
     "subseries": "Of The Galaxy",
     "name": "Star-Lord",
     "title": "Of The Galaxy — Star-Lord",
@@ -169,7 +169,7 @@
     "sortOrder": 12
   },
   {
-    "popNumber": null,
+    "popNumber": 49,
     "subseries": "Of The Galaxy",
     "name": "Groot",
     "title": "Of The Galaxy — Groot",
@@ -182,7 +182,7 @@
     "sortOrder": 13
   },
   {
-    "popNumber": null,
+    "popNumber": 50,
     "subseries": "Of The Galaxy",
     "name": "Drax",
     "title": "Of The Galaxy — Drax",
@@ -195,7 +195,7 @@
     "sortOrder": 14
   },
   {
-    "popNumber": null,
+    "popNumber": 51,
     "subseries": "Of The Galaxy",
     "name": "Gamora",
     "title": "Of The Galaxy — Gamora",
@@ -208,7 +208,7 @@
     "sortOrder": 15
   },
   {
-    "popNumber": null,
+    "popNumber": 57,
     "subseries": "",
     "name": "Professor X",
     "title": "Professor X",
@@ -221,7 +221,7 @@
     "sortOrder": 16
   },
   {
-    "popNumber": null,
+    "popNumber": 65,
     "subseries": "Of The Galaxy",
     "name": "Dancing Groot",
     "title": "Of The Galaxy — Dancing Groot",
@@ -234,7 +234,7 @@
     "sortOrder": 17
   },
   {
-    "popNumber": null,
+    "popNumber": 66,
     "subseries": "Age of Ultron",
     "name": "Iron Man Mark 43",
     "title": "Age of Ultron — Iron Man Mark 43",
@@ -247,7 +247,7 @@
     "sortOrder": 18
   },
   {
-    "popNumber": null,
+    "popNumber": 80,
     "subseries": "",
     "name": "Punisher",
     "title": "Punisher",
@@ -260,7 +260,7 @@
     "sortOrder": 19
   },
   {
-    "popNumber": null,
+    "popNumber": 81,
     "subseries": "",
     "name": "Spider-Man 2099",
     "title": "Spider-Man 2099",
@@ -273,7 +273,7 @@
     "sortOrder": 20
   },
   {
-    "popNumber": null,
+    "popNumber": 82,
     "subseries": "",
     "name": "Venom",
     "title": "Venom",
@@ -286,7 +286,7 @@
     "sortOrder": 21
   },
   {
-    "popNumber": null,
+    "popNumber": 83,
     "subseries": "Age of Ultron",
     "name": "Grinning Ultron",
     "title": "Age of Ultron — Grinning Ultron",
@@ -299,7 +299,7 @@
     "sortOrder": 22
   },
   {
-    "popNumber": null,
+    "popNumber": 86,
     "subseries": "",
     "name": "Yellow Jacket",
     "title": "Yellow Jacket",
@@ -312,7 +312,7 @@
     "sortOrder": 23
   },
   {
-    "popNumber": null,
+    "popNumber": 96,
     "subseries": "",
     "name": "Agent Carter",
     "title": "Agent Carter",
@@ -325,7 +325,7 @@
     "sortOrder": 24
   },
   {
-    "popNumber": null,
+    "popNumber": 100,
     "subseries": "",
     "name": "Anti-Venom",
     "title": "Anti-Venom",
@@ -338,7 +338,7 @@
     "sortOrder": 25
   },
   {
-    "popNumber": null,
+    "popNumber": 101,
     "subseries": "Of The Galaxy",
     "name": "Holiday Dancing Groot",
     "title": "Of The Galaxy — Holiday Dancing Groot",
@@ -364,7 +364,7 @@
     "sortOrder": 27
   },
   {
-    "popNumber": null,
+    "popNumber": 112,
     "subseries": "",
     "name": "Deadpool",
     "title": "Deadpool",
@@ -377,7 +377,7 @@
     "sortOrder": 28
   },
   {
-    "popNumber": null,
+    "popNumber": 125,
     "subseries": "",
     "name": "Captain America",
     "title": "Captain America",
@@ -390,7 +390,7 @@
     "sortOrder": 29
   },
   {
-    "popNumber": null,
+    "popNumber": 126,
     "subseries": "",
     "name": "Iron Man",
     "title": "Iron Man",
@@ -403,7 +403,7 @@
     "sortOrder": 30
   },
   {
-    "popNumber": null,
+    "popNumber": 130,
     "subseries": "",
     "name": "Black Panther",
     "title": "Black Panther",
@@ -416,7 +416,7 @@
     "sortOrder": 31
   },
   {
-    "popNumber": null,
+    "popNumber": 131,
     "subseries": "",
     "name": "Agent 13",
     "title": "Agent 13",
@@ -429,7 +429,7 @@
     "sortOrder": 32
   },
   {
-    "popNumber": null,
+    "popNumber": 146,
     "subseries": "",
     "name": "Spider-Gwen",
     "title": "Spider-Gwen",
@@ -455,7 +455,7 @@
     "sortOrder": 34
   },
   {
-    "popNumber": null,
+    "popNumber": 174,
     "subseries": "Strange",
     "name": "Doctor Strange",
     "title": "Strange — Doctor Strange",
@@ -468,7 +468,7 @@
     "sortOrder": 35
   },
   {
-    "popNumber": null,
+    "popNumber": 185,
     "subseries": "",
     "name": "Logan",
     "title": "Logan",
@@ -481,7 +481,7 @@
     "sortOrder": 36
   },
   {
-    "popNumber": null,
+    "popNumber": 198,
     "subseries": "Of The Galaxy Vol. 2",
     "name": "Star-Lord",
     "title": "Of The Galaxy Vol. 2 — Star-Lord",
@@ -494,7 +494,7 @@
     "sortOrder": 37
   },
   {
-    "popNumber": null,
+    "popNumber": 212,
     "subseries": "Of The Galaxy Vol. 2",
     "name": "Groot",
     "title": "Of The Galaxy Vol. 2 — Groot",
@@ -507,7 +507,7 @@
     "sortOrder": 38
   },
   {
-    "popNumber": null,
+    "popNumber": 220,
     "subseries": "",
     "name": "Spider-Man",
     "title": "Spider-Man",
@@ -520,7 +520,7 @@
     "sortOrder": 39
   },
   {
-    "popNumber": null,
+    "popNumber": 222,
     "subseries": "",
     "name": "Spider-Man",
     "title": "Spider-Man",
@@ -546,7 +546,7 @@
     "sortOrder": 41
   },
   {
-    "popNumber": null,
+    "popNumber": 240,
     "subseries": "",
     "name": "Thor",
     "title": "Thor",
@@ -559,7 +559,7 @@
     "sortOrder": 42
   },
   {
-    "popNumber": null,
+    "popNumber": 241,
     "subseries": "",
     "name": "Hulk",
     "title": "Hulk",
@@ -572,7 +572,7 @@
     "sortOrder": 43
   },
   {
-    "popNumber": null,
+    "popNumber": 243,
     "subseries": "",
     "name": "Hela",
     "title": "Hela",
@@ -585,7 +585,7 @@
     "sortOrder": 44
   },
   {
-    "popNumber": null,
+    "popNumber": 266,
     "subseries": "Hill",
     "name": "B-Real (Dr Greenthumb)",
     "title": "Hill — B-Real (Dr Greenthumb)",
@@ -598,7 +598,7 @@
     "sortOrder": 45
   },
   {
-    "popNumber": null,
+    "popNumber": 273,
     "subseries": "",
     "name": "Black Panther",
     "title": "Black Panther",
@@ -611,7 +611,7 @@
     "sortOrder": 46
   },
   {
-    "popNumber": null,
+    "popNumber": 278,
     "subseries": "",
     "name": "Erik Killmonger",
     "title": "Erik Killmonger",
@@ -624,7 +624,7 @@
     "sortOrder": 47
   },
   {
-    "popNumber": null,
+    "popNumber": 285,
     "subseries": "Infinity War",
     "name": "Iron Man",
     "title": "Infinity War — Iron Man",
@@ -637,7 +637,7 @@
     "sortOrder": 48
   },
   {
-    "popNumber": null,
+    "popNumber": 286,
     "subseries": "Infinity War",
     "name": "Thor",
     "title": "Infinity War — Thor",
@@ -650,7 +650,7 @@
     "sortOrder": 49
   },
   {
-    "popNumber": null,
+    "popNumber": 287,
     "subseries": "Infinity War",
     "name": "Iron Spider",
     "title": "Infinity War — Iron Spider",
@@ -663,7 +663,7 @@
     "sortOrder": 50
   },
   {
-    "popNumber": null,
+    "popNumber": 288,
     "subseries": "Infinity War",
     "name": "Captain America",
     "title": "Infinity War — Captain America",
@@ -676,7 +676,7 @@
     "sortOrder": 51
   },
   {
-    "popNumber": null,
+    "popNumber": 289,
     "subseries": "Infinity War",
     "name": "Thanos",
     "title": "Infinity War — Thanos",
@@ -689,7 +689,7 @@
     "sortOrder": 52
   },
   {
-    "popNumber": null,
+    "popNumber": 289,
     "subseries": "Infinity War",
     "name": "Thanos",
     "title": "Infinity War — Thanos",
@@ -702,7 +702,7 @@
     "sortOrder": 53
   },
   {
-    "popNumber": null,
+    "popNumber": 289,
     "subseries": "Infinity War",
     "name": "Thanos",
     "title": "Infinity War — Thanos",
@@ -715,7 +715,7 @@
     "sortOrder": 54
   },
   {
-    "popNumber": null,
+    "popNumber": 290,
     "subseries": "Infinity War",
     "name": "Corvus Glaive",
     "title": "Infinity War — Corvus Glaive",
@@ -728,7 +728,7 @@
     "sortOrder": 55
   },
   {
-    "popNumber": null,
+    "popNumber": 291,
     "subseries": "Infinity War",
     "name": "Ebony Maw",
     "title": "Infinity War — Ebony Maw",
@@ -741,7 +741,7 @@
     "sortOrder": 56
   },
   {
-    "popNumber": null,
+    "popNumber": 293,
     "subseries": "Infinity War",
     "name": "Groot",
     "title": "Infinity War — Groot",
@@ -754,7 +754,7 @@
     "sortOrder": 57
   },
   {
-    "popNumber": null,
+    "popNumber": 294,
     "subseries": "Infinity War",
     "name": "Hulkbuster",
     "title": "Infinity War — Hulkbuster",
@@ -767,7 +767,7 @@
     "sortOrder": 58
   },
   {
-    "popNumber": null,
+    "popNumber": 300,
     "subseries": "Infinity War",
     "name": "Iron Spider",
     "title": "Infinity War — Iron Spider",
@@ -793,7 +793,7 @@
     "sortOrder": 60
   },
   {
-    "popNumber": null,
+    "popNumber": 314,
     "subseries": "",
     "name": "Cable",
     "title": "Cable",
@@ -806,7 +806,7 @@
     "sortOrder": 61
   },
   {
-    "popNumber": null,
+    "popNumber": 317,
     "subseries": "",
     "name": "Negasonic Teenage Warhead",
     "title": "Negasonic Teenage Warhead",
@@ -819,7 +819,7 @@
     "sortOrder": 62
   },
   {
-    "popNumber": null,
+    "popNumber": 319,
     "subseries": "",
     "name": "Deadpool as. Bob Ross",
     "title": "Deadpool as. Bob Ross",
@@ -832,7 +832,7 @@
     "sortOrder": 63
   },
   {
-    "popNumber": null,
+    "popNumber": 322,
     "subseries": "",
     "name": "Clown Deadpool",
     "title": "Clown Deadpool",
@@ -845,7 +845,7 @@
     "sortOrder": 64
   },
   {
-    "popNumber": null,
+    "popNumber": 333,
     "subseries": "",
     "name": "Silk",
     "title": "Silk",
@@ -858,7 +858,7 @@
     "sortOrder": 65
   },
   {
-    "popNumber": null,
+    "popNumber": 342,
     "subseries": "WASP",
     "name": "Ghost",
     "title": "WASP — Ghost",
@@ -871,7 +871,7 @@
     "sortOrder": 66
   },
   {
-    "popNumber": null,
+    "popNumber": 363,
     "subseries": "",
     "name": "Venom",
     "title": "Venom",
@@ -884,7 +884,7 @@
     "sortOrder": 67
   },
   {
-    "popNumber": null,
+    "popNumber": 368,
     "subseries": "",
     "name": "Venomized Loki",
     "title": "Venomized Loki",
@@ -897,7 +897,7 @@
     "sortOrder": 68
   },
   {
-    "popNumber": null,
+    "popNumber": 375,
     "subseries": "Ten Years",
     "name": "Iron Man",
     "title": "Ten Years — Iron Man",
@@ -910,7 +910,7 @@
     "sortOrder": 69
   },
   {
-    "popNumber": null,
+    "popNumber": 381,
     "subseries": "Ten Years",
     "name": "Thor",
     "title": "Ten Years — Thor",
@@ -923,7 +923,7 @@
     "sortOrder": 70
   },
   {
-    "popNumber": null,
+    "popNumber": 382,
     "subseries": "Ten Years",
     "name": "Gamora",
     "title": "Ten Years — Gamora",
@@ -936,7 +936,7 @@
     "sortOrder": 71
   },
   {
-    "popNumber": null,
+    "popNumber": 383,
     "subseries": "Ten Years",
     "name": "Black Panther",
     "title": "Ten Years — Black Panther",
@@ -949,7 +949,7 @@
     "sortOrder": 72
   },
   {
-    "popNumber": null,
+    "popNumber": 384,
     "subseries": "Ten Years",
     "name": "Ant-Man",
     "title": "Ten Years — Ant-Man",
@@ -962,7 +962,7 @@
     "sortOrder": 73
   },
   {
-    "popNumber": null,
+    "popNumber": 387,
     "subseries": "",
     "name": "Ulysses Klaue",
     "title": "Ulysses Klaue",
@@ -975,7 +975,7 @@
     "sortOrder": 74
   },
   {
-    "popNumber": null,
+    "popNumber": 420,
     "subseries": "Ten Years",
     "name": "Rocket",
     "title": "Ten Years — Rocket",
@@ -988,7 +988,7 @@
     "sortOrder": 75
   },
   {
-    "popNumber": null,
+    "popNumber": 427,
     "subseries": "Marvel",
     "name": "Vers",
     "title": "Marvel — Vers",
@@ -1001,7 +1001,7 @@
     "sortOrder": 76
   },
   {
-    "popNumber": null,
+    "popNumber": 428,
     "subseries": "Marvel",
     "name": "Nick Fury",
     "title": "Marvel — Nick Fury",
@@ -1014,7 +1014,7 @@
     "sortOrder": 77
   },
   {
-    "popNumber": null,
+    "popNumber": 430,
     "subseries": "Marvel",
     "name": "Maria Rambeau",
     "title": "Marvel — Maria Rambeau",
@@ -1027,7 +1027,7 @@
     "sortOrder": 78
   },
   {
-    "popNumber": null,
+    "popNumber": 444,
     "subseries": "Marvel",
     "name": "Captain Marvel",
     "title": "Marvel — Captain Marvel",
@@ -1040,7 +1040,7 @@
     "sortOrder": 79
   },
   {
-    "popNumber": null,
+    "popNumber": 449,
     "subseries": "Endgame",
     "name": "Tony Stark",
     "title": "Endgame — Tony Stark",
@@ -1053,7 +1053,7 @@
     "sortOrder": 80
   },
   {
-    "popNumber": null,
+    "popNumber": 451,
     "subseries": "Endgame",
     "name": "Hulk",
     "title": "Endgame — Hulk",
@@ -1066,7 +1066,7 @@
     "sortOrder": 81
   },
   {
-    "popNumber": null,
+    "popNumber": 452,
     "subseries": "Endgame",
     "name": "Thor",
     "title": "Endgame — Thor",
@@ -1079,7 +1079,7 @@
     "sortOrder": 82
   },
   {
-    "popNumber": null,
+    "popNumber": 454,
     "subseries": "Endgame",
     "name": "Black Widow",
     "title": "Endgame — Black Widow",
@@ -1092,7 +1092,7 @@
     "sortOrder": 83
   },
   {
-    "popNumber": null,
+    "popNumber": 457,
     "subseries": "Endgame",
     "name": "Hawkeye",
     "title": "Endgame — Hawkeye",
@@ -1105,7 +1105,7 @@
     "sortOrder": 84
   },
   {
-    "popNumber": null,
+    "popNumber": 461,
     "subseries": "Endgame",
     "name": "War Machine",
     "title": "Endgame — War Machine",
@@ -1118,7 +1118,7 @@
     "sortOrder": 85
   },
   {
-    "popNumber": null,
+    "popNumber": 479,
     "subseries": "Endgame",
     "name": "Casual Thor",
     "title": "Endgame — Casual Thor",
@@ -1131,7 +1131,7 @@
     "sortOrder": 86
   },
   {
-    "popNumber": null,
+    "popNumber": 494,
     "subseries": "",
     "name": "Nova",
     "title": "Nova",
@@ -1144,7 +1144,7 @@
     "sortOrder": 87
   },
   {
-    "popNumber": null,
+    "popNumber": 502,
     "subseries": "80 Years",
     "name": "Cyclops",
     "title": "80 Years — Cyclops",
@@ -1157,7 +1157,7 @@
     "sortOrder": 88
   },
   {
-    "popNumber": null,
+    "popNumber": 503,
     "subseries": "80 Years",
     "name": "Marvel Girl",
     "title": "80 Years — Marvel Girl",
@@ -1170,7 +1170,7 @@
     "sortOrder": 89
   },
   {
-    "popNumber": null,
+    "popNumber": 505,
     "subseries": "80 Years",
     "name": "Beast",
     "title": "80 Years — Beast",
@@ -1183,7 +1183,7 @@
     "sortOrder": 90
   },
   {
-    "popNumber": null,
+    "popNumber": 506,
     "subseries": "80 Years",
     "name": "Angel",
     "title": "80 Years — Angel",
@@ -1196,7 +1196,7 @@
     "sortOrder": 91
   },
   {
-    "popNumber": null,
+    "popNumber": 519,
     "subseries": "of the Galaxy vol. 2",
     "name": "Stan Lee",
     "title": "of the Galaxy vol. 2 — Stan Lee",
@@ -1209,7 +1209,7 @@
     "sortOrder": 92
   },
   {
-    "popNumber": null,
+    "popNumber": 530,
     "subseries": "",
     "name": "Groot (Holiday)",
     "title": "Groot (Holiday)",
@@ -1222,7 +1222,7 @@
     "sortOrder": 93
   },
   {
-    "popNumber": null,
+    "popNumber": 551,
     "subseries": "80 Years",
     "name": "Black Widow",
     "title": "80 Years — Black Widow",
@@ -1235,7 +1235,7 @@
     "sortOrder": 94
   },
   {
-    "popNumber": null,
+    "popNumber": 557,
     "subseries": "Four",
     "name": "Mister Fantastic",
     "title": "Four — Mister Fantastic",
@@ -1248,7 +1248,7 @@
     "sortOrder": 95
   },
   {
-    "popNumber": null,
+    "popNumber": 558,
     "subseries": "Four",
     "name": "Invisible Girl",
     "title": "Four — Invisible Girl",
@@ -1261,7 +1261,7 @@
     "sortOrder": 96
   },
   {
-    "popNumber": null,
+    "popNumber": 560,
     "subseries": "Four",
     "name": "The Thing",
     "title": "Four — The Thing",
@@ -1274,7 +1274,7 @@
     "sortOrder": 97
   },
   {
-    "popNumber": null,
+    "popNumber": 561,
     "subseries": "Four",
     "name": "Doctor Doom",
     "title": "Four — Doctor Doom",
@@ -1287,7 +1287,7 @@
     "sortOrder": 98
   },
   {
-    "popNumber": null,
+    "popNumber": 563,
     "subseries": "Four",
     "name": "Silver Surfer",
     "title": "Four — Silver Surfer",
@@ -1300,7 +1300,7 @@
     "sortOrder": 99
   },
   {
-    "popNumber": null,
+    "popNumber": 564,
     "subseries": "Four",
     "name": "H.E.R.B.I.E",
     "title": "Four — H.E.R.B.I.E",
@@ -1313,7 +1313,7 @@
     "sortOrder": 100
   },
   {
-    "popNumber": null,
+    "popNumber": 565,
     "subseries": "Four",
     "name": "Galactus",
     "title": "Four — Galactus",
@@ -1326,7 +1326,7 @@
     "sortOrder": 101
   },
   {
-    "popNumber": null,
+    "popNumber": 567,
     "subseries": "Four",
     "name": "Invisible Girl",
     "title": "Four — Invisible Girl",
@@ -1339,7 +1339,7 @@
     "sortOrder": 102
   },
   {
-    "popNumber": null,
+    "popNumber": 569,
     "subseries": "Four",
     "name": "Human Torch (Special Edition)",
     "title": "Four — Human Torch (Special Edition)",
@@ -1352,7 +1352,7 @@
     "sortOrder": 103
   },
   {
-    "popNumber": null,
+    "popNumber": 573,
     "subseries": "Endgame",
     "name": "Captain America",
     "title": "Endgame — Captain America",
@@ -1365,7 +1365,7 @@
     "sortOrder": 104
   },
   {
-    "popNumber": null,
+    "popNumber": 574,
     "subseries": "Endgame",
     "name": "Iron Spider",
     "title": "Endgame — Iron Spider",
@@ -1378,7 +1378,7 @@
     "sortOrder": 105
   },
   {
-    "popNumber": null,
+    "popNumber": 579,
     "subseries": "Endgame",
     "name": "Thanos In The Garden",
     "title": "Endgame — Thanos In The Garden",
@@ -1391,7 +1391,7 @@
     "sortOrder": 106
   },
   {
-    "popNumber": null,
+    "popNumber": 580,
     "subseries": "Endgame",
     "name": "Iron Man",
     "title": "Endgame — Iron Man",
@@ -1404,7 +1404,7 @@
     "sortOrder": 107
   },
   {
-    "popNumber": null,
+    "popNumber": 584,
     "subseries": "Assemble",
     "name": "Iron Man",
     "title": "Assemble — Iron Man",
@@ -1417,7 +1417,7 @@
     "sortOrder": 108
   },
   {
-    "popNumber": null,
+    "popNumber": 589,
     "subseries": "Assemble",
     "name": "Captain America",
     "title": "Assemble — Captain America",
@@ -1430,7 +1430,7 @@
     "sortOrder": 109
   },
   {
-    "popNumber": null,
+    "popNumber": 593,
     "subseries": "",
     "name": "Spider-Man",
     "title": "Spider-Man",
@@ -1443,7 +1443,7 @@
     "sortOrder": 110
   },
   {
-    "popNumber": null,
+    "popNumber": 595,
     "subseries": "",
     "name": "Venomized Punisher",
     "title": "Venomized Punisher",
@@ -1456,7 +1456,7 @@
     "sortOrder": 111
   },
   {
-    "popNumber": null,
+    "popNumber": 600,
     "subseries": "Maximum Venom",
     "name": "Venomized Miles Morales",
     "title": "Maximum Venom — Venomized Miles Morales",
@@ -1469,7 +1469,7 @@
     "sortOrder": 112
   },
   {
-    "popNumber": null,
+    "popNumber": 602,
     "subseries": "Maximum Venom",
     "name": "Venomized Doctor Strange",
     "title": "Maximum Venom — Venomized Doctor Strange",
@@ -1482,7 +1482,7 @@
     "sortOrder": 113
   },
   {
-    "popNumber": null,
+    "popNumber": 604,
     "subseries": "",
     "name": "Black Widow",
     "title": "Black Widow",
@@ -1495,7 +1495,7 @@
     "sortOrder": 114
   },
   {
-    "popNumber": null,
+    "popNumber": 605,
     "subseries": "",
     "name": "Taskmaster",
     "title": "Taskmaster",
@@ -1508,7 +1508,7 @@
     "sortOrder": 115
   },
   {
-    "popNumber": null,
+    "popNumber": 606,
     "subseries": "",
     "name": "Taskmaster with bow",
     "title": "Taskmaster with bow",
@@ -1521,7 +1521,7 @@
     "sortOrder": 116
   },
   {
-    "popNumber": null,
+    "popNumber": 610,
     "subseries": "",
     "name": "Taskmaster",
     "title": "Taskmaster",
@@ -1534,7 +1534,7 @@
     "sortOrder": 117
   },
   {
-    "popNumber": null,
+    "popNumber": 648,
     "subseries": "",
     "name": "Captain America",
     "title": "Captain America",
@@ -1547,7 +1547,7 @@
     "sortOrder": 118
   },
   {
-    "popNumber": null,
+    "popNumber": 649,
     "subseries": "",
     "name": "Iron Man (Black Light)",
     "title": "Iron Man (Black Light)",
@@ -1560,7 +1560,7 @@
     "sortOrder": 119
   },
   {
-    "popNumber": null,
+    "popNumber": 650,
     "subseries": "",
     "name": "Thor",
     "title": "Thor",
@@ -1573,7 +1573,7 @@
     "sortOrder": 120
   },
   {
-    "popNumber": null,
+    "popNumber": 651,
     "subseries": "",
     "name": "Dr. Strange",
     "title": "Dr. Strange",
@@ -1586,7 +1586,7 @@
     "sortOrder": 121
   },
   {
-    "popNumber": null,
+    "popNumber": 652,
     "subseries": "",
     "name": "Spider Man",
     "title": "Spider Man",
@@ -1599,7 +1599,7 @@
     "sortOrder": 122
   },
   {
-    "popNumber": null,
+    "popNumber": 655,
     "subseries": "",
     "name": "Stan Lee",
     "title": "Stan Lee",
@@ -1612,7 +1612,7 @@
     "sortOrder": 123
   },
   {
-    "popNumber": null,
+    "popNumber": 657,
     "subseries": "",
     "name": "Dark Captain Marvel",
     "title": "Dark Captain Marvel",
@@ -1651,7 +1651,7 @@
     "sortOrder": 126
   },
   {
-    "popNumber": null,
+    "popNumber": 700,
     "subseries": "E The Winter Soldier",
     "name": "Falcon",
     "title": "E The Winter Soldier — Falcon",
@@ -1664,7 +1664,7 @@
     "sortOrder": 127
   },
   {
-    "popNumber": null,
+    "popNumber": 702,
     "subseries": "E The Winter Soldier",
     "name": "Baron Zemo",
     "title": "E The Winter Soldier — Baron Zemo",
@@ -1677,7 +1677,7 @@
     "sortOrder": 128
   },
   {
-    "popNumber": null,
+    "popNumber": 707,
     "subseries": "",
     "name": "El Venenoide",
     "title": "El Venenoide",
@@ -1690,7 +1690,7 @@
     "sortOrder": 129
   },
   {
-    "popNumber": null,
+    "popNumber": 708,
     "subseries": "",
     "name": "El Furioso",
     "title": "El Furioso",
@@ -1703,7 +1703,7 @@
     "sortOrder": 130
   },
   {
-    "popNumber": null,
+    "popNumber": 709,
     "subseries": "",
     "name": "El Heroe Invicto",
     "title": "El Heroe Invicto",
@@ -1716,7 +1716,7 @@
     "sortOrder": 131
   },
   {
-    "popNumber": null,
+    "popNumber": 710,
     "subseries": "",
     "name": "La Estrella Cosmica",
     "title": "La Estrella Cosmica",
@@ -1729,7 +1729,7 @@
     "sortOrder": 132
   },
   {
-    "popNumber": null,
+    "popNumber": 711,
     "subseries": "",
     "name": "El Animal Indestructible",
     "title": "El Animal Indestructible",
@@ -1742,7 +1742,7 @@
     "sortOrder": 133
   },
   {
-    "popNumber": null,
+    "popNumber": 712,
     "subseries": "",
     "name": "EI Deadpool",
     "title": "EI Deadpool",
@@ -1755,7 +1755,7 @@
     "sortOrder": 134
   },
   {
-    "popNumber": null,
+    "popNumber": 714,
     "subseries": "",
     "name": "50S Vision",
     "title": "50S Vision",
@@ -1768,7 +1768,7 @@
     "sortOrder": 135
   },
   {
-    "popNumber": null,
+    "popNumber": 717,
     "subseries": "",
     "name": "Wanda 70s",
     "title": "Wanda 70s",
@@ -1781,7 +1781,7 @@
     "sortOrder": 136
   },
   {
-    "popNumber": null,
+    "popNumber": 727,
     "subseries": "",
     "name": "Ikaris",
     "title": "Ikaris",
@@ -1794,7 +1794,7 @@
     "sortOrder": 137
   },
   {
-    "popNumber": null,
+    "popNumber": 728,
     "subseries": "",
     "name": "Sersi",
     "title": "Sersi",
@@ -1807,7 +1807,7 @@
     "sortOrder": 138
   },
   {
-    "popNumber": null,
+    "popNumber": 729,
     "subseries": "",
     "name": "Thena",
     "title": "Thena",
@@ -1820,7 +1820,7 @@
     "sortOrder": 139
   },
   {
-    "popNumber": null,
+    "popNumber": 730,
     "subseries": "",
     "name": "Gilgamesh",
     "title": "Gilgamesh",
@@ -1833,7 +1833,7 @@
     "sortOrder": 140
   },
   {
-    "popNumber": null,
+    "popNumber": 731,
     "subseries": "",
     "name": "Kingo",
     "title": "Kingo",
@@ -1846,7 +1846,7 @@
     "sortOrder": 141
   },
   {
-    "popNumber": null,
+    "popNumber": 732,
     "subseries": "",
     "name": "Sprite",
     "title": "Sprite",
@@ -1859,7 +1859,7 @@
     "sortOrder": 142
   },
   {
-    "popNumber": null,
+    "popNumber": 733,
     "subseries": "",
     "name": "Druig",
     "title": "Druig",
@@ -1872,7 +1872,7 @@
     "sortOrder": 143
   },
   {
-    "popNumber": null,
+    "popNumber": 734,
     "subseries": "",
     "name": "Makkari",
     "title": "Makkari",
@@ -1885,7 +1885,7 @@
     "sortOrder": 144
   },
   {
-    "popNumber": null,
+    "popNumber": 735,
     "subseries": "",
     "name": "Ajak",
     "title": "Ajak",
@@ -1898,7 +1898,7 @@
     "sortOrder": 145
   },
   {
-    "popNumber": null,
+    "popNumber": 736,
     "subseries": "",
     "name": "Phasotos",
     "title": "Phasotos",
@@ -1911,7 +1911,7 @@
     "sortOrder": 146
   },
   {
-    "popNumber": null,
+    "popNumber": 738,
     "subseries": "",
     "name": "Dane Whitman",
     "title": "Dane Whitman",
@@ -1924,7 +1924,7 @@
     "sortOrder": 147
   },
   {
-    "popNumber": null,
+    "popNumber": 740,
     "subseries": "",
     "name": "Ikaris",
     "title": "Ikaris",
@@ -1937,7 +1937,7 @@
     "sortOrder": 148
   },
   {
-    "popNumber": null,
+    "popNumber": 747,
     "subseries": "Endgame",
     "name": "Loki",
     "title": "Endgame — Loki",
@@ -1950,7 +1950,7 @@
     "sortOrder": 149
   },
   {
-    "popNumber": null,
+    "popNumber": 766,
     "subseries": "Miles Morales",
     "name": "Miles Morales",
     "title": "Miles Morales — Miles Morales",
@@ -1963,7 +1963,7 @@
     "sortOrder": 150
   },
   {
-    "popNumber": null,
+    "popNumber": 770,
     "subseries": "Miles Morales",
     "name": "Miles Morales",
     "title": "Miles Morales — Miles Morales",
@@ -1976,7 +1976,7 @@
     "sortOrder": 151
   },
   {
-    "popNumber": null,
+    "popNumber": 778,
     "subseries": "",
     "name": "Flamenco Deadpool",
     "title": "Flamenco Deadpool",
@@ -1989,7 +1989,7 @@
     "sortOrder": 152
   },
   {
-    "popNumber": null,
+    "popNumber": 779,
     "subseries": "",
     "name": "Roman Senator Deadpool",
     "title": "Roman Senator Deadpool",
@@ -2002,7 +2002,7 @@
     "sortOrder": 153
   },
   {
-    "popNumber": null,
+    "popNumber": 787,
     "subseries": "",
     "name": "Zombie Thor",
     "title": "Zombie Thor",
@@ -2015,7 +2015,7 @@
     "sortOrder": 154
   },
   {
-    "popNumber": null,
+    "popNumber": 788,
     "subseries": "",
     "name": "Zombie Gambit",
     "title": "Zombie Gambit",
@@ -2028,7 +2028,7 @@
     "sortOrder": 155
   },
   {
-    "popNumber": null,
+    "popNumber": 791,
     "subseries": "",
     "name": "Zombie M.O.D.O.K",
     "title": "Zombie M.O.D.O.K",
@@ -2041,7 +2041,7 @@
     "sortOrder": 156
   },
   {
-    "popNumber": null,
+    "popNumber": 798,
     "subseries": "",
     "name": "Gambit",
     "title": "Gambit",
@@ -2054,7 +2054,7 @@
     "sortOrder": 157
   },
   {
-    "popNumber": null,
+    "popNumber": 799,
     "subseries": "",
     "name": "Magneto",
     "title": "Magneto",
@@ -2067,7 +2067,7 @@
     "sortOrder": 158
   },
   {
-    "popNumber": null,
+    "popNumber": 810,
     "subseries": "",
     "name": "Red Guardian",
     "title": "Red Guardian",
@@ -2080,7 +2080,7 @@
     "sortOrder": 159
   },
   {
-    "popNumber": null,
+    "popNumber": 812,
     "subseries": "& Winter Soldier",
     "name": "Falcon",
     "title": "& Winter Soldier — Falcon",
@@ -2093,7 +2093,7 @@
     "sortOrder": 160
   },
   {
-    "popNumber": null,
+    "popNumber": 815,
     "subseries": "& Winter Soldier",
     "name": "US Agent",
     "title": "& Winter Soldier — US Agent",
@@ -2106,7 +2106,7 @@
     "sortOrder": 161
   },
   {
-    "popNumber": null,
+    "popNumber": 816,
     "subseries": "& Winter Soldier",
     "name": "Sharon Carter",
     "title": "& Winter Soldier — Sharon Carter",
@@ -2119,7 +2119,7 @@
     "sortOrder": 162
   },
   {
-    "popNumber": null,
+    "popNumber": 817,
     "subseries": "& Winter Soldier",
     "name": "Captain America",
     "title": "& Winter Soldier — Captain America",
@@ -2132,7 +2132,7 @@
     "sortOrder": 163
   },
   {
-    "popNumber": null,
+    "popNumber": 823,
     "subseries": "",
     "name": "Scarlet Witch",
     "title": "Scarlet Witch",
@@ -2145,7 +2145,7 @@
     "sortOrder": 164
   },
   {
-    "popNumber": null,
+    "popNumber": 824,
     "subseries": "",
     "name": "The Vision",
     "title": "The Vision",
@@ -2158,7 +2158,7 @@
     "sortOrder": 165
   },
   {
-    "popNumber": null,
+    "popNumber": 826,
     "subseries": "",
     "name": "Agatha Harkness",
     "title": "Agatha Harkness",
@@ -2171,7 +2171,7 @@
     "sortOrder": 166
   },
   {
-    "popNumber": null,
+    "popNumber": 829,
     "subseries": "MechStrike",
     "name": "Captain America",
     "title": "MechStrike — Captain America",
@@ -2184,7 +2184,7 @@
     "sortOrder": 167
   },
   {
-    "popNumber": null,
+    "popNumber": 833,
     "subseries": "MechStrike",
     "name": "Hulk",
     "title": "MechStrike — Hulk",
@@ -2197,7 +2197,7 @@
     "sortOrder": 168
   },
   {
-    "popNumber": null,
+    "popNumber": 834,
     "subseries": "MechStrike",
     "name": "Thor",
     "title": "MechStrike — Thor",
@@ -2210,7 +2210,7 @@
     "sortOrder": 169
   },
   {
-    "popNumber": null,
+    "popNumber": 838,
     "subseries": "The Shield",
     "name": "Winter Soldier",
     "title": "The Shield — Winter Soldier",
@@ -2223,7 +2223,7 @@
     "sortOrder": 170
   },
   {
-    "popNumber": null,
+    "popNumber": 843,
     "subseries": "",
     "name": "Shang-Chi",
     "title": "Shang-Chi",
@@ -2236,7 +2236,7 @@
     "sortOrder": 171
   },
   {
-    "popNumber": null,
+    "popNumber": 844,
     "subseries": "",
     "name": "Shang-Chi",
     "title": "Shang-Chi",
@@ -2249,7 +2249,7 @@
     "sortOrder": 172
   },
   {
-    "popNumber": null,
+    "popNumber": 849,
     "subseries": "",
     "name": "Razor Fist",
     "title": "Razor Fist",
@@ -2262,7 +2262,7 @@
     "sortOrder": 173
   },
   {
-    "popNumber": null,
+    "popNumber": 852,
     "subseries": "",
     "name": "Katy Casual",
     "title": "Katy Casual",
@@ -2275,7 +2275,7 @@
     "sortOrder": 174
   },
   {
-    "popNumber": null,
+    "popNumber": 857,
     "subseries": "Infinity Warps",
     "name": "Iron Hammer",
     "title": "Infinity Warps — Iron Hammer",
@@ -2288,7 +2288,7 @@
     "sortOrder": 175
   },
   {
-    "popNumber": null,
+    "popNumber": 860,
     "subseries": "Infinity Warps",
     "name": "Ghost Panther",
     "title": "Infinity Warps — Ghost Panther",
@@ -2301,7 +2301,7 @@
     "sortOrder": 176
   },
   {
-    "popNumber": null,
+    "popNumber": 861,
     "subseries": "Infinity Warps",
     "name": "",
     "title": "Infinity Warps",
@@ -2314,7 +2314,7 @@
     "sortOrder": 177
   },
   {
-    "popNumber": null,
+    "popNumber": 865,
     "subseries": "Infinity Warps",
     "name": "Weapon Hex",
     "title": "Infinity Warps — Weapon Hex",
@@ -2327,7 +2327,7 @@
     "sortOrder": 178
   },
   {
-    "popNumber": null,
+    "popNumber": 874,
     "subseries": "Strange",
     "name": "Supreme",
     "title": "Strange — Supreme",
@@ -2340,7 +2340,7 @@
     "sortOrder": 179
   },
   {
-    "popNumber": null,
+    "popNumber": 876,
     "subseries": "",
     "name": "T`challa Star-Lord",
     "title": "T`challa Star-Lord",
@@ -2353,7 +2353,7 @@
     "sortOrder": 180
   },
   {
-    "popNumber": null,
+    "popNumber": 888,
     "subseries": "",
     "name": "Vevom",
     "title": "Vevom",
@@ -2366,7 +2366,7 @@
     "sortOrder": 181
   },
   {
-    "popNumber": null,
+    "popNumber": 889,
     "subseries": "",
     "name": "Carnage",
     "title": "Carnage",
@@ -2379,7 +2379,7 @@
     "sortOrder": 182
   },
   {
-    "popNumber": null,
+    "popNumber": 895,
     "subseries": "",
     "name": "Loki",
     "title": "Loki",
@@ -2392,7 +2392,7 @@
     "sortOrder": 183
   },
   {
-    "popNumber": null,
+    "popNumber": 896,
     "subseries": "",
     "name": "Mobius",
     "title": "Mobius",
@@ -2405,7 +2405,7 @@
     "sortOrder": 184
   },
   {
-    "popNumber": null,
+    "popNumber": 897,
     "subseries": "",
     "name": "Sylvie with Cape",
     "title": "Sylvie with Cape",
@@ -2418,7 +2418,7 @@
     "sortOrder": 185
   },
   {
-    "popNumber": null,
+    "popNumber": 898,
     "subseries": "",
     "name": "President Loki",
     "title": "President Loki",
@@ -2431,7 +2431,7 @@
     "sortOrder": 186
   },
   {
-    "popNumber": null,
+    "popNumber": 899,
     "subseries": "",
     "name": "Ravonna Renslayer with Miss Minutes",
     "title": "Ravonna Renslayer with Miss Minutes",
@@ -2444,7 +2444,7 @@
     "sortOrder": 187
   },
   {
-    "popNumber": null,
+    "popNumber": 900,
     "subseries": "",
     "name": "Kid Loki",
     "title": "Kid Loki",
@@ -2457,7 +2457,7 @@
     "sortOrder": 188
   },
   {
-    "popNumber": null,
+    "popNumber": 901,
     "subseries": "",
     "name": "Alligator Loki",
     "title": "Alligator Loki",
@@ -2470,7 +2470,7 @@
     "sortOrder": 189
   },
   {
-    "popNumber": null,
+    "popNumber": 910,
     "subseries": "Endgame",
     "name": "Ant-Man",
     "title": "Endgame — Ant-Man",
@@ -2483,7 +2483,7 @@
     "sortOrder": 190
   },
   {
-    "popNumber": null,
+    "popNumber": 911,
     "subseries": "No Way Home",
     "name": "Spider-Man Black & Gold Suit",
     "title": "No Way Home — Spider-Man Black & Gold Suit",
@@ -2496,7 +2496,7 @@
     "sortOrder": 191
   },
   {
-    "popNumber": null,
+    "popNumber": 912,
     "subseries": "No Way Home",
     "name": "Doctor Strange in Spider-Man",
     "title": "No Way Home — Doctor Strange in Spider-Man",
@@ -2509,7 +2509,7 @@
     "sortOrder": 192
   },
   {
-    "popNumber": null,
+    "popNumber": 913,
     "subseries": "No Way Home",
     "name": "Spider-Man",
     "title": "No Way Home — Spider-Man",
@@ -2522,7 +2522,7 @@
     "sortOrder": 193
   },
   {
-    "popNumber": null,
+    "popNumber": 924,
     "subseries": "No Way Home",
     "name": "MJ",
     "title": "No Way Home — MJ",
@@ -2535,7 +2535,7 @@
     "sortOrder": 194
   },
   {
-    "popNumber": null,
+    "popNumber": 925,
     "subseries": "No Way Home",
     "name": "Ned",
     "title": "No Way Home — Ned",
@@ -2548,7 +2548,7 @@
     "sortOrder": 195
   },
   {
-    "popNumber": null,
+    "popNumber": 935,
     "subseries": "",
     "name": "Gingerbread Hulk",
     "title": "Gingerbread Hulk",
@@ -2561,7 +2561,7 @@
     "sortOrder": 196
   },
   {
-    "popNumber": null,
+    "popNumber": 936,
     "subseries": "",
     "name": "Gingerbread Captain Marvel",
     "title": "Gingerbread Captain Marvel",
@@ -2574,7 +2574,7 @@
     "sortOrder": 197
   },
   {
-    "popNumber": null,
+    "popNumber": 937,
     "subseries": "",
     "name": "Gingerbread Black Panther",
     "title": "Gingerbread Black Panther",
@@ -2587,7 +2587,7 @@
     "sortOrder": 198
   },
   {
-    "popNumber": null,
+    "popNumber": 940,
     "subseries": "",
     "name": "Gingerbread Scarlet Witch",
     "title": "Gingerbread Scarlet Witch",
@@ -2600,7 +2600,7 @@
     "sortOrder": 199
   },
   {
-    "popNumber": null,
+    "popNumber": 941,
     "subseries": "",
     "name": "Zombie Captain America",
     "title": "Zombie Captain America",
@@ -2613,7 +2613,7 @@
     "sortOrder": 200
   },
   {
-    "popNumber": null,
+    "popNumber": 942,
     "subseries": "",
     "name": "Zombie Falcon",
     "title": "Zombie Falcon",
@@ -2626,7 +2626,7 @@
     "sortOrder": 201
   },
   {
-    "popNumber": null,
+    "popNumber": 943,
     "subseries": "",
     "name": "Zombie Scarlet Witch",
     "title": "Zombie Scarlet Witch",
@@ -2639,7 +2639,7 @@
     "sortOrder": 202
   },
   {
-    "popNumber": null,
+    "popNumber": 944,
     "subseries": "",
     "name": "Zombie Iron Man",
     "title": "Zombie Iron Man",
@@ -2652,7 +2652,7 @@
     "sortOrder": 203
   },
   {
-    "popNumber": null,
+    "popNumber": 968,
     "subseries": "",
     "name": "Captain Carter",
     "title": "Captain Carter",
@@ -2665,7 +2665,7 @@
     "sortOrder": 204
   },
   {
-    "popNumber": null,
+    "popNumber": 969,
     "subseries": "",
     "name": "Infinity Killmonger",
     "title": "Infinity Killmonger",
@@ -2678,7 +2678,7 @@
     "sortOrder": 205
   },
   {
-    "popNumber": null,
+    "popNumber": 970,
     "subseries": "",
     "name": "Gamora",
     "title": "Gamora",
@@ -2691,7 +2691,7 @@
     "sortOrder": 206
   },
   {
-    "popNumber": null,
+    "popNumber": 971,
     "subseries": "",
     "name": "Queen General Ramonda",
     "title": "Queen General Ramonda",
@@ -2704,7 +2704,7 @@
     "sortOrder": 207
   },
   {
-    "popNumber": null,
+    "popNumber": 972,
     "subseries": "",
     "name": "Frost Giant Loki",
     "title": "Frost Giant Loki",
@@ -2717,7 +2717,7 @@
     "sortOrder": 208
   },
   {
-    "popNumber": null,
+    "popNumber": 973,
     "subseries": "",
     "name": "Infinity Ultron",
     "title": "Infinity Ultron",
@@ -2730,7 +2730,7 @@
     "sortOrder": 209
   },
   {
-    "popNumber": null,
+    "popNumber": 987,
     "subseries": "& Winter Soldier",
     "name": "Captain America",
     "title": "& Winter Soldier — Captain America",
@@ -2743,7 +2743,7 @@
     "sortOrder": 210
   },
   {
-    "popNumber": null,
+    "popNumber": 988,
     "subseries": "",
     "name": "Sylvie",
     "title": "Sylvie",
@@ -2756,7 +2756,7 @@
     "sortOrder": 211
   },
   {
-    "popNumber": null,
+    "popNumber": 990,
     "subseries": "Monster Hunters",
     "name": "Doctor Doom",
     "title": "Monster Hunters — Doctor Doom",
@@ -2769,7 +2769,7 @@
     "sortOrder": 212
   },
   {
-    "popNumber": null,
+    "popNumber": 991,
     "subseries": "Monster Hunters",
     "name": "Green Goblin",
     "title": "Monster Hunters — Green Goblin",
@@ -2782,7 +2782,7 @@
     "sortOrder": 213
   },
   {
-    "popNumber": null,
+    "popNumber": 992,
     "subseries": "Monster Hunters",
     "name": "Loki",
     "title": "Monster Hunters — Loki",
@@ -2795,7 +2795,7 @@
     "sortOrder": 214
   },
   {
-    "popNumber": null,
+    "popNumber": 993,
     "subseries": "Monster Hunters",
     "name": "Thanos",
     "title": "Monster Hunters — Thanos",
@@ -2808,7 +2808,7 @@
     "sortOrder": 215
   },
   {
-    "popNumber": null,
+    "popNumber": 994,
     "subseries": "Monster Hunters",
     "name": "Venom",
     "title": "Monster Hunters — Venom",
@@ -2821,7 +2821,7 @@
     "sortOrder": 216
   },
   {
-    "popNumber": null,
+    "popNumber": 997,
     "subseries": "Monster Hunters",
     "name": "Spider-Man",
     "title": "Monster Hunters — Spider-Man",
