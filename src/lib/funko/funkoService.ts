@@ -11,6 +11,7 @@ import {
   rowToItem,
 } from '@/lib/funko/mapRow'
 import { parsePopNumber } from '@/lib/funko/parsePopNumber'
+import { funkoSortSql, parseFunkoSort, type FunkoSort } from '@/lib/funko/funkoSort'
 import type { FunkoCatalogStats, FunkoImportRow, FunkoListResult } from '@/lib/funko/types'
 
 export const DEFAULT_PAGE_SIZE = 24
@@ -20,6 +21,7 @@ export interface ListFunkoOptions {
   owned?: boolean
   inTransit?: boolean
   search?: string
+  sort?: FunkoSort
   page?: number
   pageSize?: number
 }
@@ -86,6 +88,7 @@ export async function listFunkoItems(
   }
 
   const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : ''
+  const orderBy = funkoSortSql(parseFunkoSort(options.sort))
 
   const countRows = await query<{ total: string }>(
     `SELECT COUNT(*)::text AS total
@@ -99,7 +102,7 @@ export async function listFunkoItems(
   const rows = await query<Record<string, unknown>>(
     `SELECT ${ITEM_SELECT_SQL} ${ITEM_FROM_SQL}
      ${where}
-     ORDER BY i.sort_order ASC, i.title ASC
+     ORDER BY ${orderBy}
      LIMIT $${idx} OFFSET $${idx + 1}`,
     [...params, pageSize, offset],
   )

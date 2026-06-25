@@ -1,7 +1,11 @@
 import fs from 'fs/promises'
 import path from 'path'
+import {
+  catalogEntryPopNumber,
+  catalogMatchMinScore,
+  scoreCatalogEntry,
+} from '@/lib/funko/catalogMatch'
 import { getCategoryDef } from '@/lib/funko/categoryConfig'
-import { parsePopNumber } from '@/lib/funko/parsePopNumber'
 import type { FunkoImportRow } from '@/lib/funko/types'
 
 export interface CollectionImportRow {
@@ -51,15 +55,6 @@ function norm(s: string): string {
     .trim()
 }
 
-function tokenOverlap(a: string, b: string): number {
-  const ta = new Set(norm(a).split(/\s+/).filter((t) => t.length > 2))
-  const tb = new Set(norm(b).split(/\s+/).filter((t) => t.length > 2))
-  if (!ta.size || !tb.size) return 0
-  let n = 0
-  for (const t of ta) if (tb.has(t)) n++
-  return n
-}
-
 export async function matchCatalogImage(
   row: CollectionImportRow,
   categorySlug: string,
@@ -67,18 +62,20 @@ export async function matchCatalogImage(
   const catalog = await loadCatalog(categorySlug)
   if (!catalog.length) return null
 
-  const needle = [row.subseries, row.name].filter(Boolean).join(' ')
+  const def = getCategoryDef(categorySlug)
+  const query = {
+    popNumber: row.popNumber,
+    title: row.name || row.title,
+    subseries: row.subseries,
+    categorySeries: def?.name,
+  }
+
   let best: { imageUrl: string; score: number } | null = null
 
   for (const entry of catalog) {
-    let score = 0
-    const entryPop = parsePopNumber(entry.title)
-    if (row.popNumber != null && entryPop === row.popNumber) score += 12
-    if (row.name && norm(entry.title).includes(norm(row.name))) score += 6
-    score += tokenOverlap(needle, entry.title) * 2
-    if (row.subseries && norm(entry.title).includes(norm(row.subseries.split(/\s+/)[0]))) {
-      score += 2
-    }
+    const entryPop = catalogEntryPopNumber(entry)
+    const score = scoreCatalogEntry(entry, query)
+    if (score < catalogMatchMinScore(query, entryPop)) continue
     if (score > (best?.score ?? 0) && entry.imageUrl) {
       best = { imageUrl: entry.imageUrl, score }
     }

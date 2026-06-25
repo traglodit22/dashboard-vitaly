@@ -1,8 +1,14 @@
 import fs from 'fs/promises'
 import path from 'path'
+import {
+  buildCatalogSearchNeedle,
+  catalogEntryPopNumber,
+  catalogMatchMinScore,
+  scoreCatalogEntry,
+  type CatalogMatchQuery,
+} from '@/lib/funko/catalogMatch'
 import { getCategoryDef } from '@/lib/funko/categoryConfig'
-import { parsePopNumber } from '@/lib/funko/parsePopNumber'
-import type { FunkoImageSuggestion, FunkoImportRow } from '@/lib/funko/types'
+import type { FunkoImageSuggestion, FunkoImportRow, FunkoTitleSuggestion } from '@/lib/funko/types'
 
 const DATA_DIR = path.join(process.cwd(), 'scripts/data/funko')
 
@@ -29,8 +35,53 @@ async function loadCatalog(categorySlug: string): Promise<FunkoImportRow[]> {
   }
 }
 
-function norm(s: string): string {
-  return s
+export async function suggestCatalogImages(opts: {
+  categorySlug: string
+  popNumber: number | null
+  title: string
+  subseries?: string
+  categorySeries?: string
+  limit?: number
+}): Promise<FunkoImageSuggestion[]> {
+  const catalog = await loadCatalog(opts.categorySlug)
+  const query: CatalogMatchQuery = {
+    popNumber: opts.popNumber,
+    title: opts.title,
+    subseries: opts.subseries ?? '',
+    categorySeries: opts.categorySeries ?? getCategoryDef(opts.categorySlug)?.name,
+  }
+  const limit = opts.limit ?? 12
+  const seen = new Set<string>()
+
+  const ranked: FunkoImageSuggestion[] = []
+  for (const entry of catalog) {
+    if (!entry.imageUrl || seen.has(entry.imageUrl)) continue
+    const entryPop = catalogEntryPopNumber(entry)
+    const score = scoreCatalogEntry(entry, query)
+    if (score < catalogMatchMinScore(query, entryPop)) continue
+    seen.add(entry.imageUrl)
+    ranked.push({
+      handle: entry.handle,
+      title: entry.title,
+      imageUrl: entry.imageUrl,
+      score,
+      popNumber: entryPop,
+    })
+  }
+
+  ranked.sort((a, b) => b.score - a.score || a.title.localeCompare(b.title))
+  return ranked.slice(0, limit)
+}
+
+function cleanSuggestionTitle(title: string): string {
+  const md = title.trim().match(/^\[([^\]]+)\]/)
+  let t = md ? md[1] : title.trim()
+  t = t.replace(/\s*#\d+.*$/, '').replace(/\s+/g, ' ').trim()
+  return t
+}
+
+function titleKey(title: string): string {
+  return title
     .toLowerCase()
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -38,62 +89,73 @@ function norm(s: string): string {
     .trim()
 }
 
-function tokenOverlap(a: string, b: string): number {
-  const ta = new Set(norm(a).split(/\s+/).filter((t) => t.length > 2))
-  const tb = new Set(norm(b).split(/\s+/).filter((t) => t.length > 2))
-  if (!ta.size || !tb.size) return 0
-  let n = 0
-  for (const t of ta) if (tb.has(t)) n++
-  return n
-}
+async function loadPopIndexTitles(categorySlug: string, popNumber: number): Promise<string[]> {
+  const dir = path.join(DATA_DIR, 'pop-index')
+  const out = new Set<string>()
+  const files = [`${categorySlug}.fandom.json`, `${categorySlug}.pricecharting.json`]
 
-function scoreEntry(
-  entry: FunkoImportRow,
-  opts: { popNumber: number | null; title: string; subseries: string },
-): number {
-  let score = 0
-  const entryPop = parsePopNumber(entry.title)
-  if (opts.popNumber != null && entryPop === opts.popNumber) score += 12
-  const needle = [opts.subseries, opts.title].filter(Boolean).join(' ')
-  if (opts.title && norm(entry.title).includes(norm(opts.title))) score += 6
-  score += tokenOverlap(needle, entry.title) * 2
-  if (opts.subseries && norm(entry.title).includes(norm(opts.subseries.split(/\s+/)[0]))) {
-    score += 2
+  for (const file of files) {
+    try {
+      const raw = await fs.readFile(path.join(dir, file), 'utf8')
+      const data = JSON.parse(raw) as Record<string, string[]>
+      for (const t of data[String(popNumber)] ?? []) {
+        const clean = cleanSuggestionTitle(t)
+        if (clean.length > 1) out.add(clean)
+      }
+    } catch {
+      // index optional
+    }
   }
-  return score
+  return [...out]
 }
 
-export async function suggestCatalogImages(opts: {
+export async function suggestCatalogTitles(opts: {
   categorySlug: string
   popNumber: number | null
-  title: string
+  title?: string
   subseries?: string
+  categorySeries?: string
   limit?: number
-}): Promise<FunkoImageSuggestion[]> {
-  const catalog = await loadCatalog(opts.categorySlug)
-  const subseries = opts.subseries ?? ''
-  const limit = opts.limit ?? 12
-  const seen = new Set<string>()
+}): Promise<FunkoTitleSuggestion[]> {
+  const limit = opts.limit ?? 10
+  const byTitle = new Map<string, FunkoTitleSuggestion>()
+  const categorySeries =
+    opts.categorySeries ?? getCategoryDef(opts.categorySlug)?.name ?? ''
 
-  const ranked: FunkoImageSuggestion[] = []
-  for (const entry of catalog) {
-    if (!entry.imageUrl || seen.has(entry.imageUrl)) continue
-    const score = scoreEntry(entry, {
-      popNumber: opts.popNumber,
-      title: opts.title,
-      subseries,
-    })
-    if (score < 4) continue
-    seen.add(entry.imageUrl)
-    ranked.push({
-      handle: entry.handle,
-      title: entry.title,
-      imageUrl: entry.imageUrl,
-      score,
-      popNumber: parsePopNumber(entry.title),
-    })
+  function add(title: string, popNumber: number | null, score: number) {
+    const clean = cleanSuggestionTitle(title)
+    if (clean.length < 2) return
+    const key = titleKey(clean)
+    const prev = byTitle.get(key)
+    if (!prev || score > prev.score) {
+      byTitle.set(key, { title: clean, popNumber, score })
+    }
   }
 
-  ranked.sort((a, b) => b.score - a.score || a.title.localeCompare(b.title))
-  return ranked.slice(0, limit)
+  if (opts.popNumber != null) {
+    for (const t of await loadPopIndexTitles(opts.categorySlug, opts.popNumber)) {
+      add(t, opts.popNumber, 32)
+    }
+  }
+
+  const catalog = await loadCatalog(opts.categorySlug)
+  const query: CatalogMatchQuery = {
+    popNumber: opts.popNumber,
+    title: opts.popNumber != null ? '' : (opts.title ?? ''),
+    subseries: opts.subseries ?? '',
+    categorySeries,
+  }
+
+  for (const entry of catalog) {
+    const entryPop = catalogEntryPopNumber(entry)
+    const score = scoreCatalogEntry(entry, query)
+    if (score < catalogMatchMinScore(query, entryPop)) continue
+    add(entry.title, entryPop, score)
+  }
+
+  return [...byTitle.values()]
+    .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title, 'ru'))
+    .slice(0, limit)
 }
+
+export { buildCatalogSearchNeedle }

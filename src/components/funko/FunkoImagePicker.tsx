@@ -11,11 +11,18 @@ import { cn } from "@/lib/utils";
 export function FunkoImagePicker({
   open,
   item,
+  query,
   onClose,
   onSaved,
 }: {
   open: boolean;
   item: FunkoItem | null;
+  /** Поля формы до сохранения — переопределяют данные из item. */
+  query?: {
+    popNumber?: number | null;
+    subseries?: string;
+    title?: string;
+  };
   onClose: () => void;
   onSaved: (item: FunkoItem) => void;
 }) {
@@ -29,7 +36,14 @@ export function FunkoImagePicker({
     void (async () => {
       setLoading(true);
       try {
-        const res = await apiFetch(`/api/funko/${item.id}/image-suggestions`);
+        const params = new URLSearchParams();
+        if (query?.popNumber != null) params.set("popNumber", String(query.popNumber));
+        if (query?.subseries != null) params.set("subseries", query.subseries);
+        if (query?.title != null) params.set("title", query.title);
+        const qs = params.toString();
+        const res = await apiFetch(
+          `/api/funko/${item.id}/image-suggestions${qs ? `?${qs}` : ""}`,
+        );
         const data = await res.json();
         if (!res.ok) throw new Error(String(data.error ?? "Ошибка загрузки"));
         setSuggestions((data.suggestions as FunkoImageSuggestion[]) ?? []);
@@ -40,9 +54,21 @@ export function FunkoImagePicker({
         setLoading(false);
       }
     })();
-  }, [open, item]);
+  }, [open, item, query?.popNumber, query?.subseries, query?.title]);
 
   if (!open || !item) return null;
+
+  const seriesLabel = item.categoryName;
+  const subseries =
+    query?.subseries ?? item.series.find((s) => s !== seriesLabel) ?? "";
+  const popNumber = query?.popNumber ?? item.popNumber;
+  const subtitle = [
+    popNumber != null ? `№${popNumber}` : null,
+    subseries || null,
+    query?.title ?? item.title,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   async function pickSource(sourceUrl: string) {
     setApplying(sourceUrl);
@@ -93,7 +119,7 @@ export function FunkoImagePicker({
       <div className="flex max-h-[90vh] w-full max-w-lg flex-col rounded-xl border bg-card shadow-lg">
         <div className="border-b p-4">
           <h2 className="text-lg font-semibold">Подобрать фото</h2>
-          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{item.title}</p>
+          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{subtitle}</p>
         </div>
 
         <div className="overflow-y-auto p-4">
@@ -148,7 +174,7 @@ export function FunkoImagePicker({
                       {s.title}
                     </p>
                     {s.popNumber != null && (
-                      <p className="text-[10px] text-muted-foreground">#{s.popNumber}</p>
+                      <p className="text-[10px] text-muted-foreground">№{s.popNumber}</p>
                     )}
                   </div>
                   {applying === s.imageUrl && (

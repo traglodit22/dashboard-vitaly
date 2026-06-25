@@ -18,6 +18,13 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { FunkoImagePicker } from "@/components/funko/FunkoImagePicker";
 import { FunkoItemDialog } from "@/components/funko/FunkoItemDialog";
 import { apiFetch } from "@/lib/apiFetch";
@@ -29,7 +36,9 @@ import {
   isAllFunkoCategorySlug,
   notifyFunkoChanged,
   parseFunkoSearchParams,
+  type FunkoSort,
 } from "@/lib/funko/funkoRoutes";
+import { FUNKO_SORT_OPTIONS } from "@/lib/funko/funkoSort";
 import { getFunkoCategoryDisplayName } from "@/lib/funko/categoryConfig";
 import {
   DASHBOARD_PAGE_CLASS,
@@ -50,7 +59,7 @@ interface Pagination {
 function FunkoClientInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { category, filter, page, q } = parseFunkoSearchParams(searchParams);
+  const { category, filter, page, q, sort } = parseFunkoSearchParams(searchParams);
   const categoryLabel = getFunkoCategoryDisplayName(category);
   const createCategorySlug = isAllFunkoCategorySlug(category)
     ? DEFAULT_FUNKO_CATEGORY
@@ -83,23 +92,24 @@ function FunkoClientInner() {
     if (next === q.trim()) return;
 
     const timer = window.setTimeout(() => {
-      router.replace(buildFunkoHref({ category, filter, page: 1, q: searchInput }));
+      router.replace(buildFunkoHref({ category, filter, page: 1, q: searchInput, sort }));
     }, 300);
 
     return () => window.clearTimeout(timer);
-  }, [searchInput, category, filter, q, router]);
+  }, [searchInput, category, filter, q, sort, router]);
 
   useEffect(() => {
     if (!searchParams.get("filter")) {
-      router.replace(buildFunkoHref({ filter: "owned", page: 1, q }));
+      router.replace(buildFunkoHref({ category, filter: "owned", page: 1, q, sort }));
     }
-  }, [router, searchParams, q]);
+  }, [router, searchParams, category, q, sort]);
 
   const load = useCallback(async () => {
     const params = new URLSearchParams({
       category,
       filter,
       page: String(page),
+      sort,
     });
     if (q.trim()) params.set("q", q.trim());
 
@@ -111,7 +121,7 @@ function FunkoClientInner() {
     setItems(data.items as FunkoItem[]);
     setStats(data.stats as FunkoCatalogStats);
     setPagination(data.pagination as Pagination);
-  }, [category, filter, page, q]);
+  }, [category, filter, page, q, sort]);
 
   useEffect(() => {
     void (async () => {
@@ -142,7 +152,11 @@ function FunkoClientInner() {
   }, []);
 
   function goToPage(nextPage: number) {
-    router.push(buildFunkoHref({ category, filter, page: nextPage, q }));
+    router.push(buildFunkoHref({ category, filter, page: nextPage, q, sort }));
+  }
+
+  function setSort(nextSort: FunkoSort) {
+    router.push(buildFunkoHref({ category, filter, page: 1, q, sort: nextSort }));
   }
 
   async function patchItem(id: string, patch: ItemPatch) {
@@ -227,6 +241,32 @@ function FunkoClientInner() {
         </p>
       ) : (
         <>
+          <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Сортировка</span>
+              <Select
+                value={sort}
+                onValueChange={(v) => {
+                  if (v) setSort(v as FunkoSort);
+                }}
+              >
+                <SelectTrigger size="sm" className="h-8 w-full min-w-[10rem] sm:w-auto">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {FUNKO_SORT_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <p className="text-xs tabular-nums text-muted-foreground">
+              {items.length} из {pagination.total}
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {items.map((item) => (
               <FunkoCard

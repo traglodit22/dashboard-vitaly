@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth/requireAuth'
+import { parseFunkoSort } from '@/lib/funko/funkoSort'
 import {
   createFunkoItem,
   DEFAULT_PAGE_SIZE,
@@ -21,6 +22,7 @@ export async function GET(req: Request) {
   const owned = filter === 'owned' || searchParams.get('owned') === '1'
   const inTransit =
     filter === 'inTransit' || searchParams.get('inTransit') === '1' || searchParams.get('want') === '1'
+  const sort = parseFunkoSort(searchParams.get('sort'))
   const page = Math.max(1, Number(searchParams.get('page') ?? 1))
   const pageSize = Math.min(
     100,
@@ -35,6 +37,7 @@ export async function GET(req: Request) {
         search,
         owned: owned || undefined,
         inTransit: inTransit || undefined,
+        sort,
         page,
         pageSize,
       }),

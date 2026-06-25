@@ -37,7 +37,7 @@ import { cn } from "@/lib/utils";
 function FunkoSidebarInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { category, filter } = parseFunkoSearchParams(searchParams);
+  const { category, filter, sort } = parseFunkoSearchParams(searchParams);
 
   const [categories, setCategories] = useState<FunkoCategory[]>([]);
   const [orderDraft, setOrderDraft] = useState<string[]>([]);
@@ -118,6 +118,7 @@ function FunkoSidebarInner() {
       filter: opts.filter ?? filter,
       page: opts.page ?? 1,
       q: searchParams.get("q") ?? "",
+      sort,
     });
     router.push(href);
   }

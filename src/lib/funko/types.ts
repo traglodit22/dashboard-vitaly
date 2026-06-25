@@ -24,6 +24,12 @@ export interface FunkoItem {
   sortOrder: number
 }
 
+export interface FunkoTitleSuggestion {
+  title: string
+  popNumber: number | null
+  score: number
+}
+
 export interface FunkoImageSuggestion {
   handle: string
   title: string
