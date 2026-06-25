@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { apiFetch } from "@/lib/apiFetch";
 import {
   buildFunkoHref,
+  DEFAULT_FUNKO_CATEGORY,
   FUNKO_CHANGED_EVENT,
   notifyFunkoChanged,
   parseFunkoSearchParams,
@@ -30,7 +31,7 @@ function FunkoSidebarInner() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { filter, q } = parseFunkoSearchParams(searchParams);
+  const { category, filter, q } = parseFunkoSearchParams(searchParams);
 
   const [search, setSearch] = useState(q);
   const [stats, setStats] = useState<FunkoCatalogStats>({
@@ -39,15 +40,17 @@ function FunkoSidebarInner() {
     inTransit: 0,
   });
   const [importing, setImporting] = useState(false);
+  const [importingCatalog, setImportingCatalog] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const loadStats = useCallback(async () => {
-    const res = await apiFetch("/api/funko?category=animation&page=1&pageSize=1", {
-      cache: "no-store",
-    });
+    const res = await apiFetch(
+      `/api/funko?category=${encodeURIComponent(category)}&page=1&pageSize=1`,
+      { cache: "no-store" },
+    );
     const data = await res.json();
     if (res.ok) setStats(data.stats as FunkoCatalogStats);
-  }, []);
+  }, [category]);
 
   useEffect(() => {
     setSearch(q);
@@ -69,25 +72,34 @@ function FunkoSidebarInner() {
     return () => window.removeEventListener(FUNKO_CHANGED_EVENT, onChange);
   }, [loadStats]);
 
-  function navigate(opts: { filter?: FunkoFilter; page?: number; q?: string }) {
+  function navigate(opts: {
+    category?: string;
+    filter?: FunkoFilter;
+    page?: number;
+    q?: string;
+  }) {
+    const href = buildFunkoHref({
+      category: opts.category ?? category,
+      filter: opts.filter ?? filter,
+      page: opts.page ?? 1,
+      q: opts.q !== undefined ? opts.q : q,
+    });
     if (pathname !== "/funko") {
-      router.push(buildFunkoHref(opts));
+      router.push(href);
       return;
     }
-    router.push(
-      buildFunkoHref({
-        filter: opts.filter ?? filter,
-        page: opts.page ?? 1,
-        q: opts.q !== undefined ? opts.q : q,
-      }),
-    );
+    router.push(href);
   }
 
   function applySearch() {
     navigate({ q: search, page: 1 });
   }
 
-  async function handleImport() {
+  async function handleImportCollection() {
+    if (category !== DEFAULT_FUNKO_CATEGORY) {
+      toast.error("Импорт PDF доступен только для Animation");
+      return;
+    }
     setImporting(true);
     try {
       const res = await apiFetch("/api/funko/import-collection", {
@@ -104,6 +116,26 @@ function FunkoSidebarInner() {
       toast.error(err instanceof Error ? err.message : "Ошибка импорта");
     } finally {
       setImporting(false);
+    }
+  }
+
+  async function handleImportCatalog() {
+    setImportingCatalog(true);
+    try {
+      const res = await apiFetch("/api/funko/import-catalog", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ categorySlug: category }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(String(data.error ?? "Ошибка импорта"));
+      toast.success(String(data.message ?? "Каталог импортирован"));
+      notifyFunkoChanged();
+      navigate({ filter: "all", page: 1 });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Ошибка импорта");
+    } finally {
+      setImportingCatalog(false);
     }
   }
 
@@ -176,16 +208,33 @@ function FunkoSidebarInner() {
           size="sm"
           variant="outline"
           className="w-full"
-          disabled={importing}
-          onClick={() => void handleImport()}
+          disabled={importingCatalog}
+          onClick={() => void handleImportCatalog()}
         >
-          {importing ? (
+          {importingCatalog ? (
             <Loader2 className="size-4 animate-spin" />
           ) : (
             <Download className="size-4" />
           )}
-          Импорт PDF
+          Импорт каталога
         </Button>
+        {category === DEFAULT_FUNKO_CATEGORY && (
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="w-full"
+            disabled={importing}
+            onClick={() => void handleImportCollection()}
+          >
+            {importing ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Download className="size-4" />
+            )}
+            Импорт PDF
+          </Button>
+        )}
       </div>
     </div>
   );

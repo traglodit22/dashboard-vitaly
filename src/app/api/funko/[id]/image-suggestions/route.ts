@@ -18,8 +18,10 @@ export async function GET(
     return NextResponse.json({ error: 'Фигурка не найдена' }, { status: 404 })
   }
 
-  const subseries = item.series.find((s) => s !== 'Pop! Animation') ?? ''
+  const seriesLabel = item.categoryName
+  const subseries = item.series.find((s) => s !== seriesLabel) ?? ''
   const suggestions = await suggestCatalogImages({
+    categorySlug: item.categorySlug,
     popNumber: item.popNumber,
     title: item.title,
     subseries,

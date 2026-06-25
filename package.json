@@ -16,6 +16,7 @@
     "backfill-previews": "tsx scripts/backfill-file-previews.ts",
     "import-klub": "tsx scripts/import-klub-procurement.ts",
     "import-funko": "tsx scripts/import-funko-animations.ts",
+    "import-funko-catalog": "tsx scripts/import-funko-catalog.ts",
     "import-funko-collection": "tsx scripts/import-funko-collection.ts"
   },
   "dependencies": {

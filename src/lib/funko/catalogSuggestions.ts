@@ -1,21 +1,32 @@
 import fs from 'fs/promises'
 import path from 'path'
+import { getCategoryDef } from '@/lib/funko/categoryConfig'
 import { parsePopNumber } from '@/lib/funko/parsePopNumber'
 import type { FunkoImageSuggestion, FunkoImportRow } from '@/lib/funko/types'
 
-const CATALOG_FILE = path.join(process.cwd(), 'scripts/data/funko/animations.json')
+const DATA_DIR = path.join(process.cwd(), 'scripts/data/funko')
 
-let catalogCache: FunkoImportRow[] | null = null
+const catalogCache = new Map<string, FunkoImportRow[]>()
 
-async function loadCatalog(): Promise<FunkoImportRow[]> {
-  if (catalogCache) return catalogCache
-  try {
-    const raw = await fs.readFile(CATALOG_FILE, 'utf8')
-    catalogCache = JSON.parse(raw) as FunkoImportRow[]
-  } catch {
-    catalogCache = []
+async function loadCatalog(categorySlug: string): Promise<FunkoImportRow[]> {
+  const cached = catalogCache.get(categorySlug)
+  if (cached) return cached
+
+  const def = getCategoryDef(categorySlug)
+  if (!def) {
+    catalogCache.set(categorySlug, [])
+    return []
   }
-  return catalogCache
+
+  try {
+    const raw = await fs.readFile(path.join(DATA_DIR, def.catalogFile), 'utf8')
+    const rows = JSON.parse(raw) as FunkoImportRow[]
+    catalogCache.set(categorySlug, rows)
+    return rows
+  } catch {
+    catalogCache.set(categorySlug, [])
+    return []
+  }
 }
 
 function norm(s: string): string {
@@ -53,12 +64,13 @@ function scoreEntry(
 }
 
 export async function suggestCatalogImages(opts: {
+  categorySlug: string
   popNumber: number | null
   title: string
   subseries?: string
   limit?: number
 }): Promise<FunkoImageSuggestion[]> {
-  const catalog = await loadCatalog()
+  const catalog = await loadCatalog(opts.categorySlug)
   const subseries = opts.subseries ?? ''
   const limit = opts.limit ?? 12
   const seen = new Set<string>()

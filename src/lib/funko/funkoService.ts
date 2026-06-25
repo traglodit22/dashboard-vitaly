@@ -1,4 +1,5 @@
 import { query } from '@/lib/db/index'
+import { getCategorySeriesLabel } from '@/lib/funko/categoryConfig'
 import { enrichFunkoItems } from '@/lib/funko/enrichItem'
 import { ensureFunkoSchema } from '@/lib/funko/ensureFunko'
 import { deleteFunkoGcsImage } from '@/lib/funko/funkoImage'
@@ -168,9 +169,10 @@ export async function createFunkoItem(input: {
       ? input.popNumber
       : parsePopNumber(title)
 
+  const seriesLabel = getCategorySeriesLabel(input.categorySlug)
   const series = input.subseries?.trim()
-    ? [input.subseries.trim(), 'Pop! Animation']
-    : ['Pop! Animation']
+    ? [input.subseries.trim(), seriesLabel]
+    : [seriesLabel]
 
   let handle = slugifyHandle(title, popNumber)
   const existing = await query<{ id: string }>(
@@ -331,9 +333,16 @@ export async function patchFunkoItem(
     values.push(patch.popNumber)
   }
   if (patch.subseries !== undefined) {
+    const rows = await query<{ slug: string }>(
+      `SELECT c.slug FROM funko_items i
+       JOIN funko_categories c ON c.id = i.category_id
+       WHERE i.id = $1`,
+      [id],
+    )
+    const seriesLabel = getCategorySeriesLabel(rows[0]?.slug ?? 'animation')
     const series = patch.subseries?.trim()
-      ? [patch.subseries.trim(), 'Pop! Animation']
-      : ['Pop! Animation']
+      ? [patch.subseries.trim(), seriesLabel]
+      : [seriesLabel]
     setClauses.push(`series = $${idx++}`)
     values.push(series)
   }

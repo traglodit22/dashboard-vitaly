@@ -37,7 +37,7 @@ function fromItem(item: FunkoItem): FunkoItemFormValues {
   return {
     title: item.title,
     popNumber: item.popNumber != null ? String(item.popNumber) : "",
-    subseries: item.series.find((s) => s !== "Pop! Animation") ?? "",
+    subseries: item.series.find((s) => s !== item.categoryName) ?? "",
     notes: item.notes ?? "",
     owned: item.owned,
     inTransit: item.inTransit,
@@ -49,11 +49,13 @@ function fromItem(item: FunkoItem): FunkoItemFormValues {
 export function FunkoItemDialog({
   open,
   item,
+  categorySlug,
   onClose,
   onSaved,
 }: {
   open: boolean;
   item: FunkoItem | null;
+  categorySlug: string;
   onClose: () => void;
   onSaved: (item: FunkoItem) => void;
 }) {
@@ -93,7 +95,7 @@ export function FunkoItemDialog({
           method: isNew ? "POST" : "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(
-            isNew ? { ...payload, categorySlug: "animation" } : payload,
+            isNew ? { ...payload, categorySlug } : payload,
           ),
         },
       );
