@@ -13,6 +13,7 @@ export interface FunkoItem {
   handle: string
   title: string
   imageUrl: string | null
+  imageGcsKey: string | null
   series: string[]
   popNumber: number | null
   owned: boolean
@@ -21,6 +22,22 @@ export interface FunkoItem {
   quantity: number
   notes: string | null
   sortOrder: number
+}
+
+export interface FunkoImageSuggestion {
+  handle: string
+  title: string
+  imageUrl: string
+  score: number
+  popNumber: number | null
+}
+
+export interface FunkoListResult {
+  items: FunkoItem[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
 }
 
 export interface FunkoCatalogStats {

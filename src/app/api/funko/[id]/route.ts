@@ -27,6 +27,13 @@ export async function PATCH(
       quantity: typeof body.quantity === 'number' ? body.quantity : undefined,
       notes: body.notes !== undefined ? body.notes : undefined,
       title: typeof body.title === 'string' ? body.title : undefined,
+      popNumber:
+        typeof body.popNumber === 'number'
+          ? body.popNumber
+          : body.popNumber === null
+            ? null
+            : undefined,
+      subseries: body.subseries !== undefined ? body.subseries : undefined,
     })
 
     if (!item) {

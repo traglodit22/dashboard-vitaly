@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS funko_items (
   handle      TEXT NOT NULL,
   title       TEXT NOT NULL,
   image_url   TEXT,
+  image_gcs_key TEXT,
   series      TEXT[] NOT NULL DEFAULT '{}',
   pop_number  INTEGER,
   owned           BOOLEAN NOT NULL DEFAULT false,
@@ -62,6 +63,7 @@ export async function ensureFunkoSchema(): Promise<void> {
     END $$;
     ALTER TABLE funko_items ADD COLUMN IF NOT EXISTS in_transit BOOLEAN NOT NULL DEFAULT false;
     ALTER TABLE funko_items ADD COLUMN IF NOT EXISTS has_duplicates BOOLEAN NOT NULL DEFAULT false;
+    ALTER TABLE funko_items ADD COLUMN IF NOT EXISTS image_gcs_key TEXT;
   `)
   await pool.query(ANIMATION_CATEGORY_SQL)
   ensured = true

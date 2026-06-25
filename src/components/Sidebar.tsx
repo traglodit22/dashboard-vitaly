@@ -9,6 +9,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { sectionForPath, activeItem } from "@/components/navigation";
 import { FilesSidebarTree } from "@/components/files/FilesSidebarTree";
 import { GallerySidebarCalendar } from "@/components/gallery/GallerySidebarCalendar";
+import { FunkoSidebar } from "@/components/funko/FunkoSidebar";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -20,19 +21,20 @@ export function Sidebar() {
 
   const isFilesSection = section.key === "files";
   const isGallerySection = section.key === "gallery";
+  const isFunkoSection = section.key === "funko";
 
   return (
     <aside
       className={cn(
         "hidden shrink-0 flex-col border-r border-border bg-sidebar md:flex",
-        isFilesSection ? "w-72 xl:w-80" : isGallerySection ? "w-64 xl:w-72" : "w-56",
+        isFilesSection ? "w-72 xl:w-80" : isGallerySection || isFunkoSection ? "w-64 xl:w-72" : "w-56",
       )}
     >
       <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-hidden p-3">
         <div className="shrink-0 px-3 pb-1 pt-2 text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
           {section.label}
         </div>
-        {!isGallerySection &&
+        {!isGallerySection && !isFunkoSection &&
           section.items.map(({ href, label, icon: Icon }) => {
             const active = current?.href === href;
             return (
@@ -57,6 +59,7 @@ export function Sidebar() {
           </Suspense>
         )}
         {isGallerySection && <GallerySidebarCalendar />}
+        {isFunkoSection && <FunkoSidebar />}
       </nav>
 
       <div className="space-y-1 border-t border-border p-3">

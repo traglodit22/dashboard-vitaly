@@ -1,65 +1,96 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
-  Download,
+  ChevronLeft,
+  ChevronRight,
+  ImageIcon,
   Loader2,
   MessageSquare,
   PackageCheck,
-  Search,
-  Sparkles,
+  Pencil,
+  Trash2,
   Truck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { FunkoImagePicker } from "@/components/funko/FunkoImagePicker";
+import { FunkoItemDialog } from "@/components/funko/FunkoItemDialog";
 import { apiFetch } from "@/lib/apiFetch";
+import {
+  buildFunkoHref,
+  FUNKO_CHANGED_EVENT,
+  FUNKO_CREATE_EVENT,
+  notifyFunkoChanged,
+  parseFunkoSearchParams,
+} from "@/lib/funko/funkoRoutes";
 import {
   DASHBOARD_PAGE_CLASS,
   DASHBOARD_PAGE_TITLE_CLASS,
 } from "@/lib/dashboard/pageLayout";
-import type { FunkoCatalogStats, FunkoCategory, FunkoItem } from "@/lib/funko/types";
+import type { FunkoCatalogStats, FunkoItem } from "@/lib/funko/types";
 import { cn } from "@/lib/utils";
 
-type FilterMode = "all" | "owned" | "inTransit";
+type ItemPatch = Partial<Pick<FunkoItem, "owned" | "inTransit" | "notes">>;
 
-type ItemPatch = Partial<
-  Pick<FunkoItem, "owned" | "inTransit" | "notes">
->;
+interface Pagination {
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
 
-export function FunkoClient() {
-  const [categories, setCategories] = useState<FunkoCategory[]>([]);
+function FunkoClientInner() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { filter, page, q } = parseFunkoSearchParams(searchParams);
+
   const [items, setItems] = useState<FunkoItem[]>([]);
   const [stats, setStats] = useState<FunkoCatalogStats>({
     total: 0,
     owned: 0,
     inTransit: 0,
   });
+  const [pagination, setPagination] = useState<Pagination>({
+    total: 0,
+    page: 1,
+    pageSize: 24,
+    totalPages: 1,
+  });
   const [loading, setLoading] = useState(true);
-  const [importing, setImporting] = useState(false);
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<FilterMode>("all");
-  const categorySlug = "animation";
+  const [editItem, setEditItem] = useState<FunkoItem | null>(null);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [pickerItem, setPickerItem] = useState<FunkoItem | null>(null);
+
+  useEffect(() => {
+    if (!searchParams.get("filter")) {
+      router.replace(buildFunkoHref({ filter: "owned", page: 1, q }));
+    }
+  }, [router, searchParams, q]);
 
   const load = useCallback(async () => {
-    const params = new URLSearchParams({ category: categorySlug });
-    if (search.trim()) params.set("search", search.trim());
-    if (filter === "owned") params.set("owned", "1");
-    if (filter === "inTransit") params.set("inTransit", "1");
+    const params = new URLSearchParams({
+      category: "animation",
+      filter,
+      page: String(page),
+    });
+    if (q.trim()) params.set("q", q.trim());
 
     const res = await apiFetch(`/api/funko?${params}`);
     const data = await res.json();
     if (!res.ok) {
       throw new Error(String(data.error ?? "Не удалось загрузить каталог"));
     }
-    setCategories(data.categories as FunkoCategory[]);
     setItems(data.items as FunkoItem[]);
     setStats(data.stats as FunkoCatalogStats);
-  }, [filter, search]);
+    setPagination(data.pagination as Pagination);
+  }, [filter, page, q]);
 
   useEffect(() => {
     void (async () => {
+      setLoading(true);
       try {
         await load();
       } catch (err) {
@@ -70,28 +101,23 @@ export function FunkoClient() {
     })();
   }, [load]);
 
-  const activeCategory = useMemo(
-    () => categories.find((c) => c.slug === categorySlug) ?? null,
-    [categories],
-  );
+  useEffect(() => {
+    const onChange = () => void load();
+    window.addEventListener(FUNKO_CHANGED_EVENT, onChange);
+    return () => window.removeEventListener(FUNKO_CHANGED_EVENT, onChange);
+  }, [load]);
 
-  async function handleImportCollection() {
-    setImporting(true);
-    try {
-      const res = await apiFetch("/api/funko/import-collection", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(String(data.error ?? "Ошибка импорта"));
-      toast.success(String(data.message ?? `Импортировано ${data.imported}`));
-      await load();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Ошибка импорта");
-    } finally {
-      setImporting(false);
-    }
+  useEffect(() => {
+    const onCreate = () => {
+      setEditItem(null);
+      setEditorOpen(true);
+    };
+    window.addEventListener(FUNKO_CREATE_EVENT, onCreate);
+    return () => window.removeEventListener(FUNKO_CREATE_EVENT, onCreate);
+  }, []);
+
+  function goToPage(nextPage: number) {
+    router.push(buildFunkoHref({ filter, page: nextPage, q }));
   }
 
   async function patchItem(id: string, patch: ItemPatch) {
@@ -99,7 +125,6 @@ export function FunkoClient() {
     setItems((list) =>
       list.map((item) => (item.id === id ? { ...item, ...patch } : item)),
     );
-
     try {
       const res = await apiFetch(`/api/funko/${id}`, {
         method: "PATCH",
@@ -111,152 +136,152 @@ export function FunkoClient() {
       setItems((list) =>
         list.map((item) => (item.id === id ? (data.item as FunkoItem) : item)),
       );
-      const nextStats = await apiFetch(`/api/funko?category=${categorySlug}`).then(
-        (r) => r.json(),
-      );
-      setStats(nextStats.stats as FunkoCatalogStats);
+      notifyFunkoChanged();
     } catch (err) {
       setItems(prev);
       toast.error(err instanceof Error ? err.message : "Ошибка сохранения");
     }
   }
 
+  async function deleteItem(item: FunkoItem) {
+    if (!window.confirm(`Удалить «${item.title}»?`)) return;
+    try {
+      const res = await apiFetch(`/api/funko/${item.id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(String(data.error ?? "Ошибка удаления"));
+      toast.success("Удалено");
+      notifyFunkoChanged();
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Ошибка удаления");
+    }
+  }
+
+  function onItemSaved() {
+    notifyFunkoChanged();
+    void load();
+  }
+
+  const filterLabel =
+    filter === "owned" ? "Есть" : filter === "inTransit" ? "В пути" : "Все";
+
   return (
     <div className={DASHBOARD_PAGE_CLASS}>
-      <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className={DASHBOARD_PAGE_TITLE_CLASS}>Funko</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Коллекция Funko Pop
-            {activeCategory ? ` · ${activeCategory.name}` : ""}
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          <StatPill label="Всего" value={stats.total} />
-          <StatPill label="Есть" value={stats.owned} icon={PackageCheck} />
-          <StatPill label="В пути" value={stats.inTransit} icon={Truck} />
-        </div>
-      </div>
-
-      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center">
-        <div className="relative flex-1">
-          <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Поиск по названию…"
-            className="pl-9"
-          />
-        </div>
-        <div className="flex flex-wrap gap-1">
-          {(
-            [
-              ["all", "Все"],
-              ["owned", "Есть"],
-              ["inTransit", "В пути"],
-            ] as const
-          ).map(([key, label]) => (
-            <Button
-              key={key}
-              type="button"
-              size="sm"
-              variant={filter === key ? "default" : "outline"}
-              onClick={() => setFilter(key)}
-            >
-              {label}
-            </Button>
-          ))}
-          <Button
-            type="button"
-            size="sm"
-            variant="secondary"
-            disabled={importing}
-            onClick={() => void handleImportCollection()}
-          >
-            {importing ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <Download className="size-4" />
-            )}
-            Импорт из PDF
-          </Button>
-        </div>
-      </div>
+      <header className="mb-4 flex flex-col gap-1 sm:mb-6">
+        <h1 className={DASHBOARD_PAGE_TITLE_CLASS}>Funko</h1>
+        <p className="text-sm text-muted-foreground">
+          Pop! Animation · {filterLabel}
+          {q.trim() ? ` · «${q.trim()}»` : ""}
+        </p>
+      </header>
 
       {loading ? (
         <div className="flex min-h-[40vh] items-center justify-center text-muted-foreground">
           <Loader2 className="size-6 animate-spin" />
         </div>
       ) : stats.total === 0 ? (
-        <EmptyCatalog importing={importing} onImport={() => void handleImportCollection()} />
+        <p className="py-12 text-center text-sm text-muted-foreground">
+          Коллекция пуста — импортируйте PDF в меню слева
+        </p>
       ) : items.length === 0 ? (
         <p className="py-12 text-center text-sm text-muted-foreground">
-          Ничего не найдено по текущему фильтру
+          Ничего не найдено
         </p>
       ) : (
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {items.map((item) => (
-            <FunkoCard key={item.id} item={item} onPatch={patchItem} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {items.map((item) => (
+              <FunkoCard
+                key={item.id}
+                item={item}
+                onPatch={patchItem}
+                onEdit={() => {
+                  setEditItem(item);
+                  setEditorOpen(true);
+                }}
+                onDelete={() => void deleteItem(item)}
+                onPickImage={() => setPickerItem(item)}
+              />
+            ))}
+          </div>
+
+          {pagination.totalPages > 1 && (
+            <div className="mt-6 flex items-center justify-center gap-3">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                disabled={page <= 1}
+                onClick={() => goToPage(page - 1)}
+              >
+                <ChevronLeft className="size-4" />
+              </Button>
+              <span className="text-sm tabular-nums text-muted-foreground">
+                {pagination.page} / {pagination.totalPages}
+                <span className="hidden sm:inline"> · {pagination.total} шт.</span>
+              </span>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                disabled={page >= pagination.totalPages}
+                onClick={() => goToPage(page + 1)}
+              >
+                <ChevronRight className="size-4" />
+              </Button>
+            </div>
+          )}
+        </>
       )}
+
+      <FunkoItemDialog
+        open={editorOpen}
+        item={editItem}
+        onClose={() => setEditorOpen(false)}
+        onSaved={() => onItemSaved()}
+      />
+
+      <FunkoImagePicker
+        open={Boolean(pickerItem)}
+        item={pickerItem}
+        onClose={() => setPickerItem(null)}
+        onSaved={(updated) => {
+          setItems((list) =>
+            list.map((i) => (i.id === updated.id ? updated : i)),
+          );
+          notifyFunkoChanged();
+        }}
+      />
     </div>
   );
 }
 
-function StatPill({
-  label,
-  value,
-  icon: Icon,
-}: {
-  label: string;
-  value: number;
-  icon?: React.ComponentType<{ className?: string }>;
-}) {
+export function FunkoClient() {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-md border bg-muted/40 px-2.5 py-1 tabular-nums">
-      {Icon ? <Icon className="size-3.5 text-muted-foreground" /> : null}
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium">{value}</span>
-    </span>
-  );
-}
-
-function EmptyCatalog({
-  importing,
-  onImport,
-}: {
-  importing: boolean;
-  onImport: () => void;
-}) {
-  return (
-    <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 rounded-lg border border-dashed p-8 text-center">
-      <Sparkles className="size-8 text-muted-foreground" />
-      <div>
-        <p className="font-medium">Коллекция пуста</p>
-        <p className="mt-1 max-w-md text-sm text-muted-foreground">
-          Импортируйте 368 фигурок Animation из PDF (стр. 2) — статусы «Есть» /
-          «В пути», комментарии и дубли подтянутся автоматически.
-        </p>
-      </div>
-      <Button type="button" disabled={importing} onClick={onImport}>
-        {importing ? (
-          <Loader2 className="size-4 animate-spin" />
-        ) : (
-          <Download className="size-4" />
-        )}
-        Импорт из PDF
-      </Button>
-    </div>
+    <Suspense
+      fallback={
+        <div className={DASHBOARD_PAGE_CLASS}>
+          <Loader2 className="size-6 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
+      <FunkoClientInner />
+    </Suspense>
   );
 }
 
 function FunkoCard({
   item,
   onPatch,
+  onEdit,
+  onDelete,
+  onPickImage,
 }: {
   item: FunkoItem;
   onPatch: (id: string, patch: ItemPatch) => void;
+  onEdit: () => void;
+  onDelete: () => void;
+  onPickImage: () => void;
 }) {
   const [notes, setNotes] = useState(item.notes ?? "");
   const [savingNotes, setSavingNotes] = useState(false);
@@ -279,41 +304,58 @@ function FunkoCard({
   return (
     <article
       className={cn(
-        "flex gap-3 overflow-hidden rounded-lg border bg-card p-2 shadow-sm transition-colors sm:flex-col sm:gap-0 sm:p-0",
+        "flex flex-col overflow-hidden rounded-lg border bg-card shadow-sm",
         item.owned && "ring-1 ring-emerald-500/40",
         item.inTransit && !item.owned && "ring-1 ring-amber-500/30",
       )}
     >
-      <div className="relative size-20 shrink-0 bg-muted/30 sm:aspect-square sm:size-auto sm:w-full">
+      <div className="relative aspect-square bg-muted/30">
         {item.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={item.imageUrl}
             alt={item.title}
             loading="lazy"
-            className="size-full object-contain p-1"
+            className="size-full object-contain p-2"
             referrerPolicy="no-referrer"
           />
         ) : (
-          <div className="flex size-full items-center justify-center text-xs text-muted-foreground">
-            Нет фото
-          </div>
+          <button
+            type="button"
+            onClick={onPickImage}
+            className="flex size-full flex-col items-center justify-center gap-1 text-xs text-muted-foreground hover:bg-muted/50"
+          >
+            <ImageIcon className="size-6 opacity-50" />
+            Добавить фото
+          </button>
         )}
         {item.popNumber != null && (
-          <Badge className="absolute top-1 right-1 tabular-nums" variant="secondary">
+          <Badge className="absolute top-1.5 right-1.5 tabular-nums" variant="secondary">
             #{item.popNumber}
           </Badge>
         )}
         {item.hasDuplicates && (
-          <Badge className="absolute bottom-1 left-1 text-[10px]" variant="destructive">
-            есть дубли
-            {item.quantity > 1 ? ` ×${item.quantity}` : ""}
+          <Badge className="absolute top-1.5 left-1.5 text-[10px]" variant="destructive">
+            дубли{item.quantity > 1 ? ` ×${item.quantity}` : ""}
           </Badge>
         )}
+        <div className="absolute right-1.5 bottom-1.5 flex gap-0.5">
+          <IconBtn label="Редактировать" onClick={onEdit}>
+            <Pencil className="size-3" />
+          </IconBtn>
+          <IconBtn label="Подобрать фото" onClick={onPickImage}>
+            <ImageIcon className="size-3" />
+          </IconBtn>
+          <IconBtn label="Удалить" onClick={onDelete} destructive>
+            <Trash2 className="size-3" />
+          </IconBtn>
+        </div>
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col gap-2 sm:p-2">
-        <h3 className="line-clamp-2 text-xs leading-snug font-medium">{item.title}</h3>
+      <div className="flex flex-1 flex-col gap-2 p-2">
+        <h3 className="line-clamp-2 min-h-[2.5rem] text-xs leading-snug font-medium">
+          {item.title}
+        </h3>
 
         <div className="relative">
           <MessageSquare className="pointer-events-none absolute top-2 left-2 size-3 text-muted-foreground" />
@@ -365,5 +407,31 @@ function FunkoCard({
         </div>
       </div>
     </article>
+  );
+}
+
+function IconBtn({
+  children,
+  label,
+  onClick,
+  destructive,
+}: {
+  children: React.ReactNode;
+  label: string;
+  onClick: () => void;
+  destructive?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      onClick={onClick}
+      className={cn(
+        "rounded-md bg-background/90 p-1.5 shadow-sm backdrop-blur transition-colors hover:bg-accent",
+        destructive && "hover:text-destructive",
+      )}
+    >
+      {children}
+    </button>
   );
 }

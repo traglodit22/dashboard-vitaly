@@ -1,5 +1,6 @@
 import { query } from '@/lib/db/index'
 import { ensureFunkoSchema } from '@/lib/funko/ensureFunko'
+import { deleteFunkoGcsImage } from '@/lib/funko/funkoImage'
 import {
   collectionHandle,
   loadCollectionJson,
@@ -18,6 +19,13 @@ export async function importFunkoCollection(
   const categoryId = category[0]?.id
   if (!categoryId) throw new Error('Категория animation не найдена')
 
+  const existing = await query<{ image_gcs_key: string | null }>(
+    'SELECT image_gcs_key FROM funko_items WHERE category_id = $1',
+    [categoryId],
+  )
+  for (const row of existing) {
+    await deleteFunkoGcsImage(row.image_gcs_key)
+  }
   await query('DELETE FROM funko_items WHERE category_id = $1', [categoryId])
 
   const BATCH = 25

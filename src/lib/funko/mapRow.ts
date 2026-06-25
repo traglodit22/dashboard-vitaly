@@ -19,6 +19,7 @@ export function rowToItem(row: Record<string, unknown>): FunkoItem {
     handle: row.handle as string,
     title: row.title as string,
     imageUrl: (row.image_url as string) ?? null,
+    imageGcsKey: (row.image_gcs_key as string) ?? null,
     series: Array.isArray(series) ? (series as string[]) : [],
     popNumber: row.pop_number != null ? Number(row.pop_number) : null,
     owned: Boolean(row.owned),
