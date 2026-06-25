@@ -4,6 +4,7 @@ import type {
   LasLegasOverview,
   LasLegasPeriodDetail,
 } from './types'
+import { normalizeLasLegasPayload } from './normalize'
 
 const DEFAULT_URL = 'https://las-legas.by/api/integrations/dashboard/stats'
 
@@ -66,7 +67,8 @@ export async function fetchLasLegas<T>(
     )
   }
 
-  const data = (await res.json()) as T
+  const raw = (await res.json()) as T
+  const data = normalizeLasLegasPayload(raw)
   cache.set(cacheKey, { data, expiresAt: Date.now() + cacheTtlMs() })
   return data
 }
