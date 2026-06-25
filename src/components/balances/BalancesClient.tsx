@@ -32,7 +32,7 @@ interface BalanceProvider {
   name: string;
   apiUrl: string;
   panelUrl: string;
-  apiKey: string;
+  hasApiKey: boolean;
   apiHeaderName: string;
   currency: string;
   threshold: number;
@@ -368,6 +368,8 @@ function ProviderDialog({
     if (!form.name.trim()) errs.push("Укажите название");
     if (!form.apiUrl.trim()) errs.push("Укажите API URL");
     if (!isEdit && !form.apiKey.trim()) errs.push("Укажите API Key");
+    if (isEdit && provider && !provider.hasApiKey && !form.apiKey.trim())
+      errs.push("Укажите API Key");
     if (!form.threshold || isNaN(Number(form.threshold)))
       errs.push("Порог должен быть числом");
     setErrors(errs);
@@ -487,14 +489,17 @@ function ProviderDialog({
           {/* API Key */}
           <div className="space-y-1.5">
             <Label htmlFor="bp-key">
-              API Key{isEdit && " (оставьте пустым, чтобы не менять)"}
+              API Key
+              {isEdit && provider?.hasApiKey && " (оставьте пустым, чтобы не менять)"}
             </Label>
             <Input
               id="bp-key"
               type="password"
               value={form.apiKey}
               onChange={set("apiKey")}
-              placeholder={isEdit ? "••••••••" : "ваш ключ из панели"}
+              placeholder={
+                isEdit && provider?.hasApiKey ? "••••••••" : "ваш ключ из панели"
+              }
               autoComplete="new-password"
             />
           </div>

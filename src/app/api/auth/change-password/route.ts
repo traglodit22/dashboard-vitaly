@@ -1,5 +1,5 @@
 import { getSession, getSessionEmail } from '@/lib/auth/session'
-import { hashPassword } from '@/lib/auth/password'
+import { hashPassword, verifyPassword } from '@/lib/auth/password'
 import { query } from '@/lib/db/index'
 
 export const runtime = 'nodejs'
@@ -45,12 +45,11 @@ export async function POST(req: Request): Promise<Response> {
     return Response.json({ error: 'Пользователь не найден' }, { status: 404 })
   }
 
-  const currentHash = hashPassword(currentPassword)
-  if (currentHash !== activeHash) {
+  if (!(await verifyPassword(currentPassword, activeHash))) {
     return Response.json({ error: 'Неверный текущий пароль' }, { status: 401 })
   }
 
-  const newHash = hashPassword(newPassword)
+  const newHash = await hashPassword(newPassword)
   await query(
     `INSERT INTO dashboard_users (email, password_hash)
      VALUES ($1, $2)

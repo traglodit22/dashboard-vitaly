@@ -156,4 +156,9 @@ if [[ -f /etc/nginx/sites-available/dashboard ]] && [[ -f deploy/sync-nginx-uplo
   bash deploy/sync-nginx-upload-limits.sh /etc/nginx/sites-available/dashboard 50M
 fi
 
+if [[ -f /etc/nginx/sites-available/dashboard ]] && [[ -f deploy/sync-nginx-security-headers.sh ]]; then
+  echo "==> Sync nginx security headers"
+  bash deploy/sync-nginx-security-headers.sh /etc/nginx/sites-available/dashboard
+fi
+
 echo "==> Deploy finished"

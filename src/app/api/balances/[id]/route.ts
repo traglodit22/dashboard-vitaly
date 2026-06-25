@@ -5,12 +5,13 @@ import { requireAuth } from '@/lib/auth/requireAuth'
 export const runtime = 'nodejs'
 
 function rowToProvider(row: Record<string, unknown>) {
+  const hasApiKey = Boolean((row.api_key as string | null)?.trim())
   return {
     id: row.id as string,
     name: row.name as string,
     apiUrl: row.api_url as string,
     panelUrl: (row.panel_url as string) ?? '',
-    apiKey: (row.api_key as string) ?? '',
+    hasApiKey,
     apiHeaderName: (row.api_header_name as string) ?? 'Authorization',
     currency: (row.currency as string) ?? 'RUB',
     threshold: Number(row.threshold),

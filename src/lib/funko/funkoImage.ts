@@ -1,4 +1,5 @@
 import { query } from '@/lib/db/index'
+import { isAllowedFunkoImageProxyUrl } from '@/lib/funko/funkoImageProxy'
 import { deleteFromGcs, downloadFromGcs, isGcsConfigured, uploadToGcs } from '@/lib/files/gcsStorage'
 import { mimeToExtension } from '@/lib/files/mimeDetect'
 
@@ -26,6 +27,10 @@ export async function deleteFunkoGcsImage(key: string | null | undefined): Promi
 export async function downloadRemoteImage(
   url: string,
 ): Promise<{ buffer: Buffer; mime: string }> {
+  if (!isAllowedFunkoImageProxyUrl(url)) {
+    throw new Error('URL изображения не разрешён')
+  }
+
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), 30_000)
   try {

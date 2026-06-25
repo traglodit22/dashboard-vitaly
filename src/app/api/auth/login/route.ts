@@ -1,11 +1,19 @@
-import { createHash } from 'crypto'
 import { createSession } from '@/lib/auth/session'
 import { findUserByCredentials } from '@/lib/auth/ensureUsers'
+import { clearLoginRateLimit, isLoginRateLimited } from '@/lib/auth/loginRateLimit'
+import { verifyPassword } from '@/lib/auth/password'
 import { query } from '@/lib/db/index'
 
 export const runtime = 'nodejs'
 
 export async function POST(req: Request): Promise<Response> {
+  if (isLoginRateLimited(req)) {
+    return Response.json(
+      { error: 'Слишком много попыток входа. Подождите 15 минут.' },
+      { status: 429 },
+    )
+  }
+
   const { email, password } = (await req.json()) as { email?: string; password?: string }
 
   if (!email || !password) {
@@ -14,6 +22,7 @@ export async function POST(req: Request): Promise<Response> {
 
   const user = await findUserByCredentials(email, password)
   if (user) {
+    clearLoginRateLimit(req)
     await createSession(user.email, req)
     return Response.json({ ok: true })
   }
@@ -30,13 +39,13 @@ export async function POST(req: Request): Promise<Response> {
   const activeHash = dbHash ?? (process.env.ADMIN_PASSWORD_HASH ?? '')
 
   const emailMatch = email.trim().toLowerCase() === adminEmail.trim().toLowerCase()
-  const passwordHash = createHash('sha256').update(password).digest('hex')
-  const passwordMatch = Boolean(activeHash) && passwordHash === activeHash
+  const passwordMatch = Boolean(activeHash) && (await verifyPassword(password, activeHash))
 
   if (!emailMatch || !passwordMatch) {
     return Response.json({ error: 'Неверный email или пароль' }, { status: 401 })
   }
 
+  clearLoginRateLimit(req)
   await createSession(adminEmail, req)
   return Response.json({ ok: true })
 }

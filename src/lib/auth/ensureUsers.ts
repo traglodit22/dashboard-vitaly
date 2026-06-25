@@ -1,5 +1,5 @@
 import { pool, query } from '@/lib/db/index'
-import { hashPassword } from '@/lib/auth/password'
+import { verifyPassword } from '@/lib/auth/password'
 
 const USERS_DDL = `
 CREATE TABLE IF NOT EXISTS dashboard_users (
@@ -10,20 +10,20 @@ CREATE TABLE IF NOT EXISTS dashboard_users (
 );
 `
 
-const NADINA_EMAIL = 'nadina2s@gmail.com'
-const NADINA_PASSWORD_HASH =
-  'c58b1394bd53504f6416453800e4f7c61e63a4a7f2a53fa9c827e35724fcc8c8'
-
 /** Создаёт таблицу и недостающих пользователей. Не перезаписывает пароли. */
 export async function ensureDashboardUsers(): Promise<void> {
   await pool.query(USERS_DDL)
 
-  await pool.query(
-    `INSERT INTO dashboard_users (email, password_hash)
-     VALUES ($1, $2)
-     ON CONFLICT (email) DO NOTHING`,
-    [NADINA_EMAIL, NADINA_PASSWORD_HASH],
-  )
+  const seedEmail = process.env.DASHBOARD_SEED_EMAIL?.trim()
+  const seedHash = process.env.DASHBOARD_SEED_PASSWORD_HASH?.trim()
+  if (seedEmail && seedHash) {
+    await pool.query(
+      `INSERT INTO dashboard_users (email, password_hash)
+       VALUES ($1, $2)
+       ON CONFLICT (email) DO NOTHING`,
+      [seedEmail, seedHash],
+    )
+  }
 
   const adminEmail = process.env.ADMIN_EMAIL?.trim()
   if (!adminEmail) return
@@ -73,14 +73,19 @@ export async function findUserByCredentials(
 ): Promise<{ email: string } | null> {
   await ensureDashboardUsers()
 
-  const hash = hashPassword(password)
-  const rows = await query<{ email: string }>(
-    `SELECT email FROM dashboard_users
-     WHERE lower(trim(email)) = lower(trim($1)) AND password_hash = $2
+  const rows = await query<{ email: string; password_hash: string }>(
+    `SELECT email, password_hash FROM dashboard_users
+     WHERE lower(trim(email)) = lower(trim($1))
      LIMIT 1`,
-    [email, hash],
+    [email],
   )
-  return rows[0] ?? null
+
+  const row = rows[0]
+  if (row && (await verifyPassword(password, row.password_hash))) {
+    return { email: row.email }
+  }
+
+  return null
 }
 
 export async function listDashboardUsers(): Promise<{ email: string; createdAt: string }[]> {
