@@ -17,7 +17,8 @@
     "import-klub": "tsx scripts/import-klub-procurement.ts",
     "import-funko": "tsx scripts/import-funko-animations.ts",
     "import-funko-catalog": "tsx scripts/import-funko-catalog.ts",
-    "import-funko-collection": "tsx scripts/import-funko-collection.ts"
+    "import-funko-collection": "tsx scripts/import-funko-collection.ts",
+    "fix-funko-titles": "tsx scripts/fix-funko-titles.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.2",
