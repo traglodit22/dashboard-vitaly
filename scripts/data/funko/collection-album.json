@@ -1,0 +1,67 @@
+[
+  {
+    "popNumber": null,
+    "subseries": "Carey",
+    "name": "Mariah Carey",
+    "title": "Carey — Mariah Carey",
+    "features": "",
+    "notes": null,
+    "owned": true,
+    "inTransit": false,
+    "hasDuplicates": false,
+    "quantity": 0,
+    "sortOrder": 0
+  },
+  {
+    "popNumber": null,
+    "subseries": "",
+    "name": "Notorious B.I.G.",
+    "title": "Notorious B.I.G.",
+    "features": "",
+    "notes": null,
+    "owned": true,
+    "inTransit": false,
+    "hasDuplicates": false,
+    "quantity": 0,
+    "sortOrder": 1
+  },
+  {
+    "popNumber": null,
+    "subseries": "",
+    "name": "The Queen of Blood",
+    "title": "The Queen of Blood",
+    "features": "",
+    "notes": null,
+    "owned": true,
+    "inTransit": false,
+    "hasDuplicates": false,
+    "quantity": 0,
+    "sortOrder": 2
+  },
+  {
+    "popNumber": null,
+    "subseries": "Elizabeth II",
+    "name": "Queen Elizabeth II Wedding Outfit",
+    "title": "Elizabeth II — Queen Elizabeth II Wedding Outfit",
+    "features": "",
+    "notes": null,
+    "owned": true,
+    "inTransit": false,
+    "hasDuplicates": false,
+    "quantity": 0,
+    "sortOrder": 3
+  },
+  {
+    "popNumber": null,
+    "subseries": "Elizabeth II",
+    "name": "Queen Elizabeth II Wedding Outfit",
+    "title": "Elizabeth II — Queen Elizabeth II Wedding Outfit",
+    "features": "в красном с собачкой",
+    "notes": "в красном с собачкой",
+    "owned": true,
+    "inTransit": false,
+    "hasDuplicates": false,
+    "quantity": 0,
+    "sortOrder": 4
+  }
+]

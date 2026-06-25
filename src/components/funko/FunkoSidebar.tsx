@@ -166,16 +166,12 @@ function FunkoSidebarInner() {
   }
 
   async function handleImportCollection() {
-    if (category !== DEFAULT_FUNKO_CATEGORY) {
-      toast.error("Импорт PDF доступен только для Animation");
-      return;
-    }
     setImporting(true);
     try {
       const res = await apiFetch("/api/funko/import-collection", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ all: true }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(String(data.error ?? "Ошибка импорта"));
@@ -393,23 +389,21 @@ function FunkoSidebarInner() {
           )}
           Импорт каталога
         </Button>
-        {category === DEFAULT_FUNKO_CATEGORY && (
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            className="w-full"
-            disabled={importing}
-            onClick={() => void handleImportCollection()}
-          >
-            {importing ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <Download className="size-4" />
-            )}
-            Импорт PDF
-          </Button>
-        )}
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          className="w-full"
+          disabled={importing}
+          onClick={() => void handleImportCollection()}
+        >
+          {importing ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Download className="size-4" />
+          )}
+          Импорт PDF
+        </Button>
       </div>
     </div>
   );
