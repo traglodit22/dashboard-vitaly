@@ -22,6 +22,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
+import { LasLegasStats } from "@/components/laslegas/LasLegasStats";
 import { toast } from "sonner";
 import { filesCategoryPath, FILES_CHANGED_EVENT } from "@/lib/files/routes";
 import { CLOUD_SLUG } from "@/lib/files/types";
@@ -246,6 +247,8 @@ export function DashboardHome() {
           </CardContent>
         </Card>
       )}
+
+      <LasLegasStats />
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
