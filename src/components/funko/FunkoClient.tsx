@@ -387,10 +387,11 @@ function FunkoCard({
     <article
       className={cn(
         "flex flex-col overflow-hidden rounded-lg border shadow-sm",
-        item.owned && "border-emerald-200/80 bg-emerald-50 dark:border-emerald-900/50 dark:bg-emerald-950/30",
+        item.owned &&
+          "border-emerald-300/90 bg-emerald-100 dark:border-emerald-700/70 dark:bg-emerald-900/50",
         item.inTransit &&
           !item.owned &&
-          "border-amber-200/80 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/30",
+          "border-amber-300/90 bg-amber-100 dark:border-amber-700/70 dark:bg-amber-900/50",
         !item.owned && !item.inTransit && "bg-card",
       )}
     >
