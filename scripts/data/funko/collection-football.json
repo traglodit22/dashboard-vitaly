@@ -1,0 +1,80 @@
+[
+  {
+    "popNumber": 2,
+    "subseries": "United",
+    "name": "Romelu Lukaku",
+    "title": "United — Romelu Lukaku",
+    "features": "",
+    "notes": null,
+    "owned": true,
+    "inTransit": false,
+    "hasDuplicates": false,
+    "quantity": 0,
+    "sortOrder": 0
+  },
+  {
+    "popNumber": 4,
+    "subseries": "United",
+    "name": "Paul Pogba",
+    "title": "United — Paul Pogba",
+    "features": "",
+    "notes": null,
+    "owned": true,
+    "inTransit": false,
+    "hasDuplicates": false,
+    "quantity": 0,
+    "sortOrder": 1
+  },
+  {
+    "popNumber": 38,
+    "subseries": "City",
+    "name": "Bernardo Silva",
+    "title": "City — Bernardo Silva",
+    "features": "",
+    "notes": null,
+    "owned": true,
+    "inTransit": false,
+    "hasDuplicates": false,
+    "quantity": 0,
+    "sortOrder": 2
+  },
+  {
+    "popNumber": 48,
+    "subseries": "City",
+    "name": "Raheem Sterling",
+    "title": "City — Raheem Sterling",
+    "features": "",
+    "notes": null,
+    "owned": true,
+    "inTransit": false,
+    "hasDuplicates": false,
+    "quantity": 0,
+    "sortOrder": 3
+  },
+  {
+    "popNumber": 49,
+    "subseries": "City",
+    "name": "Phil Foden",
+    "title": "City — Phil Foden",
+    "features": "",
+    "notes": null,
+    "owned": true,
+    "inTransit": false,
+    "hasDuplicates": false,
+    "quantity": 0,
+    "sortOrder": 4
+  },
+  {
+    "popNumber": 50,
+    "subseries": "",
+    "name": "Lionel Messi",
+    "title": "Lionel Messi",
+    "features": "",
+    "notes": null,
+    "owned": true,
+    "inTransit": false,
+    "hasDuplicates": false,
+    "quantity": 0,
+    "sortOrder": 5
+  }
+]

@@ -1,0 +1,28 @@
+[
+  {
+    "popNumber": 10,
+    "subseries": "",
+    "name": "Mario Andretti",
+    "title": "Mario Andretti",
+    "features": "",
+    "notes": null,
+    "owned": true,
+    "inTransit": false,
+    "hasDuplicates": false,
+    "quantity": 0,
+    "sortOrder": 0
+  },
+  {
+    "popNumber": 18,
+    "subseries": "",
+    "name": "Virat Kohli",
+    "title": "Virat Kohli",
+    "features": "",
+    "notes": null,
+    "owned": true,
+    "inTransit": false,
+    "hasDuplicates": false,
+    "quantity": 0,
+    "sortOrder": 1
+  }
+]

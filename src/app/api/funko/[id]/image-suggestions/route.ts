@@ -36,7 +36,7 @@ export async function GET(
     title,
     subseries,
     categorySeries: seriesLabel,
-    limit: 12,
+    limit: 24,
   })
 
   return NextResponse.json({ suggestions })

@@ -253,6 +253,88 @@ def parse_table_page(page: fitz.Page, *, starwars: bool = False) -> list[dict]:
     return [finalize_row(r, i) for i, r in enumerate(raw_rows)]
 
 
+def route_sport_row(row: dict) -> str:
+    """Распределить строку со стр. Sport по спортивным категориям."""
+    sub = (row.get("subseries") or "").strip().lower()
+    name = (row.get("name") or "").strip().lower()
+    text = f"{sub} {name}"
+
+    if "night live" in text or "snl" in sub:
+        return "snl"
+    if any(h in text for h in ("wwe", "wrestling", "stone cold", "the rock", "undertaker")):
+        return "wwe"
+    if "ufc" in text or "mma" in text:
+        return "ufc"
+    if "tennis" in text:
+        return "tennis"
+    if any(h in text for h in ("hockey", "nhl", "stanley")):
+        return "hockey"
+    if any(h in text for h in ("mlb", "baseball")):
+        return "mlb"
+    if "boy" in sub or any(
+        h in name for h in ("de la hoya", "muhammad ali", "tyson", "fury", "pacquiao")
+    ):
+        return "boxing"
+
+    nba_mascot_hints = (
+        "benny the bull",
+        "the raptor",
+        "the coyote",
+        "mascot",
+        "benny",
+        "raptor",
+        "coyote",
+    )
+    nba_team_subs = (
+        "lakers",
+        "bulls",
+        "raptors",
+        "spyrs",
+        "spurs",
+        "76ers",
+        "rocket",
+        "rockets",
+        "hornets",
+        "suns",
+        "timberwolves",
+        "warriors",
+        "state warriors",
+    )
+    if any(t in sub for t in nba_team_subs) and any(m in name for m in nba_mascot_hints):
+        return "nba-mascots"
+
+    soccer_hints = ("city", "united", "lukaku", "pogba", "silva", "foden", "sterling", "messi")
+    if any(h in sub or h in name for h in soccer_hints):
+        return "football"
+
+    basketball_hints = (
+        "lebron",
+        "curry",
+        "wall",
+        "embiid",
+        "towns",
+        "hayward",
+        "paul",
+        "ball",
+        "jordan",
+        "kobe",
+        "durant",
+        "harden",
+        "giannis",
+        "doncic",
+    )
+    if any(h in name for h in basketball_hints):
+        return "basketball"
+    if any(t in sub for t in nba_team_subs):
+        return "basketball"
+
+    legends_hints = ("andretti", "kohli", "woods", "nicklaus", "senna", "schumacher")
+    if any(h in name for h in legends_hints):
+        return "sports-legends"
+
+    return "basketball"
+
+
 def route_other_row(row: dict) -> str:
     """Распределить строку со стр. Other по категориям."""
     text = f"{row.get('subseries', '')} {row.get('name', '')} {row.get('features', '')}".lower()
@@ -381,6 +463,12 @@ def main() -> None:
                 if not row.get("name") and not row.get("subseries"):
                     continue
                 target = route_other_row(row)
+                buckets[target].append(row)
+        elif slug == "sport":
+            for row in rows:
+                if not row.get("name") and not row.get("subseries"):
+                    continue
+                target = route_sport_row(row)
                 buckets[target].append(row)
         else:
             cleaned = []

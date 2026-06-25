@@ -31,7 +31,10 @@ export async function downloadRemoteImage(
   try {
     const res = await fetch(url, {
       signal: controller.signal,
-      headers: { Accept: 'image/*' },
+      headers: {
+        Accept: 'image/*',
+        'User-Agent': 'Mozilla/5.0 (compatible; DashBoardTrag/1.0)',
+      },
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const mime = (res.headers.get('content-type') ?? 'image/jpeg').split(';')[0].trim()

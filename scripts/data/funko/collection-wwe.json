@@ -1,0 +1,28 @@
+[
+  {
+    "popNumber": 69,
+    "subseries": "",
+    "name": "Undertaker",
+    "title": "Undertaker",
+    "features": "",
+    "notes": null,
+    "owned": true,
+    "inTransit": false,
+    "hasDuplicates": false,
+    "quantity": 0,
+    "sortOrder": 0
+  },
+  {
+    "popNumber": null,
+    "subseries": "",
+    "name": "John Cena and The Rock",
+    "title": "John Cena and The Rock",
+    "features": "",
+    "notes": null,
+    "owned": true,
+    "inTransit": false,
+    "hasDuplicates": false,
+    "quantity": 0,
+    "sortOrder": 1
+  }
+]

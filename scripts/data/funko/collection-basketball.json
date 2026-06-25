@@ -52,45 +52,6 @@
     "sortOrder": 3
   },
   {
-    "popNumber": 1,
-    "subseries": "",
-    "name": "Muhammad Ali",
-    "title": "Muhammad Ali",
-    "features": "",
-    "notes": null,
-    "owned": false,
-    "inTransit": true,
-    "hasDuplicates": false,
-    "quantity": 0,
-    "sortOrder": 4
-  },
-  {
-    "popNumber": 10,
-    "subseries": "",
-    "name": "Mario Andretti",
-    "title": "Mario Andretti",
-    "features": "",
-    "notes": null,
-    "owned": true,
-    "inTransit": false,
-    "hasDuplicates": false,
-    "quantity": 0,
-    "sortOrder": 5
-  },
-  {
-    "popNumber": 18,
-    "subseries": "",
-    "name": "Virat Kohli",
-    "title": "Virat Kohli",
-    "features": "",
-    "notes": null,
-    "owned": true,
-    "inTransit": false,
-    "hasDuplicates": false,
-    "quantity": 0,
-    "sortOrder": 6
-  },
-  {
     "popNumber": 42,
     "subseries": "",
     "name": "Lebron James",
@@ -101,7 +62,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 7
+    "sortOrder": 4
   },
   {
     "popNumber": 32,
@@ -114,7 +75,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 8
+    "sortOrder": 5
   },
   {
     "popNumber": 39,
@@ -127,7 +88,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 9
+    "sortOrder": 6
   },
   {
     "popNumber": 40,
@@ -140,7 +101,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 10
+    "sortOrder": 7
   },
   {
     "popNumber": 41,
@@ -153,7 +114,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 11
+    "sortOrder": 8
   },
   {
     "popNumber": 50,
@@ -166,7 +127,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 12
+    "sortOrder": 9
   },
   {
     "popNumber": 51,
@@ -179,7 +140,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 13
+    "sortOrder": 10
   },
   {
     "popNumber": 52,
@@ -192,7 +153,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 14
+    "sortOrder": 11
   },
   {
     "popNumber": 54,
@@ -205,7 +166,7 @@
     "inTransit": true,
     "hasDuplicates": true,
     "quantity": 2,
-    "sortOrder": 15
+    "sortOrder": 12
   },
   {
     "popNumber": 75,
@@ -218,7 +179,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 16
+    "sortOrder": 13
   },
   {
     "popNumber": 103,
@@ -231,7 +192,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 17
+    "sortOrder": 14
   },
   {
     "popNumber": 121,
@@ -244,7 +205,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 18
+    "sortOrder": 15
   },
   {
     "popNumber": 122,
@@ -257,7 +218,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 19
+    "sortOrder": 16
   },
   {
     "popNumber": 123,
@@ -270,7 +231,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 20
+    "sortOrder": 17
   },
   {
     "popNumber": 126,
@@ -283,7 +244,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 21
+    "sortOrder": 18
   },
   {
     "popNumber": 132,
@@ -296,7 +257,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 22
+    "sortOrder": 19
   },
   {
     "popNumber": 138,
@@ -309,7 +270,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 23
+    "sortOrder": 20
   },
   {
     "popNumber": 139,
@@ -322,7 +283,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 24
+    "sortOrder": 21
   },
   {
     "popNumber": 140,
@@ -335,7 +296,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 25
+    "sortOrder": 22
   },
   {
     "popNumber": 141,
@@ -348,7 +309,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 26
+    "sortOrder": 23
   },
   {
     "popNumber": 142,
@@ -361,7 +322,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 27
+    "sortOrder": 24
   },
   {
     "popNumber": 157,
@@ -374,7 +335,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 28
+    "sortOrder": 25
   },
   {
     "popNumber": 173,
@@ -387,7 +348,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 29
+    "sortOrder": 26
   },
   {
     "popNumber": 177,
@@ -400,7 +361,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 30
+    "sortOrder": 27
   },
   {
     "popNumber": 180,
@@ -413,7 +374,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 31
+    "sortOrder": 28
   },
   {
     "popNumber": 181,
@@ -426,7 +387,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 32
+    "sortOrder": 29
   },
   {
     "popNumber": 193,
@@ -439,7 +400,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 33
+    "sortOrder": 30
   },
   {
     "popNumber": 194,
@@ -452,7 +413,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 34
+    "sortOrder": 31
   },
   {
     "popNumber": 195,
@@ -465,7 +426,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 35
+    "sortOrder": 32
   },
   {
     "popNumber": 196,
@@ -478,46 +439,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 36
-  },
-  {
-    "popNumber": 2,
-    "subseries": "Boy",
-    "name": "Oscar De La Hoya",
-    "title": "Boy — Oscar De La Hoya",
-    "features": "",
-    "notes": null,
-    "owned": true,
-    "inTransit": false,
-    "hasDuplicates": false,
-    "quantity": 0,
-    "sortOrder": 37
-  },
-  {
-    "popNumber": 2,
-    "subseries": "United",
-    "name": "Romelu Lukaku",
-    "title": "United — Romelu Lukaku",
-    "features": "",
-    "notes": null,
-    "owned": true,
-    "inTransit": false,
-    "hasDuplicates": false,
-    "quantity": 0,
-    "sortOrder": 38
-  },
-  {
-    "popNumber": 4,
-    "subseries": "United",
-    "name": "Paul Pogba",
-    "title": "United — Paul Pogba",
-    "features": "",
-    "notes": null,
-    "owned": true,
-    "inTransit": false,
-    "hasDuplicates": false,
-    "quantity": 0,
-    "sortOrder": 39
+    "sortOrder": 33
   },
   {
     "popNumber": 9,
@@ -530,7 +452,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 40
+    "sortOrder": 34
   },
   {
     "popNumber": 10,
@@ -543,7 +465,7 @@
     "inTransit": true,
     "hasDuplicates": true,
     "quantity": 2,
-    "sortOrder": 41
+    "sortOrder": 35
   },
   {
     "popNumber": 16,
@@ -556,7 +478,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 42
+    "sortOrder": 36
   },
   {
     "popNumber": 22,
@@ -569,7 +491,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 43
+    "sortOrder": 37
   },
   {
     "popNumber": 25,
@@ -582,7 +504,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 44
+    "sortOrder": 38
   },
   {
     "popNumber": 30,
@@ -595,7 +517,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 45
+    "sortOrder": 39
   },
   {
     "popNumber": 32,
@@ -608,20 +530,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 46
-  },
-  {
-    "popNumber": 38,
-    "subseries": "City",
-    "name": "Bernardo Silva",
-    "title": "City — Bernardo Silva",
-    "features": "",
-    "notes": null,
-    "owned": true,
-    "inTransit": false,
-    "hasDuplicates": false,
-    "quantity": 0,
-    "sortOrder": 47
+    "sortOrder": 40
   },
   {
     "popNumber": 41,
@@ -634,7 +543,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 48
+    "sortOrder": 41
   },
   {
     "popNumber": 42,
@@ -647,7 +556,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 49
+    "sortOrder": 42
   },
   {
     "popNumber": 44,
@@ -660,46 +569,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 50
-  },
-  {
-    "popNumber": 48,
-    "subseries": "City",
-    "name": "Raheem Sterling",
-    "title": "City — Raheem Sterling",
-    "features": "",
-    "notes": null,
-    "owned": true,
-    "inTransit": false,
-    "hasDuplicates": false,
-    "quantity": 0,
-    "sortOrder": 51
-  },
-  {
-    "popNumber": 49,
-    "subseries": "City",
-    "name": "Phil Foden",
-    "title": "City — Phil Foden",
-    "features": "",
-    "notes": null,
-    "owned": true,
-    "inTransit": false,
-    "hasDuplicates": false,
-    "quantity": 0,
-    "sortOrder": 52
-  },
-  {
-    "popNumber": 50,
-    "subseries": "",
-    "name": "Lionel Messi",
-    "title": "Lionel Messi",
-    "features": "",
-    "notes": null,
-    "owned": true,
-    "inTransit": false,
-    "hasDuplicates": false,
-    "quantity": 0,
-    "sortOrder": 53
+    "sortOrder": 43
   },
   {
     "popNumber": 53,
@@ -712,7 +582,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 54
+    "sortOrder": 44
   },
   {
     "popNumber": 54,
@@ -725,7 +595,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 55
+    "sortOrder": 45
   },
   {
     "popNumber": 55,
@@ -738,7 +608,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 56
+    "sortOrder": 46
   },
   {
     "popNumber": 64,
@@ -751,7 +621,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 57
+    "sortOrder": 47
   },
   {
     "popNumber": 67,
@@ -764,7 +634,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 58
+    "sortOrder": 48
   },
   {
     "popNumber": 68,
@@ -777,7 +647,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 59
+    "sortOrder": 49
   },
   {
     "popNumber": 68,
@@ -790,7 +660,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 60
+    "sortOrder": 50
   },
   {
     "popNumber": 2,
@@ -803,7 +673,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 61
+    "sortOrder": 51
   },
   {
     "popNumber": 20,
@@ -816,7 +686,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 62
+    "sortOrder": 52
   },
   {
     "popNumber": 42,
@@ -829,7 +699,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 63
+    "sortOrder": 53
   },
   {
     "popNumber": 49,
@@ -842,7 +712,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 64
+    "sortOrder": 54
   },
   {
     "popNumber": 81,
@@ -855,7 +725,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 65
+    "sortOrder": 55
   },
   {
     "popNumber": 82,
@@ -868,7 +738,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 66
+    "sortOrder": 56
   },
   {
     "popNumber": 83,
@@ -881,7 +751,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 67
+    "sortOrder": 57
   },
   {
     "popNumber": 84,
@@ -894,7 +764,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 68
+    "sortOrder": 58
   },
   {
     "popNumber": 85,
@@ -907,7 +777,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 69
+    "sortOrder": 59
   },
   {
     "popNumber": 86,
@@ -920,7 +790,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 70
+    "sortOrder": 60
   },
   {
     "popNumber": 87,
@@ -933,7 +803,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 71
+    "sortOrder": 61
   },
   {
     "popNumber": 88,
@@ -946,7 +816,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 72
+    "sortOrder": 62
   },
   {
     "popNumber": 89,
@@ -959,7 +829,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 73
+    "sortOrder": 63
   },
   {
     "popNumber": 91,
@@ -972,7 +842,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 74
+    "sortOrder": 64
   },
   {
     "popNumber": 6,
@@ -985,7 +855,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 75
+    "sortOrder": 65
   },
   {
     "popNumber": 20,
@@ -998,7 +868,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 76
+    "sortOrder": 66
   },
   {
     "popNumber": 26,
@@ -1011,7 +881,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 77
+    "sortOrder": 67
   },
   {
     "popNumber": 46,
@@ -1024,7 +894,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 78
+    "sortOrder": 68
   },
   {
     "popNumber": 47,
@@ -1037,7 +907,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 79
+    "sortOrder": 69
   },
   {
     "popNumber": 50,
@@ -1050,7 +920,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 80
+    "sortOrder": 70
   },
   {
     "popNumber": 62,
@@ -1063,7 +933,7 @@
     "inTransit": true,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 81
+    "sortOrder": 71
   },
   {
     "popNumber": 63,
@@ -1076,7 +946,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 82
+    "sortOrder": 72
   },
   {
     "popNumber": 69,
@@ -1089,7 +959,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 83
+    "sortOrder": 73
   },
   {
     "popNumber": 74,
@@ -1102,7 +972,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 84
+    "sortOrder": 74
   },
   {
     "popNumber": 76,
@@ -1115,7 +985,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 85
+    "sortOrder": 75
   },
   {
     "popNumber": 78,
@@ -1128,7 +998,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 86
+    "sortOrder": 76
   },
   {
     "popNumber": 83,
@@ -1141,7 +1011,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 87
+    "sortOrder": 77
   },
   {
     "popNumber": 105,
@@ -1154,7 +1024,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 88
+    "sortOrder": 78
   },
   {
     "popNumber": 106,
@@ -1167,46 +1037,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 89
-  },
-  {
-    "popNumber": 2,
-    "subseries": "Raptors",
-    "name": "The Raptor",
-    "title": "Raptors — The Raptor",
-    "features": "",
-    "notes": null,
-    "owned": true,
-    "inTransit": false,
-    "hasDuplicates": false,
-    "quantity": 0,
-    "sortOrder": 90
-  },
-  {
-    "popNumber": 3,
-    "subseries": "Bulls",
-    "name": "Benny The Bull",
-    "title": "Bulls — Benny The Bull",
-    "features": "",
-    "notes": null,
-    "owned": true,
-    "inTransit": false,
-    "hasDuplicates": false,
-    "quantity": 0,
-    "sortOrder": 91
-  },
-  {
-    "popNumber": 6,
-    "subseries": "Spyrs",
-    "name": "The coyote",
-    "title": "Spyrs — The coyote",
-    "features": "",
-    "notes": null,
-    "owned": true,
-    "inTransit": false,
-    "hasDuplicates": false,
-    "quantity": 0,
-    "sortOrder": 92
+    "sortOrder": 79
   },
   {
     "popNumber": 8,
@@ -1219,7 +1050,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 93
+    "sortOrder": 80
   },
   {
     "popNumber": 10,
@@ -1232,7 +1063,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 94
+    "sortOrder": 81
   },
   {
     "popNumber": 11,
@@ -1245,7 +1076,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 95
+    "sortOrder": 82
   },
   {
     "popNumber": 12,
@@ -1258,7 +1089,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 96
+    "sortOrder": 83
   },
   {
     "popNumber": 7,
@@ -1271,20 +1102,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 97
-  },
-  {
-    "popNumber": 4,
-    "subseries": "Night Live",
-    "name": "Drunk Uncle",
-    "title": "Night Live — Drunk Uncle",
-    "features": "",
-    "notes": null,
-    "owned": true,
-    "inTransit": false,
-    "hasDuplicates": false,
-    "quantity": 0,
-    "sortOrder": 98
+    "sortOrder": 84
   },
   {
     "popNumber": 1,
@@ -1297,7 +1115,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 99
+    "sortOrder": 85
   },
   {
     "popNumber": 8,
@@ -1310,7 +1128,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 100
+    "sortOrder": 86
   },
   {
     "popNumber": 1,
@@ -1323,7 +1141,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 101
+    "sortOrder": 87
   },
   {
     "popNumber": 7,
@@ -1336,7 +1154,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 102
+    "sortOrder": 88
   },
   {
     "popNumber": 10,
@@ -1349,7 +1167,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 103
+    "sortOrder": 89
   },
   {
     "popNumber": 19,
@@ -1362,7 +1180,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 104
+    "sortOrder": 90
   },
   {
     "popNumber": 25,
@@ -1375,7 +1193,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 105
+    "sortOrder": 91
   },
   {
     "popNumber": 27,
@@ -1388,7 +1206,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 106
+    "sortOrder": 92
   },
   {
     "popNumber": 34,
@@ -1401,7 +1219,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 107
+    "sortOrder": 93
   },
   {
     "popNumber": 34,
@@ -1414,7 +1232,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 108
+    "sortOrder": 94
   },
   {
     "popNumber": 35,
@@ -1427,7 +1245,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 109
+    "sortOrder": 95
   },
   {
     "popNumber": 51,
@@ -1440,7 +1258,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 110
+    "sortOrder": 96
   },
   {
     "popNumber": 54,
@@ -1453,20 +1271,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 111
-  },
-  {
-    "popNumber": 69,
-    "subseries": "",
-    "name": "Undertaker",
-    "title": "Undertaker",
-    "features": "",
-    "notes": null,
-    "owned": true,
-    "inTransit": false,
-    "hasDuplicates": false,
-    "quantity": 0,
-    "sortOrder": 112
+    "sortOrder": 97
   },
   {
     "popNumber": 74,
@@ -1479,7 +1284,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 113
+    "sortOrder": 98
   },
   {
     "popNumber": 77,
@@ -1492,7 +1297,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 114
+    "sortOrder": 99
   },
   {
     "popNumber": 80,
@@ -1505,7 +1310,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 115
+    "sortOrder": 100
   },
   {
     "popNumber": 84,
@@ -1518,7 +1323,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 116
+    "sortOrder": 101
   },
   {
     "popNumber": 86,
@@ -1531,7 +1336,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 117
+    "sortOrder": 102
   },
   {
     "popNumber": 87,
@@ -1544,7 +1349,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 118
+    "sortOrder": 103
   },
   {
     "popNumber": 107,
@@ -1557,7 +1362,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 119
+    "sortOrder": 104
   },
   {
     "popNumber": 108,
@@ -1570,7 +1375,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 120
+    "sortOrder": 105
   },
   {
     "popNumber": 109,
@@ -1583,7 +1388,7 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 121
+    "sortOrder": 106
   },
   {
     "popNumber": 135,
@@ -1596,19 +1401,6 @@
     "inTransit": false,
     "hasDuplicates": false,
     "quantity": 0,
-    "sortOrder": 122
-  },
-  {
-    "popNumber": null,
-    "subseries": "",
-    "name": "John Cena and The Rock",
-    "title": "John Cena and The Rock",
-    "features": "",
-    "notes": null,
-    "owned": true,
-    "inTransit": false,
-    "hasDuplicates": false,
-    "quantity": 0,
-    "sortOrder": 123
+    "sortOrder": 107
   }
 ]

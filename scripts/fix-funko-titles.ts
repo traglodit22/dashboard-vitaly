@@ -35,7 +35,15 @@ const PRICECHARTING_SLUG: Record<string, string> = {
   marvel: 'marvel',
   movies: 'movies',
   rocks: 'rocks',
-  sport: 'sports',
+  basketball: 'basketball',
+  football: 'football',
+  hockey: 'hockey',
+  mlb: 'mlb',
+  'sports-legends': 'sports-legends',
+  snl: 'snl',
+  ufc: 'ufc',
+  tennis: 'tennis',
+  wwe: 'wwe',
   starwars: 'star-wars',
   tv: 'television',
 }
@@ -52,7 +60,6 @@ const PLACEHOLDER_TITLES = new Set(
     'TV',
     'Asia',
     'Soda',
-    'Sport',
     'Rocks',
     'Retro',
     'Gold',
@@ -87,7 +94,7 @@ function seriesMatches(rowSeries: string[], filters: string[]): boolean {
 }
 
 function extractPopFromHandle(handle: string): number | null {
-  for (const re of [/model-(\d+)(?:$|-)/i, /-(\d{1,4})$/, /^(\d{1,4})-/]) {
+  for (const re of [/(?:^|-)model-(\d+)(?:$|-)/i, /(?:^|-)pop-(\d+)(?:$|-)/i]) {
     const m = handle.match(re)
     if (m) {
       const n = Number(m[1])

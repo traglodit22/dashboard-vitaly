@@ -1,0 +1,41 @@
+[
+  {
+    "popNumber": 2,
+    "subseries": "Raptors",
+    "name": "The Raptor",
+    "title": "Raptors — The Raptor",
+    "features": "",
+    "notes": null,
+    "owned": true,
+    "inTransit": false,
+    "hasDuplicates": false,
+    "quantity": 0,
+    "sortOrder": 0
+  },
+  {
+    "popNumber": 3,
+    "subseries": "Bulls",
+    "name": "Benny The Bull",
+    "title": "Bulls — Benny The Bull",
+    "features": "",
+    "notes": null,
+    "owned": true,
+    "inTransit": false,
+    "hasDuplicates": false,
+    "quantity": 0,
+    "sortOrder": 1
+  },
+  {
+    "popNumber": 6,
+    "subseries": "Spyrs",
+    "name": "The coyote",
+    "title": "Spyrs — The coyote",
+    "features": "",
+    "notes": null,
+    "owned": true,
+    "inTransit": false,
+    "hasDuplicates": false,
+    "quantity": 0,
+    "sortOrder": 2
+  }
+]
