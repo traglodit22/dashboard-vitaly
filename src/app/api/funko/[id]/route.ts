@@ -17,7 +17,13 @@ export async function PATCH(
   try {
     const item = await patchFunkoItem(id, {
       owned: typeof body.owned === 'boolean' ? body.owned : undefined,
-      want: typeof body.want === 'boolean' ? body.want : undefined,
+      inTransit:
+        typeof body.inTransit === 'boolean'
+          ? body.inTransit
+          : typeof body.want === 'boolean'
+            ? body.want
+            : undefined,
+      hasDuplicates: typeof body.hasDuplicates === 'boolean' ? body.hasDuplicates : undefined,
       quantity: typeof body.quantity === 'number' ? body.quantity : undefined,
       notes: body.notes !== undefined ? body.notes : undefined,
       title: typeof body.title === 'string' ? body.title : undefined,

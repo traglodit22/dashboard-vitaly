@@ -6,7 +6,9 @@ export default function SettingsPage() {
     <div className={DASHBOARD_PAGE_CLASS}>
       <header className="mb-4 sm:mb-6">
         <h1 className={DASHBOARD_PAGE_TITLE_CLASS}>Настройки</h1>
-        <p className="text-xs text-muted-foreground sm:text-sm">Интеграция ДоброПост и оформление.</p>
+        <p className="text-xs text-muted-foreground sm:text-sm">
+          Оформление, интеграции, автопроверка и резервное копирование.
+        </p>
       </header>
       <SettingsClient />
     </div>

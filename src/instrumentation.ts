@@ -28,4 +28,11 @@ export async function register() {
   } catch (err) {
     console.error('[funko] startup schema failed:', err)
   }
+
+  const { ensureVpsBackupSchema } = await import('@/lib/backup/vpsBackup')
+  try {
+    await ensureVpsBackupSchema()
+  } catch (err) {
+    console.error('[backup] startup schema failed:', err)
+  }
 }

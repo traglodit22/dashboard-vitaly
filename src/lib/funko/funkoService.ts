@@ -12,7 +12,7 @@ import type { FunkoCatalogStats, FunkoImportRow } from '@/lib/funko/types'
 export interface ListFunkoOptions {
   categorySlug?: string
   owned?: boolean
-  want?: boolean
+  inTransit?: boolean
   search?: string
 }
 
@@ -38,8 +38,8 @@ export async function listFunkoItems(options: ListFunkoOptions = {}) {
   if (options.owned === true) {
     clauses.push('i.owned = true')
   }
-  if (options.want === true) {
-    clauses.push('i.want = true')
+  if (options.inTransit === true) {
+    clauses.push('i.in_transit = true')
   }
   if (options.search?.trim()) {
     clauses.push(`(i.title ILIKE $${idx} OR i.handle ILIKE $${idx})`)
@@ -68,11 +68,11 @@ export async function getFunkoStats(categorySlug?: string): Promise<FunkoCatalog
     params.push(categorySlug)
   }
 
-  const rows = await query<{ total: string; owned: string; want: string }>(
+  const rows = await query<{ total: string; owned: string; in_transit: string }>(
     `SELECT
        COUNT(*)::text AS total,
        COUNT(*) FILTER (WHERE i.owned)::text AS owned,
-       COUNT(*) FILTER (WHERE i.want)::text AS want
+       COUNT(*) FILTER (WHERE i.in_transit)::text AS in_transit
      FROM funko_items i
      JOIN funko_categories c ON c.id = i.category_id
      ${where}`,
@@ -83,7 +83,7 @@ export async function getFunkoStats(categorySlug?: string): Promise<FunkoCatalog
   return {
     total: Number(row?.total ?? 0),
     owned: Number(row?.owned ?? 0),
-    want: Number(row?.want ?? 0),
+    inTransit: Number(row?.in_transit ?? 0),
   }
 }
 
@@ -156,7 +156,8 @@ export async function patchFunkoItem(
   id: string,
   patch: {
     owned?: boolean
-    want?: boolean
+    inTransit?: boolean
+    hasDuplicates?: boolean
     quantity?: number
     notes?: string | null
     title?: string
@@ -172,9 +173,13 @@ export async function patchFunkoItem(
     setClauses.push(`owned = $${idx++}`)
     values.push(patch.owned)
   }
-  if (typeof patch.want === 'boolean') {
-    setClauses.push(`want = $${idx++}`)
-    values.push(patch.want)
+  if (typeof patch.inTransit === 'boolean') {
+    setClauses.push(`in_transit = $${idx++}`)
+    values.push(patch.inTransit)
+  }
+  if (typeof patch.hasDuplicates === 'boolean') {
+    setClauses.push(`has_duplicates = $${idx++}`)
+    values.push(patch.hasDuplicates)
   }
   if (typeof patch.quantity === 'number') {
     setClauses.push(`quantity = $${idx++}`)

@@ -17,9 +17,10 @@ CREATE TABLE IF NOT EXISTS funko_items (
   image_url   TEXT,
   series      TEXT[] NOT NULL DEFAULT '{}',
   pop_number  INTEGER,
-  owned       BOOLEAN NOT NULL DEFAULT false,
-  want        BOOLEAN NOT NULL DEFAULT false,
-  quantity    INTEGER NOT NULL DEFAULT 0,
+  owned           BOOLEAN NOT NULL DEFAULT false,
+  in_transit      BOOLEAN NOT NULL DEFAULT false,
+  has_duplicates  BOOLEAN NOT NULL DEFAULT false,
+  quantity        INTEGER NOT NULL DEFAULT 0,
   notes       TEXT,
   sort_order  INTEGER NOT NULL DEFAULT 0,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -46,6 +47,22 @@ let ensured = false
 export async function ensureFunkoSchema(): Promise<void> {
   if (ensured) return
   await pool.query(FUNKO_DDL)
+  await pool.query(`
+    DO $$
+    BEGIN
+      IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'funko_items' AND column_name = 'want'
+      ) AND NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'funko_items' AND column_name = 'in_transit'
+      ) THEN
+        ALTER TABLE funko_items RENAME COLUMN want TO in_transit;
+      END IF;
+    END $$;
+    ALTER TABLE funko_items ADD COLUMN IF NOT EXISTS in_transit BOOLEAN NOT NULL DEFAULT false;
+    ALTER TABLE funko_items ADD COLUMN IF NOT EXISTS has_duplicates BOOLEAN NOT NULL DEFAULT false;
+  `)
   await pool.query(ANIMATION_CATEGORY_SQL)
   ensured = true
 }

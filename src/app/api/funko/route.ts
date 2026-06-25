@@ -16,7 +16,7 @@ export async function GET(req: Request) {
   const categorySlug = searchParams.get('category') ?? undefined
   const search = searchParams.get('search') ?? undefined
   const owned = searchParams.get('owned') === '1'
-  const want = searchParams.get('want') === '1'
+  const inTransit = searchParams.get('inTransit') === '1' || searchParams.get('want') === '1'
 
   try {
     const [categories, items, stats] = await Promise.all([
@@ -25,7 +25,7 @@ export async function GET(req: Request) {
         categorySlug,
         search,
         owned: owned || undefined,
-        want: want || undefined,
+        inTransit: inTransit || undefined,
       }),
       getFunkoStats(categorySlug),
     ])

@@ -16,7 +16,8 @@ export interface FunkoItem {
   series: string[]
   popNumber: number | null
   owned: boolean
-  want: boolean
+  inTransit: boolean
+  hasDuplicates: boolean
   quantity: number
   notes: string | null
   sortOrder: number
@@ -25,7 +26,7 @@ export interface FunkoItem {
 export interface FunkoCatalogStats {
   total: number
   owned: number
-  want: number
+  inTransit: number
 }
 
 export interface FunkoImportRow {
