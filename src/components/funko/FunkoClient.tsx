@@ -386,9 +386,12 @@ function FunkoCard({
   return (
     <article
       className={cn(
-        "flex flex-col overflow-hidden rounded-lg border bg-card shadow-sm",
-        item.owned && "ring-1 ring-emerald-500/40",
-        item.inTransit && !item.owned && "ring-1 ring-amber-500/30",
+        "flex flex-col overflow-hidden rounded-lg border shadow-sm",
+        item.owned && "border-emerald-200/80 bg-emerald-50 dark:border-emerald-900/50 dark:bg-emerald-950/30",
+        item.inTransit &&
+          !item.owned &&
+          "border-amber-200/80 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/30",
+        !item.owned && !item.inTransit && "bg-card",
       )}
     >
       <div className="relative aspect-square bg-muted/30">
