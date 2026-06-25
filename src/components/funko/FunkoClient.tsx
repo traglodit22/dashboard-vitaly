@@ -27,7 +27,7 @@ import {
   notifyFunkoChanged,
   parseFunkoSearchParams,
 } from "@/lib/funko/funkoRoutes";
-import { FUNKO_CATEGORY_DEFS } from "@/lib/funko/categoryConfig";
+import { getCategoryDef } from "@/lib/funko/categoryConfig";
 import {
   DASHBOARD_PAGE_CLASS,
   DASHBOARD_PAGE_TITLE_CLASS,
@@ -48,9 +48,7 @@ function FunkoClientInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { category, filter, page, q } = parseFunkoSearchParams(searchParams);
-  const categoryDef =
-    FUNKO_CATEGORY_DEFS.find((c) => c.slug === category) ??
-    FUNKO_CATEGORY_DEFS.find((c) => c.slug === DEFAULT_FUNKO_CATEGORY)!;
+  const categoryDef = getCategoryDef(category) ?? getCategoryDef(DEFAULT_FUNKO_CATEGORY)!;
 
   const [items, setItems] = useState<FunkoItem[]>([]);
   const [stats, setStats] = useState<FunkoCatalogStats>({
@@ -125,10 +123,6 @@ function FunkoClientInner() {
     router.push(buildFunkoHref({ category, filter, page: nextPage, q }));
   }
 
-  function switchCategory(slug: string) {
-    router.push(buildFunkoHref({ category: slug, filter, page: 1, q }));
-  }
-
   async function patchItem(id: string, patch: ItemPatch) {
     const prev = items;
     setItems((list) =>
@@ -176,40 +170,12 @@ function FunkoClientInner() {
 
   return (
     <div className={DASHBOARD_PAGE_CLASS}>
-      <header className="mb-4 flex flex-col gap-3 sm:mb-6">
-        <div>
-          <h1 className={DASHBOARD_PAGE_TITLE_CLASS}>Funko</h1>
-          <p className="text-sm text-muted-foreground">
-            {categoryDef.name} · {filterLabel}
-            {q.trim() ? ` · «${q.trim()}»` : ""}
-          </p>
-        </div>
-        <nav
-          aria-label="Категории Funko"
-          className="flex gap-0 overflow-x-auto border-b border-border [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {FUNKO_CATEGORY_DEFS.map((cat) => {
-            const active = cat.slug === category;
-            return (
-              <button
-                key={cat.slug}
-                type="button"
-                onClick={() => switchCategory(cat.slug)}
-                className={cn(
-                  "relative shrink-0 border-r border-border px-3 py-2 text-sm font-medium transition-colors last:border-r-0 sm:px-4",
-                  active
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {cat.shortLabel}
-                {active && (
-                  <span className="absolute inset-x-2 bottom-0 h-0.5 rounded-full bg-primary sm:inset-x-3" />
-                )}
-              </button>
-            );
-          })}
-        </nav>
+      <header className="mb-4 flex flex-col gap-1 sm:mb-6">
+        <h1 className={DASHBOARD_PAGE_TITLE_CLASS}>Funko</h1>
+        <p className="text-sm text-muted-foreground">
+          {categoryDef.name} · {filterLabel}
+          {q.trim() ? ` · «${q.trim()}»` : ""}
+        </p>
       </header>
 
       {loading ? (

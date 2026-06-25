@@ -11,7 +11,7 @@
  *   python3 scripts/extract-funko-catalogs.py /tmp/funko_pop.csv
  */
 import { pool } from '../src/lib/db/index'
-import { FUNKO_CATEGORY_DEFS } from '../src/lib/funko/categoryConfig'
+import { FUNKO_CATEGORY_DEFS, hasCatalogSource } from '../src/lib/funko/categoryConfig'
 import { ensureFunkoSchema } from '../src/lib/funko/ensureFunko'
 import { importFunkoRows } from '../src/lib/funko/funkoService'
 import { loadCategoryImportRows } from '../src/lib/funko/loadCategoryData'
@@ -25,7 +25,7 @@ async function main() {
   const slugArg = process.argv.find((a) => !a.startsWith('-') && a !== process.argv[0] && a !== process.argv[1])
   const targets = slugArg
     ? FUNKO_CATEGORY_DEFS.filter((d) => d.slug === slugArg)
-    : FUNKO_CATEGORY_DEFS.filter((d) => d.seriesFilter)
+    : FUNKO_CATEGORY_DEFS.filter(hasCatalogSource)
 
   if (slugArg && !targets.length) {
     console.error(`Неизвестная категория: ${slugArg}`)

@@ -1,5 +1,6 @@
 import { query } from '@/lib/db/index'
 import { getCategorySeriesLabel } from '@/lib/funko/categoryConfig'
+import { applyFunkoCategoryOrder, getFunkoCategoryOrderKeys } from '@/lib/funko/categoryOrder'
 import { enrichFunkoItems } from '@/lib/funko/enrichItem'
 import { ensureFunkoSchema } from '@/lib/funko/ensureFunko'
 import { deleteFunkoGcsImage } from '@/lib/funko/funkoImage'
@@ -40,7 +41,9 @@ export async function listFunkoCategories() {
   const rows = await query<Record<string, unknown>>(
     'SELECT * FROM funko_categories ORDER BY sort_order ASC, name ASC',
   )
-  return rows.map(rowToCategory)
+  const categories = rows.map(rowToCategory)
+  const order = await getFunkoCategoryOrderKeys()
+  return applyFunkoCategoryOrder(categories, order)
 }
 
 export async function listFunkoItems(

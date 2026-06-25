@@ -1,9 +1,16 @@
 export const FUNKO_CHANGED_EVENT = 'funko:changed'
 export const FUNKO_CREATE_EVENT = 'funko:create'
+export const FUNKO_CATEGORY_ORDER_CHANGED_EVENT = 'funko:category-order-changed'
 
 export function notifyFunkoChanged(): void {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event(FUNKO_CHANGED_EVENT))
+  }
+}
+
+export function notifyFunkoCategoryOrderChanged(): void {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(FUNKO_CATEGORY_ORDER_CHANGED_EVENT))
   }
 }
 

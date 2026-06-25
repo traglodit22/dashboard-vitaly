@@ -1,8 +1,10 @@
 import fs from 'fs/promises'
 import path from 'path'
 import {
+  categorySeriesFilters,
   FUNKO_CATEGORY_DEFS,
   getCategoryDef,
+  hasCatalogSource,
   type FunkoCategoryDef,
 } from '@/lib/funko/categoryConfig'
 import type { FunkoImportRow } from '@/lib/funko/types'
@@ -39,8 +41,12 @@ function splitCsvLine(line: string): string[] {
   return out
 }
 
-/** CSV-парсер funko_pop.csv с фильтром по серии. */
-export function parseFunkoCsv(text: string, seriesFilter: string): FunkoImportRow[] {
+/** CSV-парсер funko_pop.csv с фильтром по одной или нескольким сериям. */
+export function parseFunkoCsv(
+  text: string,
+  seriesFilters: string | string[],
+): FunkoImportRow[] {
+  const filters = Array.isArray(seriesFilters) ? seriesFilters : [seriesFilters]
   const lines = text.split(/\r?\n/)
   if (!lines.length) return []
 
@@ -59,7 +65,7 @@ export function parseFunkoCsv(text: string, seriesFilter: string): FunkoImportRo
     if (!line.trim()) continue
     const cols = splitCsvLine(line)
     const seriesRaw = cols[seriesIdx] ?? ''
-    if (!seriesRaw.includes(seriesFilter)) continue
+    if (!filters.some((f) => seriesRaw.includes(f))) continue
 
     rows.push({
       handle: cols[handleIdx]?.trim() ?? '',
@@ -84,7 +90,9 @@ export async function loadCategoryImportRows(
 ): Promise<FunkoImportRow[]> {
   const def = getCategoryDef(slug)
   if (!def) throw new Error(`Неизвестная категория: ${slug}`)
-  if (!def.seriesFilter) return []
+  if (!hasCatalogSource(def)) return []
+
+  const filters = categorySeriesFilters(def)
 
   if (source === 'bundled') {
     try {
@@ -100,9 +108,9 @@ export async function loadCategoryImportRows(
     throw new Error(`Не удалось скачать CSV: HTTP ${res.status}`)
   }
   const text = await res.text()
-  return parseFunkoCsv(text, def.seriesFilter)
+  return parseFunkoCsv(text, filters)
 }
 
 export function listImportableCategories(): FunkoCategoryDef[] {
-  return FUNKO_CATEGORY_DEFS.filter((d) => d.seriesFilter)
+  return FUNKO_CATEGORY_DEFS.filter(hasCatalogSource)
 }

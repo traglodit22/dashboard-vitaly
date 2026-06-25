@@ -1,5 +1,5 @@
 import { pool, query } from '@/lib/db/index'
-import { FUNKO_CATEGORY_DEFS } from '@/lib/funko/categoryConfig'
+import { DEFAULT_FUNKO_CATEGORY_ORDER, FUNKO_CATEGORY_DEFS } from '@/lib/funko/categoryConfig'
 
 const FUNKO_DDL = `
 CREATE TABLE IF NOT EXISTS funko_categories (
@@ -45,12 +45,19 @@ WHERE NOT EXISTS (SELECT 1 FROM funko_categories WHERE slug = 'animation');
 `
 
 async function seedFunkoCategories(): Promise<void> {
-  for (const def of FUNKO_CATEGORY_DEFS) {
+  for (let i = 0; i < FUNKO_CATEGORY_DEFS.length; i++) {
+    const def = FUNKO_CATEGORY_DEFS[i]
+    const defaultIdx = DEFAULT_FUNKO_CATEGORY_ORDER.indexOf(def.slug)
+    const sortOrder = (defaultIdx >= 0 ? defaultIdx : i) * 10 + 10
     await pool.query(
       `INSERT INTO funko_categories (slug, name, sort_order)
        SELECT $1, $2, $3
        WHERE NOT EXISTS (SELECT 1 FROM funko_categories WHERE slug = $1)`,
-      [def.slug, def.name, def.sortOrder],
+      [def.slug, def.name, sortOrder],
+    )
+    await pool.query(
+      `UPDATE funko_categories SET name = $2 WHERE slug = $1 AND name IS DISTINCT FROM $2`,
+      [def.slug, def.name],
     )
   }
 }

@@ -1,132 +1,74 @@
 /** Описание линейки Funko Pop для импорта и UI. */
 export interface FunkoCategoryDef {
   slug: string
-  /** Полное имя в БД, совпадает с меткой серии в CSV. */
+  /** Полное имя в БД. */
   name: string
-  /** Короткая подпись во вкладках. */
+  /** Подпись в боковой панели. */
   shortLabel: string
-  /** Фильтр поля series в funko_pop.csv; null — нет данных в датасете. */
-  seriesFilter: string | null
+  /** Фильтр(ы) поля series в funko_pop.csv; null — нет данных в датасете. */
+  seriesFilter: string | string[] | null
   catalogFile: string
-  sortOrder: number
+}
+
+function def(
+  slug: string,
+  name: string,
+  shortLabel: string,
+  seriesFilter: string | string[] | null,
+  catalogFile = `${slug}.json`,
+): FunkoCategoryDef {
+  return { slug, name, shortLabel, seriesFilter, catalogFile }
 }
 
 export const FUNKO_CATEGORY_DEFS: FunkoCategoryDef[] = [
-  {
-    slug: 'animation',
-    name: 'Pop! Animation',
-    shortLabel: 'Animation',
-    seriesFilter: 'Pop! Animation',
-    catalogFile: 'animations.json',
-    sortOrder: 10,
-  },
-  {
-    slug: 'asia',
-    name: 'Pop! Asia',
-    shortLabel: 'Asia',
-    seriesFilter: 'Pop! Asia',
-    catalogFile: 'asia.json',
-    sortOrder: 20,
-  },
-  {
-    slug: 'disney',
-    name: 'Pop! Disney',
-    shortLabel: 'Disney',
-    seriesFilter: 'Pop! Disney',
-    catalogFile: 'disney.json',
-    sortOrder: 30,
-  },
-  {
-    slug: 'games',
-    name: 'Pop! Games',
-    shortLabel: 'Games',
-    seriesFilter: 'Pop! Games',
-    catalogFile: 'games.json',
-    sortOrder: 40,
-  },
-  {
-    slug: 'gold',
-    name: 'Pop! Gold',
-    shortLabel: 'Gold',
-    seriesFilter: null,
-    catalogFile: 'gold.json',
-    sortOrder: 50,
-  },
-  {
-    slug: 'harry-potter',
-    name: 'Pop! Harry Potter',
-    shortLabel: 'Harry Potter',
-    seriesFilter: 'Pop! Harry Potter',
-    catalogFile: 'harry-potter.json',
-    sortOrder: 60,
-  },
-  {
-    slug: 'heroes',
-    name: 'Pop! Heroes',
-    shortLabel: 'Heroes',
-    seriesFilter: 'Pop! Heroes',
-    catalogFile: 'heroes.json',
-    sortOrder: 70,
-  },
-  {
-    slug: 'marvel',
-    name: 'Pop! Marvel',
-    shortLabel: 'Marvel',
-    seriesFilter: 'Pop! Marvel',
-    catalogFile: 'marvel.json',
-    sortOrder: 80,
-  },
-  {
-    slug: 'movies',
-    name: 'Pop! Movies',
-    shortLabel: 'Movies',
-    seriesFilter: 'Pop! Movies',
-    catalogFile: 'movies.json',
-    sortOrder: 90,
-  },
-  {
-    slug: 'retro',
-    name: 'Pop! Retro',
-    shortLabel: 'Retro',
-    seriesFilter: 'Pop! Retro Toys',
-    catalogFile: 'retro.json',
-    sortOrder: 100,
-  },
-  {
-    slug: 'rocks',
-    name: 'Pop! Rocks',
-    shortLabel: 'Rocks',
-    seriesFilter: 'Pop! Rocks',
-    catalogFile: 'rocks.json',
-    sortOrder: 110,
-  },
-  {
-    slug: 'sport',
-    name: 'Pop! Sport',
-    shortLabel: 'Sport',
-    seriesFilter: 'Pop! Sports',
-    catalogFile: 'sport.json',
-    sortOrder: 120,
-  },
-  {
-    slug: 'soda',
-    name: 'Pop! Soda',
-    shortLabel: 'Soda',
-    seriesFilter: 'Soda Figures',
-    catalogFile: 'soda.json',
-    sortOrder: 130,
-  },
-  {
-    slug: 'starwars',
-    name: 'Pop! Star Wars',
-    shortLabel: 'StarWars',
-    seriesFilter: 'Pop! Star Wars',
-    catalogFile: 'starwars.json',
-    sortOrder: 140,
-  },
+  def('animation', 'Pop! Animation', 'Animation', 'Pop! Animation', 'animations.json'),
+  def('asia', 'Pop! Asia', 'Asia', 'Pop! Asia'),
+  def('disney', 'Pop! Disney', 'Disney', 'Pop! Disney'),
+  def('games', 'Pop! Games', 'Games', 'Pop! Games'),
+  def('gold', 'Pop! Gold', 'Gold', null),
+  def('harry-potter', 'Pop! Harry Potter', 'Harry Potter', 'Pop! Harry Potter'),
+  def('heroes', 'Pop! Heroes', 'Heroes', 'Pop! Heroes'),
+  def('marvel', 'Pop! Marvel', 'Marvel', 'Pop! Marvel'),
+  def('movies', 'Pop! Movies', 'Movies', 'Pop! Movies'),
+  def('retro', 'Pop! Retro', 'Retro', 'Pop! Retro Toys', 'retro.json'),
+  def('rocks', 'Pop! Rocks', 'Rocks', 'Pop! Rocks'),
+  def('sport', 'Pop! Sport', 'Sport', 'Pop! Sports', 'sport.json'),
+  def('soda', 'Pop! Soda', 'Soda', 'Soda Figures', 'soda.json'),
+  def('starwars', 'Pop! Star Wars', 'StarWars', 'Pop! Star Wars'),
+  def('game-of-thrones', 'Pop! Game of Thrones', 'Game of Thrones', 'Pop! Game Of Thrones'),
+  def('tv', 'Pop! Television', 'TV', 'Pop! Television'),
+  def('house-of-the-dragon', 'Pop! House of the Dragon', 'House of the Dragon', null),
+  def('8-bit', 'Pop! 8-Bit', '8-Bit', 'Pop! 8-Bit'),
+  def('album', 'Pop! Albums', 'Album', 'Pop! Albums'),
+  def('art', 'Pop! Art', 'Art', ['Pop! Art Series', 'Pop! Artists']),
+  def('books', 'Pop! Books', 'Books', 'Pop! Books'),
+  def('broadway', 'Pop! Broadway', 'Broadway', null),
+  def('comedians', 'Pop! Comedians', 'Comedians', 'Pop! Comedians'),
+  def('comic-covers', 'Pop! Comic Covers', 'Comic Covers', null),
+  def('comics', 'Pop! Comics', 'Comics', 'Pop! Comics'),
+  def('directors', 'Pop! Directors', 'Directors', 'Pop! Directors'),
+  def('icons', 'Pop! Icons', 'Icons', 'Pop! Icons'),
+  def('ad-icons', 'Pop! Ad Icons', 'Ad Icons', 'Pop! Ad Icons'),
+  def('drag-queens', 'Pop! Drag Queens', 'Drag Queens', 'Pop! Drag Queens'),
+  def('halo', 'Pop! Halo', 'Halo', 'Pop! Halo'),
+  def('muppets', 'Pop! Muppets', 'Muppets', 'Pop! Muppets'),
+  def('myths', 'Pop! Myths', 'Myths', 'Pop! Myths'),
+  def('nooks', 'Pop! Nooks', 'Nooks', null),
+  def('pets', 'Pop! Pets', 'Pets', 'Pop! Pets'),
+  def('racing', 'Pop! Racing', 'Racing', null),
+  def('rides', 'Pop! Rides', 'Rides', 'Pop! Rides'),
+  def('royals', 'Pop! Royals', 'Royals', 'Pop! Royals'),
+  def('sesame-street', 'Pop! Sesame Street', 'Sesame Street', 'Pop! Sesame Street'),
+  def('sci-fi', 'Pop! Sci-Fi', 'Sci-Fi', 'Pop! Sci-Fi'),
+  def('south-park', 'Pop! South Park', 'South Park', 'Pop! South Park'),
+  def('tokidoki', 'Pop! Tokidoki', 'Tokidoki', null),
+  def('vhs-covers', 'Pop! VHS Covers', 'VHS Covers', null),
 ]
 
 export const DEFAULT_FUNKO_CATEGORY_SLUG = 'animation'
+
+/** Порядок категорий по умолчанию (до пользовательской сортировки). */
+export const DEFAULT_FUNKO_CATEGORY_ORDER = FUNKO_CATEGORY_DEFS.map((d) => d.slug)
 
 const bySlug = new Map(FUNKO_CATEGORY_DEFS.map((d) => [d.slug, d]))
 
@@ -136,4 +78,13 @@ export function getCategoryDef(slug: string): FunkoCategoryDef | undefined {
 
 export function getCategorySeriesLabel(slug: string): string {
   return getCategoryDef(slug)?.name ?? 'Pop! Animation'
+}
+
+export function categorySeriesFilters(def: FunkoCategoryDef): string[] {
+  if (!def.seriesFilter) return []
+  return Array.isArray(def.seriesFilter) ? def.seriesFilter : [def.seriesFilter]
+}
+
+export function hasCatalogSource(def: FunkoCategoryDef): boolean {
+  return categorySeriesFilters(def).length > 0
 }
