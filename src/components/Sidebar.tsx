@@ -28,7 +28,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "hidden shrink-0 flex-col border-r border-border bg-sidebar md:flex",
+        "hidden h-full min-h-0 shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar md:flex",
         isFilesSection ? "w-72 xl:w-80" : isGallerySection || isFunkoSection ? "w-64 xl:w-72" : "w-56",
       )}
     >
@@ -64,7 +64,7 @@ export function Sidebar() {
         {isFunkoSection && <FunkoSidebar />}
       </nav>
 
-      <div className="space-y-1 border-t border-border p-3">
+      <div className="shrink-0 space-y-1 border-t border-border p-3">
         <Link
           href="/settings"
           className={cn(

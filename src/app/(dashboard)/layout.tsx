@@ -12,12 +12,12 @@ export default function DashboardLayout({
   return (
     <AuthGate>
       <NavOrderProvider>
-        <div className="flex min-h-dvh flex-col [@media(display-mode:standalone)]:pt-[env(safe-area-inset-top)]">
+        <div className="flex h-dvh max-h-dvh flex-col overflow-hidden [@media(display-mode:standalone)]:pt-[env(safe-area-inset-top)]">
           <TopNav />
           <MobileSubNav />
-          <div className="flex flex-1 overflow-hidden [@media(display-mode:standalone)]:pb-[env(safe-area-inset-bottom)]">
+          <div className="flex min-h-0 flex-1 overflow-hidden [@media(display-mode:standalone)]:pb-[env(safe-area-inset-bottom)]">
             <Sidebar />
-            <main className="flex-1 overflow-auto">{children}</main>
+            <main className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain">{children}</main>
           </div>
         </div>
       </NavOrderProvider>

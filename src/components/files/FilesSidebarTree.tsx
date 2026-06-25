@@ -259,7 +259,7 @@ export function FilesSidebarTree({
   }
 
   return (
-    <div className={cn("mt-2 space-y-1 border-t border-border pt-2", className)}>
+    <div className={cn("mt-2 flex min-h-0 flex-1 flex-col space-y-1 border-t border-border pt-2", className)}>
       {!embedded && (
       <div className="px-3 pb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
         Папки
@@ -286,8 +286,8 @@ export function FilesSidebarTree({
         </div>
       ) : (
         <div className={cn(
-          "overflow-y-auto overflow-x-hidden px-1",
-          embedded ? "max-h-none" : "max-h-[min(55vh,480px)]",
+          "min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-1",
+          embedded && "max-h-none",
         )}>
           {tree.map((node) => (
             <FolderTreeNode
