@@ -1,4 +1,4 @@
-import { query, pool } from '@/lib/db/index'
+import { query } from '@/lib/db/index'
 import { SECTIONS } from '@/components/navigation'
 import {
   DEFAULT_NAV_SECTION_ORDER,
@@ -9,23 +9,16 @@ import type { NavSection } from '@/components/navigation'
 
 const VALID_KEYS = new Set(SECTIONS.map((s) => s.key))
 
-let ensured = false
-
-async function ensureNavOrderColumn(): Promise<void> {
-  if (ensured) return
-  await pool.query(
-    'ALTER TABLE system_settings ADD COLUMN IF NOT EXISTS nav_section_order TEXT[]',
-  )
-  ensured = true
-}
-
 export async function getNavSectionOrderKeys(): Promise<string[]> {
-  await ensureNavOrderColumn()
-  const rows = await query<{ nav_section_order: string[] | null }>(
-    'SELECT nav_section_order FROM system_settings WHERE id = 1',
-  )
-  const saved = sanitizeNavSectionOrder(rows[0]?.nav_section_order, VALID_KEYS)
-  if (saved?.length) return saved
+  try {
+    const rows = await query<{ nav_section_order: string[] | null }>(
+      'SELECT nav_section_order FROM system_settings WHERE id = 1',
+    )
+    const saved = sanitizeNavSectionOrder(rows[0]?.nav_section_order, VALID_KEYS)
+    if (saved?.length) return saved
+  } catch (err) {
+    console.error('[nav] read order failed:', err)
+  }
   return [...DEFAULT_NAV_SECTION_ORDER]
 }
 
@@ -35,7 +28,6 @@ export async function getOrderedNavSections(): Promise<NavSection[]> {
 }
 
 export async function saveNavSectionOrder(order: unknown): Promise<string[]> {
-  await ensureNavOrderColumn()
   const sanitized =
     sanitizeNavSectionOrder(order, VALID_KEYS) ?? [...DEFAULT_NAV_SECTION_ORDER]
 

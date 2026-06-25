@@ -94,9 +94,7 @@ export async function POST(req: Request) {
   }
   if (Array.isArray(body.navSectionOrder)) {
     const { saveNavSectionOrder } = await import('@/lib/navigation/navOrder')
-    const saved = await saveNavSectionOrder(body.navSectionOrder)
-    setClauses.push(`nav_section_order = $${idx++}`)
-    values.push(saved)
+    await saveNavSectionOrder(body.navSectionOrder)
   }
 
   if (setClauses.length > 0) {
