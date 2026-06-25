@@ -4,6 +4,7 @@ import { suggestCatalogImages } from '@/lib/funko/catalogSuggestions'
 import { getFunkoItemById } from '@/lib/funko/funkoService'
 
 export const runtime = 'nodejs'
+export const maxDuration = 30
 
 export async function GET(
   req: Request,

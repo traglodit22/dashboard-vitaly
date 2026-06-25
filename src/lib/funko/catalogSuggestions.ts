@@ -114,18 +114,19 @@ export async function suggestCatalogImages(opts: {
       : []
 
   const candidateTitles = [
-    ...catalogCandidates.map((c) => c.title),
-    ...indexTitles.map((t) => cleanPopIndexTitle(t)),
     opts.title,
-    subseries,
+    ...catalogCandidates.slice(0, 6).map((c) => c.title),
+    ...indexTitles.slice(0, 4).map((t) => cleanPopIndexTitle(t)),
   ].filter(Boolean)
+
+  const uniqueCandidates = [...new Set(candidateTitles.map((t) => t.trim()).filter(Boolean))]
 
   const pcResults = await suggestPriceChartingImages({
     categorySlug: opts.categorySlug,
     popNumber: opts.popNumber,
     title: opts.title,
     subseries,
-    candidateTitles,
+    candidateTitles: uniqueCandidates,
     limit,
   })
 

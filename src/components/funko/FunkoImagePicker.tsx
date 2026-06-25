@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Check, ImageIcon, Loader2, Upload } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { Check, ImageIcon, Loader2, RefreshCw, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { apiFetch } from "@/lib/apiFetch";
+import { funkoImageProxyPath } from "@/lib/funko/funkoImageProxy";
 import type { FunkoImageSuggestion, FunkoItem } from "@/lib/funko/types";
 import { cn } from "@/lib/utils";
+
+const SUGGESTIONS_TIMEOUT_MS = 35_000;
 
 export function FunkoImagePicker({
   open,
@@ -30,31 +33,44 @@ export function FunkoImagePicker({
   const [loading, setLoading] = useState(false);
   const [applying, setApplying] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  const loadSuggestions = useCallback(async () => {
+    if (!item) return;
+
+    setLoading(true);
+    setLoadError(null);
+    setSuggestions([]);
+
+    try {
+      const params = new URLSearchParams();
+      if (query?.popNumber != null) params.set("popNumber", String(query.popNumber));
+      if (query?.subseries != null) params.set("subseries", query.subseries);
+      if (query?.title != null) params.set("title", query.title);
+      const qs = params.toString();
+      const res = await apiFetch(
+        `/api/funko/${item.id}/image-suggestions${qs ? `?${qs}` : ""}`,
+        {},
+        SUGGESTIONS_TIMEOUT_MS,
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(String(data.error ?? "Ошибка загрузки"));
+      setSuggestions((data.suggestions as FunkoImageSuggestion[]) ?? []);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Ошибка";
+      setLoadError(message);
+      toast.error(message);
+      setSuggestions([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [item, query?.popNumber, query?.subseries, query?.title]);
 
   useEffect(() => {
     if (!open || !item) return;
-    void (async () => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams();
-        if (query?.popNumber != null) params.set("popNumber", String(query.popNumber));
-        if (query?.subseries != null) params.set("subseries", query.subseries);
-        if (query?.title != null) params.set("title", query.title);
-        const qs = params.toString();
-        const res = await apiFetch(
-          `/api/funko/${item.id}/image-suggestions${qs ? `?${qs}` : ""}`,
-        );
-        const data = await res.json();
-        if (!res.ok) throw new Error(String(data.error ?? "Ошибка загрузки"));
-        setSuggestions((data.suggestions as FunkoImageSuggestion[]) ?? []);
-      } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Ошибка");
-        setSuggestions([]);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [open, item, query?.popNumber, query?.subseries, query?.title]);
+    void loadSuggestions();
+  }, [open, item, reloadKey, loadSuggestions]);
 
   if (!open || !item) return null;
 
@@ -140,8 +156,22 @@ export function FunkoImagePicker({
           </label>
 
           {loading ? (
-            <div className="flex justify-center py-8 text-muted-foreground">
+            <div className="flex flex-col items-center gap-2 py-8 text-muted-foreground">
               <Loader2 className="size-6 animate-spin" />
+              <p className="text-xs">Ищем фото на PriceCharting…</p>
+            </div>
+          ) : loadError ? (
+            <div className="flex flex-col items-center gap-3 py-6 text-center">
+              <p className="text-sm text-muted-foreground">Не удалось загрузить варианты</p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setReloadKey((k) => k + 1)}
+              >
+                <RefreshCw className="size-4" />
+                Повторить
+              </Button>
             </div>
           ) : suggestions.length === 0 ? (
             <p className="py-6 text-center text-sm text-muted-foreground">
@@ -163,10 +193,10 @@ export function FunkoImagePicker({
                   <div className="aspect-square bg-muted/30 p-1">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={s.imageUrl}
+                      src={funkoImageProxyPath(s.imageUrl)}
                       alt={s.title}
                       className="size-full object-contain"
-                      referrerPolicy="no-referrer"
+                      loading="lazy"
                     />
                   </div>
                   <div className="space-y-0.5 p-2">
