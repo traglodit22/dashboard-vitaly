@@ -1,4 +1,4 @@
-import { Package, Boxes, Users, Wallet, UserSquare, LayoutDashboard, ShoppingCart, Cloud, Images } from "lucide-react";
+import { Package, Boxes, Users, Wallet, UserSquare, LayoutDashboard, ShoppingCart, Cloud, Images, Sparkles } from "lucide-react";
 import { CLOUD_SLUG } from "@/lib/files/types";
 
 export interface NavItem {
@@ -39,6 +39,14 @@ export const SECTIONS: NavSection[] = [
     basePath: "/gallery",
     items: [
       { href: "/gallery", label: "Галерея", icon: Images },
+    ],
+  },
+  {
+    key: "funko",
+    label: "Funko",
+    basePath: "/funko",
+    items: [
+      { href: "/funko", label: "Funko", icon: Sparkles },
     ],
   },
   {

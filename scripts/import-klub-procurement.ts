@@ -1,7 +1,11 @@
 /**
  * Импорт категории «Клуб» из scripts/data/klub/ (JSON + PNG).
- * Запуск: npx tsx scripts/import-klub-procurement.ts
- * Пересоздать данные из PDF: python3 scripts/extract-klub-pdf.py
+ *
+ * Локально / на VPS:
+ *   set -a && source .env && set +a && npm run import-klub
+ *
+ * Пересоздать данные из PDF:
+ *   python3 scripts/extract-klub-pdf.py
  */
 import fs from 'fs/promises'
 import path from 'path'

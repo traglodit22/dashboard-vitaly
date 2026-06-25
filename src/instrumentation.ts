@@ -21,4 +21,11 @@ export async function register() {
   } catch (err) {
     console.error('[files] startup seed failed:', err)
   }
+
+  const { ensureFunkoSchema } = await import('@/lib/funko/ensureFunko')
+  try {
+    await ensureFunkoSchema()
+  } catch (err) {
+    console.error('[funko] startup schema failed:', err)
+  }
 }
