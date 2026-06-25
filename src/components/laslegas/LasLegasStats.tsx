@@ -44,13 +44,21 @@ interface ModalState {
   period?: "today" | "7d" | "30d";
 }
 
-interface OverviewCard {
+interface StatTile {
   id: string;
   label: string;
   value: string;
   icon: typeof Users;
   accent?: string;
   modal: ModalState;
+}
+
+interface StatsSection {
+  id: string;
+  title: string;
+  subtitle?: string;
+  sectionClass: string;
+  tiles: StatTile[];
 }
 
 const WEEKDAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
@@ -104,85 +112,126 @@ export function LasLegasStats() {
     void loadOverview();
   }, [loadOverview]);
 
-  const cards = useMemo((): OverviewCard[] => {
+  const sections = useMemo((): StatsSection[] => {
     if (!overview) return [];
     const todayDate = overview.today.visitors.date;
-    const monthKey = overview.month.from?.slice(0, 7) ?? monthFromDate(todayDate);
+    const monthKey =
+      overview.month.from?.slice(0, 7) ?? monthFromDate(todayDate);
+    const dayModal: ModalState = {
+      kind: "day",
+      title: overview.today.visitors.dateLabel ?? "Сегодня",
+      date: todayDate,
+    };
+    const weekModal: ModalState = {
+      kind: "period",
+      title: overview.last7d.label ?? "Последние 7 дней",
+      period: "7d",
+    };
+    const monthModal: ModalState = {
+      kind: "calendar",
+      title: overview.month.label ?? "Календарь",
+      month: monthKey,
+    };
 
     return [
       {
-        id: "today-visitors",
-        label: "Посетители сегодня",
-        value: numFmt.format(overview.today.visitors.visitors),
-        icon: Users,
-        accent: "text-sky-400",
-        modal: { kind: "day", title: "Сегодня", date: todayDate },
+        id: "today",
+        title: "Сегодня",
+        subtitle: overview.today.visitors.dateLabel ?? todayDate,
+        sectionClass:
+          "border-sky-500/25 bg-gradient-to-br from-sky-500/10 via-transparent to-transparent",
+        tiles: [
+          {
+            id: "today-visitors",
+            label: "Посетители",
+            value: numFmt.format(overview.today.visitors.visitors),
+            icon: Users,
+            accent: "text-sky-400",
+            modal: dayModal,
+          },
+          {
+            id: "today-tickets",
+            label: "Билеты",
+            value: numFmt.format(overview.today.visitors.ticketsSold),
+            icon: Ticket,
+            accent: "text-sky-300",
+            modal: dayModal,
+          },
+          {
+            id: "today-revenue",
+            label: "Выручка",
+            value: formatByn(overview.today.revenue.total),
+            icon: Banknote,
+            accent: "text-emerald-400",
+            modal: dayModal,
+          },
+        ],
       },
       {
-        id: "today-revenue",
-        label: "Выручка сегодня",
-        value: formatByn(overview.today.revenue.total),
-        icon: Banknote,
-        accent: "text-emerald-400",
-        modal: { kind: "day", title: "Выручка сегодня", date: todayDate },
+        id: "week",
+        title: "7 дней",
+        subtitle: overview.last7d.label ?? "Неделя",
+        sectionClass:
+          "border-amber-500/25 bg-gradient-to-br from-amber-500/10 via-transparent to-transparent",
+        tiles: [
+          {
+            id: "7d-visitors",
+            label: "Посетители",
+            value: numFmt.format(overview.last7d.visitors ?? 0),
+            icon: Users,
+            accent: "text-amber-400",
+            modal: weekModal,
+          },
+          {
+            id: "7d-tickets",
+            label: "Билеты",
+            value: numFmt.format(overview.last7d.ticketsSold ?? 0),
+            icon: Ticket,
+            accent: "text-amber-300",
+            modal: weekModal,
+          },
+          {
+            id: "7d-revenue",
+            label: "Выручка",
+            value: formatByn(overview.last7d.revenue?.total),
+            icon: Banknote,
+            accent: "text-emerald-400",
+            modal: weekModal,
+          },
+        ],
       },
       {
-        id: "today-tickets",
-        label: "Билетов сегодня",
-        value: numFmt.format(overview.today.visitors.ticketsSold),
-        icon: Ticket,
-        modal: { kind: "day", title: "Билеты сегодня", date: todayDate },
-      },
-      {
-        id: "month-visitors",
-        label: "Посетители за месяц",
-        value: numFmt.format(overview.month.visitors ?? 0),
-        icon: Users,
-        modal: {
-          kind: "calendar",
-          title: overview.month.label ?? "Календарь",
-          month: monthKey,
-        },
-      },
-      {
-        id: "month-revenue",
-        label: "Выручка за месяц",
-        value: formatByn(overview.month.revenue?.total),
-        icon: Banknote,
-        accent: "text-emerald-400",
-        modal: {
-          kind: "calendar",
-          title: overview.month.label ?? "Календарь",
-          month: monthKey,
-        },
-      },
-      {
-        id: "7d-revenue",
-        label: "Выручка за 7 дней",
-        value: formatByn(overview.last7d.revenue?.total),
-        icon: Banknote,
-        modal: { kind: "period", title: "Последние 7 дней", period: "7d" },
-      },
-      {
-        id: "7d-visitors",
-        label: "Посетители за 7 дней",
-        value: numFmt.format(overview.last7d.visitors ?? 0),
-        icon: Users,
-        modal: { kind: "period", title: "Последние 7 дней", period: "7d" },
-      },
-      {
-        id: "30d-revenue",
-        label: "Выручка за 30 дней",
-        value: formatByn(overview.last30d.revenue?.total),
-        icon: Banknote,
-        modal: { kind: "period", title: "Последние 30 дней", period: "30d" },
-      },
-      {
-        id: "30d-visitors",
-        label: "Посетители за 30 дней",
-        value: numFmt.format(overview.last30d.visitors ?? 0),
-        icon: Users,
-        modal: { kind: "period", title: "Последние 30 дней", period: "30d" },
+        id: "month",
+        title: "Месяц",
+        subtitle: overview.month.label ?? monthKey,
+        sectionClass:
+          "border-violet-500/25 bg-gradient-to-br from-violet-500/10 via-transparent to-transparent",
+        tiles: [
+          {
+            id: "month-visitors",
+            label: "Посетители",
+            value: numFmt.format(overview.month.visitors ?? 0),
+            icon: Users,
+            accent: "text-violet-400",
+            modal: monthModal,
+          },
+          {
+            id: "month-tickets",
+            label: "Билеты",
+            value: numFmt.format(overview.month.ticketsSold ?? 0),
+            icon: Ticket,
+            accent: "text-violet-300",
+            modal: monthModal,
+          },
+          {
+            id: "month-revenue",
+            label: "Выручка",
+            value: formatByn(overview.month.revenue?.total),
+            icon: Banknote,
+            accent: "text-emerald-400",
+            modal: monthModal,
+          },
+        ],
       },
     ];
   }, [overview]);
@@ -233,24 +282,35 @@ export function LasLegasStats() {
             </div>
           )}
 
-          {!loading && !error && cards.length > 0 && (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
-              {cards.map(({ id, label, value, icon: Icon, accent, modal: m }) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => setModal(m)}
-                  className="rounded-lg border border-border bg-muted/20 p-3 text-left transition-colors hover:border-primary/40 hover:bg-primary/5"
-                >
-                  <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
-                    <Icon className={cn("size-3.5 shrink-0", accent ?? "text-primary")} />
-                    <span>{label}</span>
-                  </div>
-                  <p className={cn("text-lg font-semibold tabular-nums sm:text-xl", accent)}>
-                    {value}
-                  </p>
-                </button>
+          {!loading && !error && sections.length > 0 && (
+            <div className="space-y-4">
+              {sections.map((section) => (
+                <StatsPeriodSection
+                  key={section.id}
+                  section={section}
+                  onOpen={(modal) => setModal(modal)}
+                />
               ))}
+
+              {overview?.last30d && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setModal({
+                      kind: "period",
+                      title: overview.last30d.label ?? "Последние 30 дней",
+                      period: "30d",
+                    })
+                  }
+                  className="flex w-full flex-wrap items-center justify-between gap-2 rounded-lg border border-dashed border-border/80 px-3 py-2.5 text-left text-xs text-muted-foreground transition-colors hover:border-primary/30 hover:bg-muted/30 hover:text-foreground"
+                >
+                  <span>За 30 дней</span>
+                  <span className="tabular-nums">
+                    {numFmt.format(overview.last30d.visitors ?? 0)} пос. ·{" "}
+                    {formatByn(overview.last30d.revenue?.total)}
+                  </span>
+                </button>
+              )}
             </div>
           )}
         </CardContent>
@@ -269,6 +329,73 @@ export function LasLegasStats() {
         />
       )}
     </>
+  );
+}
+
+function StatsPeriodSection({
+  section,
+  onOpen,
+}: {
+  section: StatsSection;
+  onOpen: (modal: ModalState) => void;
+}) {
+  const sectionModal = section.tiles[0]?.modal;
+
+  return (
+    <div
+      className={cn(
+        "overflow-hidden rounded-xl border p-3 sm:p-4",
+        section.sectionClass,
+      )}
+    >
+      <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
+        <button
+          type="button"
+          onClick={() => sectionModal && onOpen(sectionModal)}
+          className="group flex min-w-0 flex-col items-start gap-0.5 text-left sm:flex-row sm:items-center sm:gap-2"
+        >
+          <span className="text-sm font-semibold tracking-tight">{section.title}</span>
+          {section.subtitle && (
+            <span className="truncate text-xs text-muted-foreground group-hover:text-foreground">
+              {section.subtitle}
+            </span>
+          )}
+        </button>
+        {sectionModal && (
+          <button
+            type="button"
+            onClick={() => onOpen(sectionModal)}
+            className="shrink-0 text-xs text-muted-foreground transition-colors hover:text-primary"
+          >
+            Подробнее →
+          </button>
+        )}
+      </div>
+
+      <div className="grid grid-cols-3 gap-2">
+        {section.tiles.map(({ id, label, value, icon: Icon, accent, modal }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => onOpen(modal)}
+            className="flex flex-col gap-1.5 rounded-lg border border-border/60 bg-background/60 px-2 py-2.5 text-left backdrop-blur-sm transition-colors hover:border-primary/40 hover:bg-background sm:px-3 sm:py-3"
+          >
+            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground sm:text-xs">
+              <Icon className={cn("size-3.5 shrink-0", accent ?? "text-primary")} />
+              <span className="truncate">{label}</span>
+            </div>
+            <p
+              className={cn(
+                "text-base font-semibold tabular-nums leading-tight sm:text-lg",
+                accent,
+              )}
+            >
+              {value}
+            </p>
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 
