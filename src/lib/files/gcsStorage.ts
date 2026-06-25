@@ -1,4 +1,5 @@
 import fs from 'fs'
+import { promises as fsp } from 'fs'
 import { Storage } from '@google-cloud/storage'
 import { MAX_FILE_BYTES, MAX_FILE_SIZE_ERROR, UPLOAD_TIMEOUT_MS } from '@/lib/files/types'
 
@@ -233,6 +234,30 @@ export async function uploadToGcs(
     const uploadUrl = await getGcsUploadSignedUrl(objectKey, mime)
     await putBufferToSignedUrl(uploadUrl, buffer, mime)
   })
+}
+
+/** Загрузка локального файла в GCS (без лимита 50 МБ для больших бэкапов). */
+export async function uploadLocalFileToGcs(
+  objectKey: string,
+  filePath: string,
+  mime: string,
+): Promise<number> {
+  const stat = await fsp.stat(filePath)
+  if (stat.size <= MAX_FILE_BYTES) {
+    const buffer = await fsp.readFile(filePath)
+    await uploadToGcs(objectKey, buffer, mime)
+    return stat.size
+  }
+
+  await withSignedUrlRetry(`upload file ${objectKey}`, async () => {
+    const storage = getSigningStorage()
+    await storage.bucket(gcsBucketName()).upload(filePath, {
+      destination: objectKey,
+      metadata: { contentType: mime },
+      resumable: true,
+    })
+  })
+  return stat.size
 }
 
 /** Скачивание из GCS через signed URL (без OAuth SDK). */

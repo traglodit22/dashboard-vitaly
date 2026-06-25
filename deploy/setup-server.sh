@@ -50,7 +50,7 @@ else
   echo "Репозиторий уже есть в $APP_DIR — пропускаю clone"
 fi
 
-chmod +x "$APP_DIR/deploy/deploy.sh" "$APP_DIR/deploy/cron-refresh-warehouse.sh" 2>/dev/null || true
+chmod +x "$APP_DIR/deploy/deploy.sh" "$APP_DIR/deploy/cron-refresh-warehouse.sh" "$APP_DIR/deploy/cron-vps-backup.sh" 2>/dev/null || true
 
 echo "==> Nginx"
 sed "s/__DOMAIN__/$DOMAIN/g" "$APP_DIR/deploy/nginx.conf" > /etc/nginx/sites-available/dashboard

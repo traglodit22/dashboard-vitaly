@@ -39,7 +39,7 @@ import {
   Toggle,
 } from "@/components/settings/shared";
 import { EMPTY_SETTINGS, formatBytes, formatMsk, type SettingsData } from "@/components/settings/types";
-import type { VpsBackupRun } from "@/lib/backup/types";
+import type { VpsBackupRun, VpsBackupSettings } from "@/lib/backup/types";
 import { SECTIONS } from "@/components/navigation";
 import { notifyNavOrderChanged } from "@/components/navigation/NavOrderProvider";
 import { orderNavSections } from "@/lib/navigation/orderSections";
@@ -763,13 +763,42 @@ function IntegrationsSection({
 
 // ─── Бэкап VPS ──────────────────────────────────────────────────────────────
 
+const WEEKDAY_OPTIONS = [
+  { value: 0, label: "Воскресенье" },
+  { value: 1, label: "Понедельник" },
+  { value: 2, label: "Вторник" },
+  { value: 3, label: "Среда" },
+  { value: 4, label: "Четверг" },
+  { value: 5, label: "Пятница" },
+  { value: 6, label: "Суббота" },
+];
+
+const HOUR_OPTIONS = Array.from({ length: 24 }, (_, hour) => ({
+  value: hour,
+  label: `${String(hour).padStart(2, "0")}:00`,
+}));
+
+function backupKindLabel(kind: VpsBackupRun["kind"]): string {
+  if (kind === "daily") return "Ежедневный · БД";
+  if (kind === "weekly") return "Еженедельный · БД + файлы";
+  return "Ручной";
+}
+
 function BackupSection() {
   const [gcsConfigured, setGcsConfigured] = useState(false);
   const [runs, setRuns] = useState<VpsBackupRun[]>([]);
+  const [settings, setSettings] = useState<VpsBackupSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
+  const [savingCron, setSavingCron] = useState(false);
   const [includeDatabase, setIncludeDatabase] = useState(true);
   const [includeFiles, setIncludeFiles] = useState(true);
+
+  const [dailyEnabled, setDailyEnabled] = useState(true);
+  const [weeklyEnabled, setWeeklyEnabled] = useState(true);
+  const [retentionCount, setRetentionCount] = useState(30);
+  const [dailyHour, setDailyHour] = useState(3);
+  const [weeklyDay, setWeeklyDay] = useState(0);
 
   const load = useCallback(async () => {
     const res = await apiFetch("/api/settings/backup", { cache: "no-store" });
@@ -777,6 +806,15 @@ function BackupSection() {
     if (!res.ok) throw new Error(String(data.error ?? "Не удалось загрузить историю бэкапов"));
     setGcsConfigured(Boolean(data.gcsConfigured));
     setRuns(Array.isArray(data.runs) ? data.runs : []);
+    if (data.settings) {
+      const s = data.settings as VpsBackupSettings;
+      setSettings(s);
+      setDailyEnabled(s.dailyEnabled);
+      setWeeklyEnabled(s.weeklyEnabled);
+      setRetentionCount(s.retentionCount);
+      setDailyHour(s.dailyHour);
+      setWeeklyDay(s.weeklyDay);
+    }
   }, []);
 
   useEffect(() => {
@@ -790,6 +828,31 @@ function BackupSection() {
       }
     })();
   }, [load]);
+
+  async function saveCronSettings() {
+    setSavingCron(true);
+    try {
+      const res = await apiFetch("/api/settings/backup", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          dailyEnabled,
+          weeklyEnabled,
+          retentionCount,
+          dailyHour,
+          weeklyDay,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(String(data.error ?? "Не удалось сохранить"));
+      setSettings(data.settings as VpsBackupSettings);
+      toast.success("Настройки автобэкапа сохранены");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Ошибка сохранения");
+    } finally {
+      setSavingCron(false);
+    }
+  }
 
   async function runBackup() {
     if (!includeDatabase && !includeFiles) {
@@ -818,7 +881,7 @@ function BackupSection() {
     <SettingsSection
       id="backup"
       title="Бэкап VPS"
-      description="Резервная копия базы данных и локальных файлов (uploads) в Google Cloud Storage."
+      description="Резервные копии базы и локальных файлов в Google Cloud. Автоматически: БД каждый день, БД + файлы раз в неделю."
       icon={Database}
       badge={
         gcsConfigured ? (
@@ -835,7 +898,91 @@ function BackupSection() {
         </p>
       )}
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <SettingsSubBlock title="Автоматическое резервное копирование">
+        <div className="space-y-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-medium">Ежедневный бэкап БД</p>
+              <p className="text-xs text-muted-foreground">
+                pg_dump каждый день в выбранный час (Europe/Minsk)
+              </p>
+            </div>
+            <Toggle checked={dailyEnabled} onChange={setDailyEnabled} />
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-medium">Еженедельный бэкап БД + файлы</p>
+              <p className="text-xs text-muted-foreground">
+                Полный архив uploads в выбранный день недели
+              </p>
+            </div>
+            <Toggle checked={weeklyEnabled} onChange={setWeeklyEnabled} />
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            <SettingsField label="Время запуска (Минск)" hint="Cron проверяет каждый час">
+              <select
+                className="flex h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+                value={dailyHour}
+                onChange={(e) => setDailyHour(Number(e.target.value))}
+              >
+                {HOUR_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </SettingsField>
+
+            <SettingsField label="День недели (полный бэкап)">
+              <select
+                className="flex h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+                value={weeklyDay}
+                onChange={(e) => setWeeklyDay(Number(e.target.value))}
+              >
+                {WEEKDAY_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </SettingsField>
+
+            <SettingsField label="Хранить последних" hint="Старые удаляются из GCS">
+              <Input
+                type="number"
+                min={1}
+                max={100}
+                value={retentionCount}
+                onChange={(e) => setRetentionCount(Number(e.target.value))}
+              />
+            </SettingsField>
+          </div>
+
+          {settings && (
+            <p className="text-xs text-muted-foreground">
+              Последний ежедневный:{" "}
+              {settings.lastDailyAt ? formatMsk(settings.lastDailyAt) : "ещё не было"}
+              {" · "}
+              Последний еженедельный:{" "}
+              {settings.lastWeeklyAt ? formatMsk(settings.lastWeeklyAt) : "ещё не было"}
+            </p>
+          )}
+
+          <SettingsActions>
+            <Button onClick={() => void saveCronSettings()} disabled={savingCron || !gcsConfigured}>
+              {savingCron ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+              Сохранить расписание
+            </Button>
+          </SettingsActions>
+        </div>
+      </SettingsSubBlock>
+
+      <SettingsDivider />
+
+      <SettingsSubBlock title="Ручной бэкап">
+        <div className="grid gap-3 sm:grid-cols-2">
         <label
           className={cn(
             "flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors",
@@ -883,7 +1030,7 @@ function BackupSection() {
             </p>
           </div>
         </label>
-      </div>
+        </div>
 
       <SettingsActions>
         <Button
@@ -894,10 +1041,14 @@ function BackupSection() {
           {running ? "Создаём бэкап…" : "Создать бэкап"}
         </Button>
       </SettingsActions>
+      </SettingsSubBlock>
 
       <SettingsDivider />
 
-      <SettingsField label="История бэкапов" hint="Архивы хранятся в GCS: backups/vps/…">
+      <SettingsField
+        label="История бэкапов"
+        hint={`До ${retentionCount} последних записей в GCS: backups/vps/…`}
+      >
         {loading ? (
           <div className="flex items-center gap-2 py-6 text-sm text-muted-foreground">
             <Loader2 className="size-4 animate-spin" />
@@ -910,7 +1061,13 @@ function BackupSection() {
             {runs.map((run) => (
               <li key={run.id} className="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-sm font-medium">{formatMsk(run.createdAt)}</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-sm font-medium">{formatMsk(run.createdAt)}</p>
+                    <Badge variant="secondary" className="text-[10px] font-normal">
+                      {backupKindLabel(run.kind)}
+                      {run.source === "cron" ? " · cron" : ""}
+                    </Badge>
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     {run.databaseKey ? `БД ${formatBytes(run.databaseBytes)}` : null}
                     {run.databaseKey && run.filesKey ? " · " : null}

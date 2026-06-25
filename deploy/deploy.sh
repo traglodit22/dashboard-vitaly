@@ -161,4 +161,11 @@ if [[ -f /etc/nginx/sites-available/dashboard ]] && [[ -f deploy/sync-nginx-secu
   bash deploy/sync-nginx-security-headers.sh /etc/nginx/sites-available/dashboard
 fi
 
+if [[ -f deploy/cron-dashboard ]] && [[ -d /etc/cron.d ]]; then
+  echo "==> Sync system cron"
+  chmod +x deploy/cron-refresh-warehouse.sh deploy/cron-vps-backup.sh 2>/dev/null || true
+  cp deploy/cron-dashboard /etc/cron.d/dashboard
+  chmod 644 /etc/cron.d/dashboard
+fi
+
 echo "==> Deploy finished"

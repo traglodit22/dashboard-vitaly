@@ -4,15 +4,30 @@ import os from 'os'
 import path from 'path'
 import { pipeline } from 'stream/promises'
 import { createGzip } from 'zlib'
-import { createReadStream, createWriteStream } from 'fs'
+import { createWriteStream } from 'fs'
 import { query } from '@/lib/db/index'
-import { getGcsReadSignedUrl, isGcsConfigured, uploadToGcs } from '@/lib/files/gcsStorage'
-import type { VpsBackupRun } from '@/lib/backup/types'
+import {
+  deleteFromGcs,
+  getGcsReadSignedUrl,
+  isGcsConfigured,
+  uploadLocalFileToGcs,
+} from '@/lib/files/gcsStorage'
+import {
+  getVpsBackupSettings,
+  markBackupRun,
+} from '@/lib/backup/backupSettings'
+import { getMinskNow, minskDateKey } from '@/lib/backup/timezone'
+import type {
+  VpsBackupKind,
+  VpsBackupRun,
+  VpsBackupSource,
+} from '@/lib/backup/types'
 
 const BACKUP_DDL = `
 CREATE TABLE IF NOT EXISTS vps_backup_runs (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   stamp           TEXT NOT NULL,
+  kind            TEXT NOT NULL DEFAULT 'manual',
   database_key    TEXT,
   files_key       TEXT,
   database_bytes  BIGINT,
@@ -24,6 +39,23 @@ CREATE TABLE IF NOT EXISTS vps_backup_runs (
 
 CREATE INDEX IF NOT EXISTS vps_backup_runs_created_idx
   ON vps_backup_runs (created_at DESC);
+
+ALTER TABLE system_settings
+  ADD COLUMN IF NOT EXISTS backup_daily_enabled BOOLEAN NOT NULL DEFAULT TRUE;
+ALTER TABLE system_settings
+  ADD COLUMN IF NOT EXISTS backup_weekly_enabled BOOLEAN NOT NULL DEFAULT TRUE;
+ALTER TABLE system_settings
+  ADD COLUMN IF NOT EXISTS backup_retention_count INTEGER NOT NULL DEFAULT 30;
+ALTER TABLE system_settings
+  ADD COLUMN IF NOT EXISTS backup_daily_hour INTEGER NOT NULL DEFAULT 3;
+ALTER TABLE system_settings
+  ADD COLUMN IF NOT EXISTS backup_weekly_day INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE system_settings
+  ADD COLUMN IF NOT EXISTS backup_last_daily_at TIMESTAMPTZ;
+ALTER TABLE system_settings
+  ADD COLUMN IF NOT EXISTS backup_last_weekly_at TIMESTAMPTZ;
+ALTER TABLE vps_backup_runs
+  ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'manual';
 `
 
 let ensured = false
@@ -100,17 +132,17 @@ async function archiveUploads(outPath: string): Promise<void> {
   await runCommand('tar', ['-czf', outPath, '-C', root, '.'])
 }
 
-async function uploadFile(objectKey: string, filePath: string, mime: string): Promise<number> {
-  const stat = await fs.stat(filePath)
-  const buffer = await fs.readFile(filePath)
-  await uploadToGcs(objectKey, buffer, mime)
-  return stat.size
+function normalizeKind(value: unknown): VpsBackupKind {
+  if (value === 'daily' || value === 'weekly') return value
+  return 'manual'
 }
 
 function rowToRun(row: Record<string, unknown>, urls?: { databaseUrl?: string; filesUrl?: string }): VpsBackupRun {
   return {
     id: row.id as string,
     stamp: row.stamp as string,
+    kind: normalizeKind(row.kind),
+    source: 'manual',
     createdAt: (row.created_at as string) ?? new Date().toISOString(),
     databaseKey: (row.database_key as string) ?? null,
     filesKey: (row.files_key as string) ?? null,
@@ -123,7 +155,7 @@ function rowToRun(row: Record<string, unknown>, urls?: { databaseUrl?: string; f
   }
 }
 
-export async function listVpsBackupRuns(limit = 15): Promise<VpsBackupRun[]> {
+export async function listVpsBackupRuns(limit = 30): Promise<VpsBackupRun[]> {
   await ensureVpsBackupSchema()
   const rows = await query<Record<string, unknown>>(
     `SELECT * FROM vps_backup_runs ORDER BY created_at DESC LIMIT $1`,
@@ -158,9 +190,34 @@ export async function listVpsBackupRuns(limit = 15): Promise<VpsBackupRun[]> {
   return out
 }
 
+export async function pruneOldBackups(retentionCount: number): Promise<number> {
+  await ensureVpsBackupSchema()
+  const rows = await query<Record<string, unknown>>(
+    `SELECT id, database_key, files_key FROM vps_backup_runs ORDER BY created_at DESC`,
+  )
+  const toDelete = rows.slice(retentionCount)
+  for (const row of toDelete) {
+    if (row.database_key) {
+      await deleteFromGcs(row.database_key as string).catch((err) => {
+        console.error('[backup] delete db object:', err)
+      })
+    }
+    if (row.files_key) {
+      await deleteFromGcs(row.files_key as string).catch((err) => {
+        console.error('[backup] delete files object:', err)
+      })
+    }
+    await query('DELETE FROM vps_backup_runs WHERE id = $1', [row.id])
+  }
+  return toDelete.length
+}
+
 export async function runVpsBackup(options: {
   database?: boolean
   files?: boolean
+  kind?: VpsBackupKind
+  source?: VpsBackupSource
+  prune?: boolean
 }): Promise<VpsBackupRun> {
   if (!options.database && !options.files) {
     throw new Error('Выберите хотя бы один тип бэкапа')
@@ -171,6 +228,7 @@ export async function runVpsBackup(options: {
 
   await ensureVpsBackupSchema()
 
+  const kind = options.kind ?? 'manual'
   const stamp = backupStamp()
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'vps-backup-'))
   let databaseKey: string | null = null
@@ -183,23 +241,28 @@ export async function runVpsBackup(options: {
       const dbPath = path.join(tmpDir, 'database.sql.gz')
       await dumpDatabase(dbPath)
       databaseKey = backupObjectKey(stamp, 'database')
-      databaseBytes = await uploadFile(databaseKey, dbPath, 'application/gzip')
+      databaseBytes = await uploadLocalFileToGcs(databaseKey, dbPath, 'application/gzip')
     }
 
     if (options.files) {
       const filesPath = path.join(tmpDir, 'uploads.tar.gz')
       await archiveUploads(filesPath)
       filesKey = backupObjectKey(stamp, 'files')
-      filesBytes = await uploadFile(filesKey, filesPath, 'application/gzip')
+      filesBytes = await uploadLocalFileToGcs(filesKey, filesPath, 'application/gzip')
     }
 
     const inserted = await query<Record<string, unknown>>(
       `INSERT INTO vps_backup_runs
-        (stamp, database_key, files_key, database_bytes, files_bytes, status)
-       VALUES ($1, $2, $3, $4, $5, 'ok')
+        (stamp, kind, database_key, files_key, database_bytes, files_bytes, status)
+       VALUES ($1, $2, $3, $4, $5, $6, 'ok')
        RETURNING *`,
-      [stamp, databaseKey, filesKey, databaseBytes, filesBytes],
+      [stamp, kind, databaseKey, filesKey, databaseBytes, filesBytes],
     )
+
+    if (options.prune !== false) {
+      const settings = await getVpsBackupSettings()
+      await pruneOldBackups(settings.retentionCount)
+    }
 
     const urls: { databaseUrl?: string; filesUrl?: string } = {}
     if (databaseKey) {
@@ -215,17 +278,68 @@ export async function runVpsBackup(options: {
       })
     }
 
-    return rowToRun(inserted[0], urls)
+    const run = rowToRun(inserted[0], urls)
+    run.source = options.source ?? 'manual'
+    return run
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     await query(
       `INSERT INTO vps_backup_runs
-        (stamp, database_key, files_key, database_bytes, files_bytes, status, error_message)
-       VALUES ($1, $2, $3, $4, $5, 'error', $6)`,
-      [stamp, databaseKey, filesKey, databaseBytes, filesBytes, message.slice(0, 2000)],
+        (stamp, kind, database_key, files_key, database_bytes, files_bytes, status, error_message)
+       VALUES ($1, $2, $3, $4, $5, $6, 'error', $7)`,
+      [stamp, kind, databaseKey, filesKey, databaseBytes, filesBytes, message.slice(0, 2000)],
     )
     throw err
   } finally {
     await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => {})
   }
+}
+
+export async function runScheduledVpsBackup(): Promise<{
+  skipped: string
+  run?: VpsBackupRun
+  pruned?: number
+}> {
+  const settings = await getVpsBackupSettings()
+  if (!settings.dailyEnabled && !settings.weeklyEnabled) {
+    return { skipped: 'disabled' }
+  }
+
+  const now = getMinskNow()
+  if (now.hour !== settings.dailyHour) {
+    return { skipped: 'wrong_hour' }
+  }
+
+  const weeklyDue =
+    settings.weeklyEnabled &&
+    now.day === settings.weeklyDay &&
+    (!settings.lastWeeklyAt || minskDateKey(settings.lastWeeklyAt) !== now.dateKey)
+
+  if (weeklyDue) {
+    const run = await runVpsBackup({
+      database: true,
+      files: true,
+      kind: 'weekly',
+      source: 'cron',
+    })
+    await markBackupRun('weekly')
+    return { skipped: 'none', run }
+  }
+
+  if (!settings.dailyEnabled) {
+    return { skipped: 'daily_disabled' }
+  }
+
+  if (settings.lastDailyAt && minskDateKey(settings.lastDailyAt) === now.dateKey) {
+    return { skipped: 'daily_already_ran' }
+  }
+
+  const run = await runVpsBackup({
+    database: true,
+    files: false,
+    kind: 'daily',
+    source: 'cron',
+  })
+  await markBackupRun('daily')
+  return { skipped: 'none', run }
 }

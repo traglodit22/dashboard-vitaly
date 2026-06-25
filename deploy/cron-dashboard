@@ -3,3 +3,6 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # Автопроверка складских статусов (замена Vercel Cron)
 0 */6 * * * root /var/www/dashboard/deploy/cron-refresh-warehouse.sh
+
+# Автобэкап VPS в GCS (ежечасно; час/день из настроек в админке)
+0 * * * * root /var/www/dashboard/deploy/cron-vps-backup.sh
