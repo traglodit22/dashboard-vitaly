@@ -17,9 +17,10 @@ import {
   readLocalRelative,
   saveLocalFile,
   saveLocalPreview,
+  writeLocalRelative,
 } from '@/lib/files/localStorage'
 import { FILE_ITEM_FROM, FILE_ITEM_SELECT, rowToFileItem } from '@/lib/files/mapRow'
-import { isImageMime, isPdfMime } from '@/lib/files/mimeDetect'
+import { isImageMime, isPdfMime, isTextMime } from '@/lib/files/mimeDetect'
 import type { FileStorageType } from '@/lib/files/types'
 import { isThumbnailPreviewPath } from '@/lib/files/previewConstants'
 import { dropCachedPreview } from '@/lib/files/previewMemoryCache'
@@ -285,6 +286,59 @@ export async function readFileContent(row: Record<string, unknown>): Promise<Buf
   const storagePath = row.storage_path as string
   if (storageType === 'gcs') return downloadFromGcs(storagePath)
   return readLocalRelative(storagePath)
+}
+
+export async function writeFileContent(
+  row: Record<string, unknown>,
+  buffer: Buffer,
+): Promise<void> {
+  const mime = row.mime_type as string
+  if (!isTextMime(mime)) {
+    throw new Error('Редактировать можно только текстовые заметки')
+  }
+  if (buffer.length > MAX_FILE_BYTES) {
+    throw new Error(MAX_FILE_SIZE_ERROR)
+  }
+
+  const storageType = row.category_storage_type as string
+  const storagePath = row.storage_path as string
+
+  if (storageType === 'gcs') {
+    await uploadToGcs(storagePath, buffer, mime)
+  } else {
+    await writeLocalRelative(storagePath, buffer)
+  }
+
+  await query(
+    'UPDATE file_items SET size_bytes = $1, updated_at = NOW() WHERE id = $2',
+    [buffer.length, row.id as string],
+  )
+}
+
+export async function createTextNoteItem(opts: {
+  categoryId: string
+  categorySlug: string
+  storageType: FileStorageType
+  folderId: string | null
+  title: string
+  content: string
+}) {
+  const title = opts.title.trim()
+  if (!title) throw new Error('Укажите название заметки')
+
+  const buffer = Buffer.from(opts.content, 'utf8')
+  const originalName = `${title}.txt`
+
+  return uploadFileItem({
+    categoryId: opts.categoryId,
+    categorySlug: opts.categorySlug,
+    storageType: opts.storageType,
+    folderId: opts.folderId,
+    title,
+    originalName,
+    mime: 'text/plain',
+    buffer,
+  })
 }
 
 export async function readFilePreview(row: Record<string, unknown>): Promise<Buffer | null> {

@@ -36,3 +36,8 @@ export function fileContentUrl(fileId: string): string {
 export function fileDownloadUrl(fileId: string): string {
   return `/api/files/${fileId}/content?download=1`
 }
+
+/** Текст заметки через сервер (без редиректа в GCS). */
+export function fileTextContentUrl(fileId: string): string {
+  return `/api/files/${fileId}/content?inline=1`
+}

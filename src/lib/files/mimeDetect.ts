@@ -58,6 +58,10 @@ export function isImageMime(mime: string): boolean {
   return mime.startsWith('image/')
 }
 
+export function isTextMime(mime: string): boolean {
+  return mime === 'text/plain'
+}
+
 export function mimeToExtension(mime: string): string | null {
   for (const [ext, type] of Object.entries(EXT_TO_MIME)) {
     if (type === mime) return ext

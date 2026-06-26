@@ -3,7 +3,7 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ChevronRight, FileText, FolderTree, GripVertical, Loader2, Pencil, Trash2, Upload, Download } from "lucide-react";
+import { ChevronRight, FileText, FolderTree, GripVertical, Loader2, Pencil, StickyNote, Trash2, Upload, Download } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,7 @@ import { FilesSubfolderGrid } from "@/components/files/FilesSubfolderGrid";
 import { FilesMobileFolderDrawer } from "@/components/files/FilesMobileFolderDrawer";
 import { FilePreviewImage } from "@/components/files/FilePreviewImage";
 import { CloudPdfViewer } from "@/components/files/CloudPdfViewer";
+import { TextNoteModal } from "@/components/files/TextNoteModal";
 import { FILE_GRID_CLASS } from "@/lib/files/fileCardLayout";
 import {
   collectExtensionOptions,
@@ -111,8 +112,11 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
   const [sortBy, setSortBy] = useState<FileSortKey>("manual");
   const [extFilter, setExtFilter] = useState("all");
   const [foldersDrawerOpen, setFoldersDrawerOpen] = useState(false);
+  const [noteCreateOpen, setNoteCreateOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const noteDisabled =
+    uploading || (category?.storageType === "gcs" && !gcsConfigured);
   const isCloudFolder = categorySlug === CLOUD_SLUG && Boolean(currentFolderId);
   const listPrefsKey = `files-list-prefs-${categorySlug}-${currentFolderId ?? "root"}`;
 
@@ -284,6 +288,20 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
           : { ...item, sortOrder: order };
       }),
     );
+  }
+
+  function handleNoteSaved(item: FileItem) {
+    setItems((prev) => {
+      const idx = prev.findIndex((i) => i.id === item.id);
+      if (idx >= 0) {
+        return prev.map((i) => (i.id === item.id ? { ...i, ...item } : i));
+      }
+      if (item.folderId === currentFolderId) {
+        return [...prev, item];
+      }
+      return prev;
+    });
+    notifyFilesChanged();
   }
 
   function onFileDrop(targetId: string) {
@@ -596,6 +614,17 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
           </Button>
           <Button
             type="button"
+            variant="outline"
+            size="sm"
+            className="h-9 shrink-0 gap-1.5"
+            disabled={noteDisabled}
+            onClick={() => setNoteCreateOpen(true)}
+          >
+            <StickyNote className="size-4" />
+            <span className="sr-only">Заметка</span>
+          </Button>
+          <Button
+            type="button"
             size="sm"
             className="h-9 shrink-0 gap-1.5"
             disabled={uploading}
@@ -643,19 +672,42 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
               {currentFolderId && " · вложенная папка"}
             </p>
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="hidden gap-1.5 sm:inline-flex"
-            disabled={uploading}
-            onClick={() => inputRef.current?.click()}
-          >
-            {uploading ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
-            Загрузить
-          </Button>
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              disabled={noteDisabled}
+              onClick={() => setNoteCreateOpen(true)}
+            >
+              <StickyNote className="size-4" />
+              Заметка
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="hidden gap-1.5 sm:inline-flex"
+              disabled={uploading}
+              onClick={() => inputRef.current?.click()}
+            >
+              {uploading ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
+              Загрузить
+            </Button>
+          </div>
         </div>
       </header>
+
+      {noteCreateOpen && category && (
+        <TextNoteModal
+          mode="create"
+          categorySlug={categorySlug}
+          folderId={currentFolderId}
+          onClose={() => setNoteCreateOpen(false)}
+          onSaved={(item) => handleNoteSaved(item as FileItem)}
+        />
+      )}
 
       {category.storageType === "gcs" && !gcsConfigured && (
         <Card className="mb-4 border-amber-500/40 bg-amber-500/5">
@@ -711,6 +763,12 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
             <FileCard
               key={item.id}
               item={item}
+              categorySlug={categorySlug}
+              folderId={currentFolderId}
+              onNoteSaved={(saved) => {
+                const full = items.find((i) => i.id === saved.id);
+                if (full) handleNoteSaved({ ...full, ...saved });
+              }}
               draggable={opts.draggable}
               dragging={opts.dragging}
               onDragStart={opts.onDragStart}
@@ -750,6 +808,9 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
             <FileCard
               key={item.id}
               item={item}
+              categorySlug={categorySlug}
+              folderId={currentFolderId}
+              onNoteSaved={(saved) => handleNoteSaved({ ...item, ...saved })}
               draggable={manualSort && listItems.length > 1}
               dragging={dragItemId === item.id}
               onDragStart={() => setDragItemId(item.id)}
@@ -787,6 +848,9 @@ function FileCard({
   onRemove,
   onRename,
   onImageClick,
+  onNoteSaved,
+  categorySlug,
+  folderId,
 }: {
   item: Pick<
     FileItem,
@@ -808,13 +872,18 @@ function FileCard({
   onRemove: () => void;
   onRename: (title: string) => void;
   onImageClick?: () => void;
+  onNoteSaved?: (item: Pick<FileItem, "id" | "title" | "mimeType" | "sizeBytes" | "updatedAt">) => void;
+  categorySlug?: string;
+  folderId?: string | null;
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(item.title);
   const [previewFailed, setPreviewFailed] = useState(false);
   const [pdfOpen, setPdfOpen] = useState(false);
+  const [textOpen, setTextOpen] = useState(false);
   const isPdf = item.mimeType === "application/pdf";
   const isImage = item.mimeType.startsWith("image/");
+  const isText = item.mimeType === "text/plain";
   const previewUrl =
     isImage || isPdf || item.hasPreview
       ? `/api/files/${item.id}/preview?v=${
@@ -828,10 +897,12 @@ function FileCard({
     setDraft(item.title);
     setPreviewFailed(false);
     setPdfOpen(false);
+    setTextOpen(false);
   }, [item.id, item.title, item.hasPreview, item.updatedAt]);
 
   const useLightbox = Boolean(onImageClick && isImage);
   const usePdfViewer = isPdf;
+  const useTextEditor = isText;
 
   function renderPreviewBody() {
     if (showPreview && previewUrl) {
@@ -856,6 +927,7 @@ function FileCard({
       <div className="flex size-full flex-col items-center justify-center gap-0.5">
         <FileText className="size-7 text-muted-foreground/50" />
         {isPdf && <span className="text-[9px] text-muted-foreground">PDF</span>}
+        {isText && <span className="text-[9px] text-muted-foreground">TXT</span>}
       </div>
     );
   }
@@ -875,6 +947,17 @@ function FileCard({
           fileId={item.id}
           title={item.title}
           onClose={() => setPdfOpen(false)}
+        />
+      )}
+      {textOpen && categorySlug && onNoteSaved && (
+        <TextNoteModal
+          mode="edit"
+          fileId={item.id}
+          initialTitle={item.title}
+          categorySlug={categorySlug}
+          folderId={folderId ?? null}
+          onClose={() => setTextOpen(false)}
+          onSaved={onNoteSaved}
         />
       )}
       <div className="flex items-center gap-0.5 border-b border-border/50 bg-muted/25 px-1 py-0.5">
@@ -965,6 +1048,15 @@ function FileCard({
           onClick={() => setPdfOpen(true)}
           className="relative block aspect-square w-full cursor-pointer bg-muted/40"
           title="Открыть PDF"
+        >
+          {renderPreviewBody()}
+        </button>
+      ) : useTextEditor ? (
+        <button
+          type="button"
+          onClick={() => setTextOpen(true)}
+          className="relative block aspect-square w-full cursor-pointer bg-muted/40"
+          title="Открыть заметку"
         >
           {renderPreviewBody()}
         </button>

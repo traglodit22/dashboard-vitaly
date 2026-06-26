@@ -110,6 +110,17 @@ export async function readLocalRelative(relPath: string): Promise<Buffer> {
   return fs.readFile(full)
 }
 
+export async function writeLocalRelative(relPath: string, buffer: Buffer): Promise<void> {
+  const root = process.env.UPLOAD_DIR ?? path.join(/* turbopackIgnore: true */ process.cwd(), 'uploads')
+  const full = path.normalize(path.join(root, relPath))
+  const rootNorm = path.normalize(root + path.sep)
+  if (!full.startsWith(rootNorm) && full !== path.normalize(root)) {
+    throw new Error('Invalid path')
+  }
+  await fs.mkdir(path.dirname(full), { recursive: true })
+  await fs.writeFile(full, buffer)
+}
+
 export async function deleteLocalRelative(relPath: string): Promise<void> {
   try {
     const root = process.env.UPLOAD_DIR ?? path.join(/* turbopackIgnore: true */ process.cwd(), 'uploads')
