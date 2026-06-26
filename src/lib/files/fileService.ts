@@ -193,6 +193,19 @@ export async function prepareGcsDirectUpload(opts: {
   return { fileId, uploadUrl, storagePath, mime: opts.mime }
 }
 
+/** Повторно выдаёт signed URL для уже подготовленной загрузки (тот же fileId и путь в GCS). */
+export async function getGcsSignedUrlForPreparedFile(opts: {
+  fileId: string
+  categorySlug: string
+  folderId: string | null
+  mime: string
+}) {
+  const ext = extForMime(opts.mime)
+  const folderPrefix = opts.folderId ? await getFolderStoragePrefix(opts.folderId) : ''
+  const storagePath = gcsObjectKey(opts.categorySlug, folderPrefix, opts.fileId, ext)
+  return getGcsUploadSignedUrl(storagePath, opts.mime)
+}
+
 export async function completeGcsDirectUpload(opts: {
   fileId: string
   categoryId: string

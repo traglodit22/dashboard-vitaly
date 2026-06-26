@@ -2,15 +2,6 @@ import { apiFetch } from '@/lib/apiFetch'
 
 const DIRECT_UPLOAD_TIMEOUT_MS = 600_000
 
-function prefersGcsProxyUpload(): boolean {
-  if (typeof navigator === 'undefined') return false
-  const ua = navigator.userAgent
-  return (
-    (/Safari/i.test(ua) && !/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS/i.test(ua)) ||
-    /iPhone|iPad|iPod/i.test(ua)
-  )
-}
-
 export class GcsUploadError extends Error {
   constructor(
     message: string,
@@ -21,7 +12,7 @@ export class GcsUploadError extends Error {
   }
 }
 
-/** PUT напрямую в GCS по signed URL (минует VPS и лимит nginx). */
+/** PUT напрямую в GCS по signed URL (только вне браузера). */
 export async function putFileToGcsSignedUrl(
   uploadUrl: string,
   file: File,
@@ -56,19 +47,25 @@ export async function putFileToGcsSignedUrl(
   }
 }
 
-/** Загрузка через VPS (fallback при CORS / сбое прямого PUT). */
+/** Загрузка через VPS — signed URL генерируется на сервере по fileId. */
 export async function putFileToGcsViaProxy(
-  uploadUrl: string,
-  file: File,
-  mime: string,
-  fileName: string,
+  opts: {
+    fileId: string
+    categorySlug: string
+    folderId: string | null
+    file: File
+    mime: string
+    fileName: string
+  },
   timeoutMs = DIRECT_UPLOAD_TIMEOUT_MS,
 ): Promise<void> {
   const fd = new FormData()
-  fd.append('uploadUrl', uploadUrl)
-  fd.append('mime', mime)
-  fd.append('fileName', fileName)
-  fd.append('file', file)
+  fd.append('fileId', opts.fileId)
+  fd.append('categorySlug', opts.categorySlug)
+  if (opts.folderId) fd.append('folderId', opts.folderId)
+  fd.append('mime', opts.mime)
+  fd.append('fileName', opts.fileName)
+  fd.append('file', opts.file)
 
   let res: Response
   try {
@@ -82,7 +79,7 @@ export async function putFileToGcsViaProxy(
     const detail = data.error?.trim()
     if (res.status === 413) {
       throw new GcsUploadError(
-        'Файл слишком большой для сервера (лимит nginx). Настройте прямую загрузку в GCS (CORS).',
+        'Файл слишком большой для сервера (лимит nginx). Обратитесь к администратору.',
         'proxy',
       )
     }
@@ -91,16 +88,29 @@ export async function putFileToGcsViaProxy(
 }
 
 /**
- * Сначала напрямую в GCS; при ошибке — через прокси на VPS (как раньше).
+ * В браузере всегда через прокси (Safari ломается на fetch к signed URL).
+ * Вне браузера — прямой PUT с fallback на прокси.
  */
 export async function uploadFileToGcsWithFallback(opts: {
+  fileId: string
+  categorySlug: string
+  folderId?: string | null
   uploadUrl: string
   file: File
   mime: string
   fileName: string
 }): Promise<'direct' | 'proxy'> {
-  if (prefersGcsProxyUpload()) {
-    await putFileToGcsViaProxy(opts.uploadUrl, opts.file, opts.mime, opts.fileName)
+  const folderId = opts.folderId ?? null
+
+  if (typeof window !== 'undefined') {
+    await putFileToGcsViaProxy({
+      fileId: opts.fileId,
+      categorySlug: opts.categorySlug,
+      folderId,
+      file: opts.file,
+      mime: opts.mime,
+      fileName: opts.fileName,
+    })
     return 'proxy'
   }
 
@@ -109,7 +119,14 @@ export async function uploadFileToGcsWithFallback(opts: {
     return 'direct'
   } catch (directErr) {
     try {
-      await putFileToGcsViaProxy(opts.uploadUrl, opts.file, opts.mime, opts.fileName)
+      await putFileToGcsViaProxy({
+        fileId: opts.fileId,
+        categorySlug: opts.categorySlug,
+        folderId,
+        file: opts.file,
+        mime: opts.mime,
+        fileName: opts.fileName,
+      })
       return 'proxy'
     } catch (proxyErr) {
       const directMsg =

@@ -176,6 +176,9 @@ export function GalleryClient() {
     }
 
     await uploadFileToGcsWithFallback({
+      fileId: init.fileId as string,
+      categorySlug: GALLERY_SLUG,
+      folderId: null,
       uploadUrl: init.uploadUrl as string,
       file,
       mime: init.mime as string,

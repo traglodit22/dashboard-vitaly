@@ -322,6 +322,9 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     }
 
     await uploadFileToGcsWithFallback({
+      fileId: init.fileId as string,
+      categorySlug,
+      folderId: targetFolderId,
       uploadUrl: init.uploadUrl as string,
       file,
       mime: init.mime as string,
