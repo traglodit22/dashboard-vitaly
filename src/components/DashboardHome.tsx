@@ -26,7 +26,12 @@ import { LasLegasStats } from "@/components/laslegas/LasLegasStats";
 import { toast } from "sonner";
 import { filesCategoryPath, FILES_CHANGED_EVENT } from "@/lib/files/routes";
 import { CLOUD_SLUG } from "@/lib/files/types";
-import { useOverviewSection } from "@/components/overview/overviewNav";
+import { useOverviewNav } from "@/components/overview/OverviewNavContext";
+import {
+  scrollToOverviewSection,
+  parseOverviewSection,
+  type OverviewSectionId,
+} from "@/components/overview/overviewNav";
 
 interface FavoriteFolder {
   id: string;
@@ -82,7 +87,7 @@ const FLUID_GRID =
   "grid gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(12.5rem,1fr))]";
 
 export function DashboardHome() {
-  const activeSection = useOverviewSection();
+  const { setVisibleIds } = useOverviewNav()!;
   const [stats, setStats] = useState<OrderStats | null>(null);
   const [balances, setBalances] = useState<BalanceProvider[]>([]);
   const [favoriteFolders, setFavoriteFolders] = useState<FavoriteFolder[]>([]);
@@ -117,6 +122,23 @@ export function DashboardHome() {
     window.addEventListener(FILES_CHANGED_EVENT, onChange);
     return () => window.removeEventListener(FILES_CHANGED_EVENT, onChange);
   }, [loadAll]);
+
+  useEffect(() => {
+    if (loading || !stats) return;
+
+    const visible = new Set<OverviewSectionId>(["orders", "laslegas", "statuses"]);
+    if (favoriteFolders.length > 0) visible.add("favorites");
+    if (balances.length > 0) visible.add("balances");
+    setVisibleIds(visible);
+  }, [loading, stats, favoriteFolders.length, balances.length, setVisibleIds]);
+
+  useEffect(() => {
+    if (loading || !stats) return;
+    const id = parseOverviewSection(window.location.hash);
+    if (!id) return;
+    const timer = window.setTimeout(() => scrollToOverviewSection(id), 100);
+    return () => window.clearTimeout(timer);
+  }, [loading, stats]);
 
   async function refreshBalances() {
     setRefreshing(true);
@@ -206,43 +228,8 @@ export function DashboardHome() {
   ] as const;
 
   return (
-    <div className="min-w-0 flex-1">
-      {activeSection === "orders" && (
-        <OverviewBlock
-          id="orders"
-          title="Заказы"
-          description="Сводная статистика по всем отправкам и заказам."
-        >
-          <div className={FLUID_GRID}>
-            {orderCards.map(({ label, value, icon: Icon, highlight, color }) => (
-              <Card
-                key={label}
-                className={cn(
-                  "border-border/80 bg-card/80 shadow-sm backdrop-blur-sm transition-colors",
-                  highlight && "border-primary/25 bg-primary/[0.04] ring-1 ring-primary/15",
-                )}
-              >
-                <CardContent className="flex flex-col gap-3 py-4 sm:py-5">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Icon className={cn("size-4 shrink-0", color || "text-primary")} />
-                    <span className="leading-snug">{label}</span>
-                  </div>
-                  <p
-                    className={cn(
-                      "text-2xl font-semibold tabular-nums leading-none sm:text-3xl",
-                      color && color !== "text-muted-foreground" ? color : "",
-                    )}
-                  >
-                    {value}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </OverviewBlock>
-      )}
-
-      {activeSection === "favorites" && (
+    <div className="min-w-0 flex-1 space-y-8 sm:space-y-10">
+      {favoriteFolders.length > 0 && (
         <OverviewBlock
           id="favorites"
           title="Быстрый доступ"
@@ -256,112 +243,129 @@ export function DashboardHome() {
             </Link>
           }
         >
-          {favoriteFolders.length === 0 ? (
-            <EmptyHint>
-              Отметьте папку звёздочкой в разделе «Файлы», и она появится здесь.
-            </EmptyHint>
-          ) : (
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {favoriteFolders.map((folder) => (
-                <Link
-                  key={folder.id}
-                  href={filesCategoryPath(folder.categorySlug, folder.id)}
-                  className="group flex items-center gap-3 rounded-xl border border-border/80 bg-muted/20 px-4 py-3.5 transition-all hover:border-primary/35 hover:bg-primary/[0.04] hover:shadow-sm"
-                  title={folder.name}
-                >
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/15">
-                    <Folder className="size-4 text-amber-500" />
-                  </div>
-                  <span className="min-w-0 truncate font-medium group-hover:text-primary">
-                    {folder.name}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          )}
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+            {favoriteFolders.map((folder) => (
+              <Link
+                key={folder.id}
+                href={filesCategoryPath(folder.categorySlug, folder.id)}
+                className="group flex items-center gap-3 rounded-xl border border-border/80 bg-muted/20 px-4 py-3.5 transition-all hover:border-primary/35 hover:bg-primary/[0.04] hover:shadow-sm"
+                title={folder.name}
+              >
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/15">
+                  <Folder className="size-4 text-amber-500" />
+                </div>
+                <span className="min-w-0 truncate font-medium group-hover:text-primary">
+                  {folder.name}
+                </span>
+              </Link>
+            ))}
+          </div>
         </OverviewBlock>
       )}
 
-      {activeSection === "balances" && (
+      {balances.length > 0 && (
         <OverviewBlock
           id="balances"
           title="Балансы панелей"
           description="SmmLaba и другие панели — актуальные остатки и пороги."
           action={
-            balances.length > 0 ? (
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={refreshBalances}
-                disabled={refreshing}
-              >
-                {refreshing ? (
-                  <Loader2 className="size-4 animate-spin" />
-                ) : (
-                  <RefreshCw className="size-4" />
-                )}
-                Обновить все
-              </Button>
-            ) : undefined
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={refreshBalances}
+              disabled={refreshing}
+            >
+              {refreshing ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <RefreshCw className="size-4" />
+              )}
+              Обновить все
+            </Button>
           }
         >
-          {balances.length === 0 ? (
-            <EmptyHint>Нет активных панелей в разделе «Балансы».</EmptyHint>
-          ) : (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-              {balances.map((p) => (
-                <BalanceTile key={p.id} provider={p} />
-              ))}
-            </div>
-          )}
-        </OverviewBlock>
-      )}
-
-      {activeSection === "laslegas" && (
-        <OverviewBlock
-          id="laslegas"
-          title="Las Legas"
-          description="Статистика музея LEGO — посетители, билеты и выручка."
-          unboxed
-        >
-          <LasLegasStats embedded />
-        </OverviewBlock>
-      )}
-
-      {activeSection === "statuses" && (
-        <OverviewBlock
-          id="statuses"
-          title="Статусы отправок"
-          description="Быстрый срез по ключевым этапам доставки."
-        >
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <StatusRow
-              label="Отправлено в ДоброПост"
-              value={stats.sentTotal}
-              color="text-emerald-400"
-              accent="from-emerald-500/15"
-            />
-            <StatusRow
-              label="Ожидают трек-код"
-              value={stats.awaitingTrack}
-              color="text-amber-400"
-              accent="from-amber-500/15"
-            />
-            <StatusRow
-              label="На складе"
-              value={stats.onWarehouse}
-              color="text-sky-400"
-              accent="from-sky-500/15"
-            />
-            <StatusRow
-              label="Доставлено"
-              value={stats.delivered}
-              color="text-emerald-400"
-              accent="from-emerald-500/15"
-            />
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+            {balances.map((p) => (
+              <BalanceTile key={p.id} provider={p} />
+            ))}
           </div>
         </OverviewBlock>
       )}
+
+      <OverviewBlock
+        id="laslegas"
+        title="Las Legas"
+        description="Статистика музея LEGO — посетители, билеты и выручка."
+        unboxed
+      >
+        <LasLegasStats embedded />
+      </OverviewBlock>
+
+      <OverviewBlock
+        id="orders"
+        title="Заказы"
+        description="Сводная статистика по всем отправкам и заказам."
+      >
+        <div className={FLUID_GRID}>
+          {orderCards.map(({ label, value, icon: Icon, highlight, color }) => (
+            <Card
+              key={label}
+              className={cn(
+                "border-border/80 bg-card/80 shadow-sm backdrop-blur-sm transition-colors",
+                highlight && "border-primary/25 bg-primary/[0.04] ring-1 ring-primary/15",
+              )}
+            >
+              <CardContent className="flex flex-col gap-3 py-4 sm:py-5">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Icon className={cn("size-4 shrink-0", color || "text-primary")} />
+                  <span className="leading-snug">{label}</span>
+                </div>
+                <p
+                  className={cn(
+                    "text-2xl font-semibold tabular-nums leading-none sm:text-3xl",
+                    color && color !== "text-muted-foreground" ? color : "",
+                  )}
+                >
+                  {value}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </OverviewBlock>
+
+      <OverviewBlock
+        id="statuses"
+        title="Статусы отправок"
+        description="Быстрый срез по ключевым этапам доставки."
+      >
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <StatusRow
+            label="Отправлено в ДоброПост"
+            value={stats.sentTotal}
+            color="text-emerald-400"
+            accent="from-emerald-500/15"
+          />
+          <StatusRow
+            label="Ожидают трек-код"
+            value={stats.awaitingTrack}
+            color="text-amber-400"
+            accent="from-amber-500/15"
+          />
+          <StatusRow
+            label="На складе"
+            value={stats.onWarehouse}
+            color="text-sky-400"
+            accent="from-sky-500/15"
+          />
+          <StatusRow
+            label="Доставлено"
+            value={stats.delivered}
+            color="text-emerald-400"
+            accent="from-emerald-500/15"
+          />
+        </div>
+      </OverviewBlock>
     </div>
   );
 }
@@ -382,7 +386,7 @@ function OverviewBlock({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-4">
+    <section id={id} className="scroll-mt-6">
       <header className="mb-4 flex flex-wrap items-start justify-between gap-3 sm:mb-6">
         <div className="min-w-0">
           <h2 className="text-lg font-semibold tracking-tight sm:text-xl">{title}</h2>
@@ -400,14 +404,6 @@ function OverviewBlock({
         </div>
       )}
     </section>
-  );
-}
-
-function EmptyHint({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="rounded-lg border border-dashed border-border/80 bg-muted/20 px-4 py-10 text-center text-sm text-muted-foreground">
-      {children}
-    </p>
   );
 }
 
