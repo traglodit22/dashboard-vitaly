@@ -6,12 +6,27 @@ import { fetchProviderBalance, forEachProviderSequentially, isSoftBalanceError, 
 
 export const runtime = 'nodejs'
 
+const CRON_LOCK_KEY = 74283901
+
+function uniqueChatIds(ids: string[]): string[] {
+  return [...new Set(ids.map((id) => String(id).trim()).filter(Boolean))]
+}
+
 export async function GET(req: Request) {
   const authHeader = req.headers.get('authorization')
   if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return new NextResponse(null, { status: 401 })
   }
 
+  const lockRows = await query<{ locked: boolean }>(
+    'SELECT pg_try_advisory_lock($1) AS locked',
+    [CRON_LOCK_KEY],
+  )
+  if (!lockRows[0]?.locked) {
+    return NextResponse.json({ skipped: 'locked' })
+  }
+
+  try {
   const settingsRows = await query<Record<string, unknown>>(
     'SELECT * FROM system_settings WHERE id = 1',
   )
@@ -36,9 +51,11 @@ export async function GET(req: Request) {
     [new Date().toISOString()],
   )
 
-  const chatIds: string[] = Array.isArray(s.telegram_notify_chat_ids)
-    ? (s.telegram_notify_chat_ids as string[])
-    : []
+  const chatIds = uniqueChatIds(
+    Array.isArray(s.telegram_notify_chat_ids)
+      ? (s.telegram_notify_chat_ids as string[])
+      : [],
+  )
   const notifyEnabled = Boolean(s.telegram_notify_enabled)
 
   let checked = 0
@@ -83,6 +100,9 @@ export async function GET(req: Request) {
   await checkBalances(chatIds, notifyEnabled)
 
   return NextResponse.json({ checked, changed })
+  } finally {
+    await query('SELECT pg_advisory_unlock($1)', [CRON_LOCK_KEY]).catch(() => {})
+  }
 }
 
 async function checkBalances(chatIds: string[], notifyEnabled: boolean) {

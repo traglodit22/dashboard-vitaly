@@ -163,9 +163,7 @@ fi
 
 if [[ -f deploy/cron-dashboard ]] && [[ -d /etc/cron.d ]]; then
   echo "==> Sync system cron"
-  chmod +x deploy/cron-refresh-warehouse.sh deploy/cron-vps-backup.sh 2>/dev/null || true
-  cp deploy/cron-dashboard /etc/cron.d/dashboard
-  chmod 644 /etc/cron.d/dashboard
+  bash deploy/sync-system-cron.sh "$APP_DIR"
 fi
 
 echo "==> Deploy finished"
