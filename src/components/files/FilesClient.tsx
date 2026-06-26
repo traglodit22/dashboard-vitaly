@@ -21,7 +21,7 @@ import {
   splitRelativePath,
 } from "@/lib/files/droppedFolderTree";
 import { ensureFolderPath, type FolderPathCache } from "@/lib/files/ensureFolderPath";
-import { uploadBaseName } from "@/lib/files/uploadNames";
+import { formatUploadClientError, snapshotFilesForUpload, uploadBaseName } from "@/lib/files/uploadNames";
 import { CloudFolderView } from "@/components/files/CloudFolderView";
 import { FilesListToolbar } from "@/components/files/FilesListToolbar";
 import { FilesSubfolderGrid } from "@/components/files/FilesSubfolderGrid";
@@ -437,8 +437,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
             );
           }
         } catch (err) {
-          const message = err instanceof Error ? err.message : "Ошибка загрузки";
-          toast.error(`«${relativePath}»`, { description: message });
+          toast.error(`«${relativePath}»`, { description: formatUploadClientError(err) });
         }
       }
 
@@ -473,7 +472,8 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     const dt = e.nativeEvent.dataTransfer ?? e.dataTransfer;
 
     if (dt.files.length > 0) {
-      await uploadStructuredDrop(parseFileListWithPaths(dt.files));
+      const picked = await snapshotFilesForUpload(dt.files);
+      await uploadStructuredDrop(parseFileListWithPaths(picked));
       return;
     }
 
@@ -550,8 +550,13 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
         multiple
         accept={categorySlug === IMPORTANT_DOCS_SLUG ? "application/pdf,image/*,.pdf" : undefined}
         onChange={(e) => {
-          if (e.target.files?.length) void uploadFiles(e.target.files);
-          e.target.value = "";
+          void (async () => {
+            const input = e.target;
+            if (!input.files?.length) return;
+            const picked = await snapshotFilesForUpload(input.files);
+            input.value = "";
+            await uploadFiles(picked);
+          })();
         }}
       />
       {uploading ? (

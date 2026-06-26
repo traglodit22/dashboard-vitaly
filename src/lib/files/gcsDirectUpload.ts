@@ -1,4 +1,5 @@
 import { apiFetch } from '@/lib/apiFetch'
+import { formatUploadClientError } from '@/lib/files/uploadNames'
 
 const DIRECT_UPLOAD_TIMEOUT_MS = 600_000
 
@@ -70,8 +71,11 @@ export async function putFileToGcsViaProxy(
   let res: Response
   try {
     res = await apiFetch('/api/files/gcs-proxy-put', { method: 'POST', body: fd }, timeoutMs)
-  } catch {
-    throw new GcsUploadError('Таймаут загрузки через сервер', 'proxy')
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new GcsUploadError('Таймаут загрузки через сервер', 'proxy')
+    }
+    throw new GcsUploadError(formatUploadClientError(err), 'proxy')
   }
 
   if (!res.ok) {
