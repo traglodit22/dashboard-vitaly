@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
-import { IMPORTANT_DOCS_SLUG, CLOUD_SLUG, MAX_FILE_MB, type FileFolder } from "@/lib/files/types";
+import { IMPORTANT_DOCS_SLUG, CLOUD_SLUG, MAX_FILE_MB, type FileFolder, isInternalFileDrag, FILE_REORDER_DRAG_TYPE } from "@/lib/files/types";
 import { FILES_CHANGED_EVENT, filesCategoryPath, notifyFilesChanged, fileDownloadUrl } from "@/lib/files/routes";
 import { reorderById } from "@/lib/files/reorderList";
 import { uploadFileToGcsWithFallback } from "@/lib/files/gcsDirectUpload";
@@ -439,8 +439,15 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
 
   async function handleDrop(e: React.DragEvent) {
     e.preventDefault();
+    e.stopPropagation();
     if (uploading) return;
+    if (isInternalFileDrag(e.dataTransfer)) return;
+
     const parsed = await parseDroppedItems(e.dataTransfer);
+    if (!parsed.files.length && !parsed.directoryPaths.length) {
+      toast.error("Не удалось прочитать файлы для загрузки");
+      return;
+    }
     await uploadStructuredDrop(parsed);
   }
 
@@ -724,6 +731,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
               }}
               onDrop={(e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 onFileDrop(item.id);
               }}
               onRemove={() => void removeItem(item)}
@@ -846,6 +854,7 @@ function FileCard({
             title="Перетащить"
             onDragStart={(e) => {
               e.dataTransfer.effectAllowed = "move";
+              e.dataTransfer.setData(FILE_REORDER_DRAG_TYPE, item.id);
               onDragStart();
             }}
             onDragEnd={onDragEnd}

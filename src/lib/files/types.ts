@@ -43,6 +43,16 @@ export interface FileItem {
 
 export const IMPORTANT_DOCS_SLUG = 'important-documents'
 export const CLOUD_SLUG = 'cloud'
+export const FOLDER_DRAG_TYPE = 'application/x-dashboard-folder'
+export const FILE_REORDER_DRAG_TYPE = 'application/x-dashboard-file-reorder'
+
+export function isInternalFileDrag(dataTransfer: DataTransfer): boolean {
+  return (
+    dataTransfer.types.includes(FOLDER_DRAG_TYPE) ||
+    dataTransfer.types.includes(FILE_REORDER_DRAG_TYPE)
+  )
+}
+
 export const GALLERY_SLUG = 'gallery'
 
 export const LOCAL_ALLOWED_MIMES = new Set([

@@ -15,7 +15,8 @@ import {
   filesCategoryPath,
   notifyFilesChanged,
 } from "@/lib/files/routes";
-import { reorderById } from "@/lib/files/reorderList";
+import { reorderById } from "@/lib/files/reorderList"
+import { FOLDER_DRAG_TYPE } from "@/lib/files/types";
 
 interface FileFolder {
   id: string;
@@ -87,6 +88,7 @@ export function FilesSidebarTree({
   const [creatingIn, setCreatingIn] = useState<string | null | false>(false)
   const [newName, setNewName] = useState("")
   const [dragFolderId, setDragFolderId] = useState<string | null>(null)
+  const [dropIntoFolderId, setDropIntoFolderId] = useState<string | null>(null)
 
   const loadFolders = useCallback(async () => {
     if (!categorySlug) return
@@ -184,7 +186,7 @@ export function FilesSidebarTree({
     notifyFilesChanged()
   }
 
-  function onFolderDrop(targetId: string, parentId: string | null) {
+  function onFolderReorder(targetId: string, parentId: string | null) {
     if (!dragFolderId || dragFolderId === targetId) return
     const siblings = siblingsOf(parentId)
     if (siblings.length < 2) return
@@ -192,6 +194,31 @@ export function FilesSidebarTree({
     const next = reorderById(siblings, dragFolderId, targetId)
     setDragFolderId(null)
     void persistFolderOrder(parentId, next)
+  }
+
+  async function moveFolderInto(newParentId: string | null) {
+    const folderId = dragFolderId
+    if (!folderId || folderId === newParentId) return
+
+    setDragFolderId(null)
+    setDropIntoFolderId(null)
+
+    const res = await apiFetch(`/api/files/folders/${folderId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ parentId: newParentId }),
+    })
+    const data = await res.json()
+    if (res.ok && data.folder) {
+      if (newParentId) {
+        setExpanded((prev) => new Set(prev).add(newParentId))
+      }
+      notifyFilesChanged()
+      await loadFolders()
+      toast.success(newParentId ? "Папка перемещена" : "Папка перенесена в корень")
+    } else {
+      toast.error("Не удалось переместить папку", { description: data.error })
+    }
   }
 
   async function renameFolderItem(folder: FileFolder, name: string) {
@@ -274,7 +301,22 @@ export function FilesSidebarTree({
           !currentFolderId
             ? "bg-primary/15 font-medium text-primary"
             : "text-muted-foreground hover:bg-accent hover:text-foreground",
+          dragFolderId && "ring-1 ring-primary/30",
         )}
+        onDragOver={(e) => {
+          if (!dragFolderId) return
+          e.preventDefault()
+          e.dataTransfer.dropEffect = "move"
+          setDropIntoFolderId("__root__")
+        }}
+        onDragLeave={() => {
+          if (dropIntoFolderId === "__root__") setDropIntoFolderId(null)
+        }}
+        onDrop={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          void moveFolderInto(null)
+        }}
       >
         <Folder className="size-3.5 shrink-0 opacity-70" />
         <span className="truncate">Все файлы</span>
@@ -303,6 +345,7 @@ export function FilesSidebarTree({
               expanded={expanded}
               siblingCount={tree.length}
               dragFolderId={dragFolderId}
+              dropIntoFolderId={dropIntoFolderId}
               onNavigate={onNavigate}
               onToggle={toggleExpand}
               onDelete={deleteFolder}
@@ -310,8 +353,13 @@ export function FilesSidebarTree({
               onToggleFavorite={toggleFavorite}
               onCreateSubfolder={startCreate}
               onDragStart={setDragFolderId}
-              onDragEnd={() => setDragFolderId(null)}
-              onDrop={onFolderDrop}
+              onDragEnd={() => {
+                setDragFolderId(null)
+                setDropIntoFolderId(null)
+              }}
+              onDropInto={moveFolderInto}
+              onDropIntoHover={setDropIntoFolderId}
+              onReorder={onFolderReorder}
               compactActions={embedded}
             />
           ))}
@@ -380,6 +428,7 @@ function FolderTreeNode({
   expanded,
   siblingCount,
   dragFolderId,
+  dropIntoFolderId,
   onToggle,
   onDelete,
   onRename,
@@ -387,7 +436,9 @@ function FolderTreeNode({
   onCreateSubfolder,
   onDragStart,
   onDragEnd,
-  onDrop,
+  onDropInto,
+  onDropIntoHover,
+  onReorder,
   onNavigate,
   compactActions = false,
 }: {
@@ -398,6 +449,7 @@ function FolderTreeNode({
   expanded: Set<string>
   siblingCount: number
   dragFolderId: string | null
+  dropIntoFolderId: string | null
   onToggle: (id: string) => void
   onDelete: (folder: FileFolder) => void
   onRename: (folder: FileFolder, name: string) => void
@@ -405,7 +457,9 @@ function FolderTreeNode({
   onCreateSubfolder: (parentId: string) => void
   onDragStart: (id: string) => void
   onDragEnd: () => void
-  onDrop: (targetId: string, parentId: string | null) => void
+  onDropInto: (newParentId: string) => void
+  onDropIntoHover: (id: string | null) => void
+  onReorder: (targetId: string, parentId: string | null) => void
   onNavigate?: () => void
   compactActions?: boolean
 }) {
@@ -430,6 +484,9 @@ function FolderTreeNode({
       return n.children.some(walk)
     })
 
+  const isDropTarget =
+    Boolean(dragFolderId && dragFolderId !== node.id && dropIntoFolderId === node.id)
+
   const row = (
     <div
       className={cn(
@@ -437,6 +494,7 @@ function FolderTreeNode({
         isDragging && "opacity-50",
         isActive && "bg-primary/12 ring-1 ring-primary/25",
         isNested && !isActive && "bg-muted/15",
+        isDropTarget && "bg-primary/10 ring-2 ring-primary/40",
       )}
       onDragOver={(e) => {
         if (!dragFolderId || dragFolderId === node.id) return
@@ -445,17 +503,19 @@ function FolderTreeNode({
       }}
       onDrop={(e) => {
         e.preventDefault()
-        onDrop(node.id, node.parentId)
+        if (!dragFolderId || dragFolderId === node.id) return
+        onReorder(node.id, node.parentId)
       }}
     >
       <div className="flex min-w-0 items-start gap-0.5">
         {canDrag ? (
           <span
             draggable
-            title="Перетащить"
+              title="Перетащите на название папки, чтобы вложить; на строку соседа — для сортировки"
             className="mt-0.5 hidden size-4 shrink-0 cursor-grab items-center justify-center rounded text-muted-foreground/40 opacity-0 transition-opacity hover:bg-accent hover:text-muted-foreground active:cursor-grabbing group-hover:opacity-100 sm:flex"
             onDragStart={(e) => {
               e.dataTransfer.effectAllowed = "move"
+              e.dataTransfer.setData(FOLDER_DRAG_TYPE, node.id)
               onDragStart(node.id)
             }}
             onDragEnd={onDragEnd}
@@ -516,12 +576,29 @@ function FolderTreeNode({
                     : isNested
                       ? "text-muted-foreground hover:bg-accent hover:text-foreground"
                       : "text-foreground/90 hover:bg-accent hover:text-foreground",
+                isDropTarget && "bg-primary/5",
               )}
               title={node.name}
               onDoubleClick={(e) => {
                 e.preventDefault()
                 setDraft(node.name)
                 setEditing(true)
+              }}
+              onDragOver={(e) => {
+                if (!dragFolderId || dragFolderId === node.id) return
+                e.preventDefault()
+                e.stopPropagation()
+                e.dataTransfer.dropEffect = "move"
+                onDropIntoHover(node.id)
+              }}
+              onDragLeave={() => {
+                if (dropIntoFolderId === node.id) onDropIntoHover(null)
+              }}
+              onDrop={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                if (!dragFolderId || dragFolderId === node.id) return
+                onDropInto(node.id)
               }}
             >
               <Folder
@@ -616,6 +693,7 @@ function FolderTreeNode({
               expanded={expanded}
               siblingCount={node.children.length}
               dragFolderId={dragFolderId}
+              dropIntoFolderId={dropIntoFolderId}
               onToggle={onToggle}
               onDelete={onDelete}
               onRename={onRename}
@@ -623,7 +701,9 @@ function FolderTreeNode({
               onCreateSubfolder={onCreateSubfolder}
               onDragStart={onDragStart}
               onDragEnd={onDragEnd}
-              onDrop={onDrop}
+              onDropInto={onDropInto}
+              onDropIntoHover={onDropIntoHover}
+              onReorder={onReorder}
               onNavigate={onNavigate}
               compactActions={compactActions}
             />

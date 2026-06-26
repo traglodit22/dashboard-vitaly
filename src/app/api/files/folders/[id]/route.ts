@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth/requireAuth'
-import { deleteFolder, fetchFolder, updateFolderSettings } from '@/lib/files/folderService'
+import { deleteFolder, fetchFolder, moveFolder, updateFolderSettings } from '@/lib/files/folderService'
 import { rowToFileFolder } from '@/lib/files/mapRow'
 
 export const runtime = 'nodejs'
@@ -32,6 +32,12 @@ export async function PATCH(
   const body = await req.json()
 
   try {
+    if (body.parentId !== undefined) {
+      const parentId = body.parentId ? String(body.parentId) : null
+      const folder = await moveFolder(id, parentId)
+      return NextResponse.json({ folder })
+    }
+
     const folder = await updateFolderSettings(id, {
       name: body.name !== undefined ? String(body.name) : undefined,
       moduleTextEnabled:

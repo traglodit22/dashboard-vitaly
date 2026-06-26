@@ -207,6 +207,79 @@ export async function fetchFolder(folderId: string) {
   return rows[0] ?? null
 }
 
+async function isFolderDescendant(folderId: string, ancestorId: string): Promise<boolean> {
+  let current: string | null = ancestorId
+  while (current) {
+    if (current === folderId) return true
+    const rows: { parent_id: string | null }[] = await query(
+      'SELECT parent_id FROM file_folders WHERE id = $1',
+      [current],
+    )
+    current = rows[0]?.parent_id ?? null
+  }
+  return false
+}
+
+export async function moveFolder(folderId: string, newParentId: string | null) {
+  if (newParentId === folderId) {
+    throw new Error('Нельзя переместить папку в саму себя')
+  }
+
+  const rows = await query<{
+    id: string
+    category_id: string
+    parent_id: string | null
+    name: string
+  }>('SELECT id, category_id, parent_id, name FROM file_folders WHERE id = $1', [folderId])
+  const folder = rows[0]
+  if (!folder) throw new Error('Папка не найдена')
+
+  if (folder.parent_id === newParentId) {
+    const current = await query<Record<string, unknown>>(
+      'SELECT * FROM file_folders WHERE id = $1',
+      [folderId],
+    )
+    return rowToFileFolder(current[0])
+  }
+
+  if (newParentId) {
+    const parentRows = await query<{ id: string; category_id: string }>(
+      'SELECT id, category_id FROM file_folders WHERE id = $1',
+      [newParentId],
+    )
+    const parent = parentRows[0]
+    if (!parent) throw new Error('Родительская папка не найдена')
+    if (parent.category_id !== folder.category_id) {
+      throw new Error('Папки из разных категорий')
+    }
+
+    if (await isFolderDescendant(folderId, newParentId)) {
+      throw new Error('Нельзя переместить папку в её подпапку')
+    }
+  }
+
+  const dup = await query<{ id: string }>(
+    `SELECT id FROM file_folders
+     WHERE category_id = $1 AND parent_id IS NOT DISTINCT FROM $2
+       AND lower(name) = lower($3) AND id <> $4`,
+    [folder.category_id, newParentId, folder.name, folderId],
+  )
+  if (dup.length) throw new Error('В этой папке уже есть папка с таким названием')
+
+  const [{ next_order }] = await query<{ next_order: string }>(
+    `SELECT COALESCE(MAX(sort_order), 0) + 10 AS next_order
+     FROM file_folders
+     WHERE category_id = $1 AND parent_id IS NOT DISTINCT FROM $2`,
+    [folder.category_id, newParentId],
+  )
+
+  const updated = await query<Record<string, unknown>>(
+    `UPDATE file_folders SET parent_id = $1, sort_order = $2 WHERE id = $3 RETURNING *`,
+    [newParentId, Number(next_order), folderId],
+  )
+  return rowToFileFolder(updated[0])
+}
+
 export async function updateFolderSettings(
   folderId: string,
   opts: {
