@@ -360,7 +360,6 @@ export function FilesSidebarTree({
               onDropInto={moveFolderInto}
               onDropIntoHover={setDropIntoFolderId}
               onReorder={onFolderReorder}
-              compactActions={embedded}
             />
           ))}
           {!loading && tree.length === 0 && (
@@ -440,7 +439,6 @@ function FolderTreeNode({
   onDropIntoHover,
   onReorder,
   onNavigate,
-  compactActions = false,
 }: {
   node: FolderNode
   depth: number
@@ -461,7 +459,6 @@ function FolderTreeNode({
   onDropIntoHover: (id: string | null) => void
   onReorder: (targetId: string, parentId: string | null) => void
   onNavigate?: () => void
-  compactActions?: boolean
 }) {
   const hasChildren = node.children.length > 0
   const isOpen = expanded.has(node.id)
@@ -562,12 +559,12 @@ function FolderTreeNode({
             }}
           />
         ) : (
-          <>
+          <div className="relative min-w-0 flex-1">
             <Link
               href={filesCategoryPath(categorySlug, node.id)}
               onClick={onNavigate}
               className={cn(
-                "flex min-w-0 flex-1 items-start gap-1.5 rounded-md px-1 py-0.5 leading-snug transition-colors",
+                "flex w-full min-w-0 items-start gap-1.5 rounded-md px-1 py-0.5 leading-snug transition-colors",
                 isRoot ? "text-sm" : "text-[13px]",
                 isActive
                   ? "font-semibold text-primary"
@@ -612,14 +609,12 @@ function FolderTreeNode({
                       : "text-amber-500",
                 )}
               />
-              <span className="min-w-0 break-words [overflow-wrap:anywhere]">{node.name}</span>
+              <span className="min-w-0 flex-1 break-words">{node.name}</span>
             </Link>
             <div
               className={cn(
-                "mt-0.5 flex shrink-0 gap-0.5",
-                compactActions || node.isFavorite
-                  ? "opacity-100"
-                  : "opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100",
+                "pointer-events-none absolute right-0 top-0.5 flex gap-0.5 rounded-md bg-background/95 p-0.5 opacity-0 shadow-sm backdrop-blur-sm transition-opacity",
+                "group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100",
               )}
             >
               <button
@@ -667,7 +662,7 @@ function FolderTreeNode({
                 <Trash2 className="size-3" />
               </button>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>
@@ -705,7 +700,6 @@ function FolderTreeNode({
               onDropIntoHover={onDropIntoHover}
               onReorder={onReorder}
               onNavigate={onNavigate}
-              compactActions={compactActions}
             />
           ))}
         </div>

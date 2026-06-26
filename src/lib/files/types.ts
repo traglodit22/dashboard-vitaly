@@ -46,11 +46,34 @@ export const CLOUD_SLUG = 'cloud'
 export const FOLDER_DRAG_TYPE = 'application/x-dashboard-folder'
 export const FILE_REORDER_DRAG_TYPE = 'application/x-dashboard-file-reorder'
 
+/** DOMStringList в Safari не всегда имеет .includes — читаем типы безопасно. */
+export function getDataTransferTypes(dataTransfer: DataTransfer): string[] {
+  return Array.from(dataTransfer.types as ArrayLike<string>)
+}
+
 export function isInternalFileDrag(dataTransfer: DataTransfer): boolean {
+  const types = getDataTransferTypes(dataTransfer)
   return (
-    dataTransfer.types.includes(FOLDER_DRAG_TYPE) ||
-    dataTransfer.types.includes(FILE_REORDER_DRAG_TYPE)
+    types.includes(FOLDER_DRAG_TYPE) ||
+    types.includes(FILE_REORDER_DRAG_TYPE)
   )
+}
+
+/** Файлы с рабочего стола / Finder (не внутренний drag карточки или папки). */
+export function isExternalFileDrop(dataTransfer: DataTransfer): boolean {
+  if (isInternalFileDrag(dataTransfer)) return false
+  const types = getDataTransferTypes(dataTransfer)
+  return types.includes('Files') || dataTransfer.files.length > 0
+}
+
+export function allowExternalFileDragOver(e: {
+  dataTransfer: DataTransfer
+  preventDefault(): void
+}): boolean {
+  if (!isExternalFileDrop(e.dataTransfer)) return false
+  e.preventDefault()
+  e.dataTransfer.dropEffect = 'copy'
+  return true
 }
 
 export const GALLERY_SLUG = 'gallery'

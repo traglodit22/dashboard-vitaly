@@ -6,7 +6,11 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
-import type { FileFolder } from "@/lib/files/types";
+import {
+  allowExternalFileDragOver,
+  isExternalFileDrop,
+  type FileFolder,
+} from "@/lib/files/types";
 import { CloudImageLightbox } from "@/components/files/CloudImageLightbox";
 import { FILE_GRID_CLASS } from "@/lib/files/fileCardLayout";
 
@@ -196,11 +200,13 @@ export function CloudFolderView({
                 onDragStart: () => onDragStart(item.id),
                 onDragEnd,
                 onDragOver: (e) => {
+                  if (allowExternalFileDragOver(e)) return;
                   if (!dragItemId || dragItemId === item.id) return;
                   e.preventDefault();
                   e.dataTransfer.dropEffect = "move";
                 },
                 onDrop: (e) => {
+                  if (isExternalFileDrop(e.dataTransfer)) return;
                   e.preventDefault();
                   if (!manualSort || !dragItemId || dragItemId === item.id) return;
                   const next = [...listItems];

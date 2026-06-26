@@ -102,38 +102,48 @@ function byPathDepth(a: string, b: string): number {
 export async function parseDroppedItems(
   dataTransfer: DataTransfer,
 ): Promise<ParsedFolderDrop> {
+  // Safari очищает DataTransfer после drop — снимок синхронно, до await.
+  const fileList = Array.from(dataTransfer.files);
   const items = Array.from(dataTransfer.items).filter((i) => i.kind === "file");
-  const hasEntries = items.some((item) => {
-    const entry = asEntry(item);
-    return entry?.isDirectory || entry?.isFile;
-  });
-
-  if (!hasEntries) {
-    if (dataTransfer.files.length) {
-      return parseFromFileList(dataTransfer.files);
-    }
-    return { files: [], directoryPaths: [] };
-  }
 
   const files: ParsedFolderDrop["files"] = [];
   const directoryPaths = new Set<string>();
+  const entryWalks: Promise<void>[] = [];
 
   for (const item of items) {
     const entry = asEntry(item);
-    if (!entry) {
-      const file = item.getAsFile();
-      if (file && !SKIP_FILE_NAMES.has(file.name)) {
-        files.push({ file, relativePath: file.name });
-      }
+    if (entry?.isDirectory || entry?.isFile) {
+      entryWalks.push(walkEntry(entry, "", files, directoryPaths));
       continue;
     }
-    await walkEntry(entry, "", files, directoryPaths);
+    const file = item.getAsFile();
+    if (file && !SKIP_FILE_NAMES.has(file.name)) {
+      files.push({ file, relativePath: file.name });
+    }
   }
 
-  return {
-    files,
-    directoryPaths: [...directoryPaths].sort(byPathDepth),
-  };
+  if (entryWalks.length) {
+    await Promise.all(entryWalks);
+    if (files.length || directoryPaths.size) {
+      return {
+        files,
+        directoryPaths: [...directoryPaths].sort(byPathDepth),
+      };
+    }
+  }
+
+  if (files.length || directoryPaths.size) {
+    return {
+      files,
+      directoryPaths: [...directoryPaths].sort(byPathDepth),
+    };
+  }
+
+  if (fileList.length) {
+    return parseFromFileList(fileList);
+  }
+
+  return { files: [], directoryPaths: [] };
 }
 
 export function splitRelativePath(relativePath: string): {
