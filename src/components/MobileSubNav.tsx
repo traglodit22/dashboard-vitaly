@@ -22,7 +22,7 @@ export function MobileSubNav() {
   return (
     <nav
       aria-label={isSettingsPage ? "Настройки" : isOverviewPage ? "Обзор" : section.label}
-      className="flex shrink-0 gap-1 overflow-x-auto border-b border-border bg-sidebar/80 px-2 py-2 backdrop-blur-sm [-ms-overflow-style:none] [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden"
+      className="flex shrink-0 gap-1.5 overflow-x-auto border-b border-border bg-sidebar/80 px-2 py-2 backdrop-blur-sm [-ms-overflow-style:none] [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden"
     >
       {isSettingsPage ? (
         <SettingsSidebarNav variant="mobile" />
@@ -36,7 +36,7 @@ export function MobileSubNav() {
               key={href}
               href={href}
               className={cn(
-                "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors",
+                "flex min-h-10 shrink-0 touch-manipulation items-center gap-1.5 rounded-lg px-3 py-2.5 text-xs font-medium transition-colors sm:text-sm",
                 active
                   ? "bg-primary/15 text-primary"
                   : "text-muted-foreground hover:bg-accent hover:text-foreground",

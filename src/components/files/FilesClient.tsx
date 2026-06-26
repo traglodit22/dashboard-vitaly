@@ -1008,7 +1008,7 @@ function FileCard({
                 href={fileDownloadUrl(item.id)}
                 download
                 title="Скачать оригинал"
-                className="flex size-6 touch-manipulation items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+                className="flex size-8 touch-manipulation items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground sm:size-6"
               >
                 <Download className="size-3" />
               </a>
@@ -1016,16 +1016,16 @@ function FileCard({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="size-6 touch-manipulation"
+                className="size-8 touch-manipulation sm:size-6"
                 onClick={() => setEditing(true)}
               >
-                <Pencil className="size-3" />
+                <Pencil className="size-3.5 sm:size-3" />
               </Button>
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="size-6 touch-manipulation text-muted-foreground hover:text-destructive"
+                className="size-8 touch-manipulation text-muted-foreground hover:text-destructive sm:size-6"
                 onClick={onRemove}
               >
                 <Trash2 className="size-3" />

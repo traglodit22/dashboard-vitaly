@@ -23,7 +23,7 @@ const linkClass: Record<Variant, (active: boolean) => string> = {
     ),
   mobile: (active) =>
     cn(
-      "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors",
+      "flex min-h-10 shrink-0 touch-manipulation items-center gap-1.5 rounded-lg px-3 py-2.5 text-xs font-medium transition-colors sm:text-sm",
       active
         ? "bg-primary/15 text-primary"
         : "text-muted-foreground hover:bg-accent hover:text-foreground",

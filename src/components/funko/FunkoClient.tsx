@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { FunkoImagePicker } from "@/components/funko/FunkoImagePicker";
 import { FunkoItemDialog } from "@/components/funko/FunkoItemDialog";
+import { FunkoMobileDrawer, FunkoMobileNavButton } from "@/components/funko/FunkoMobileDrawer";
 import { apiFetch } from "@/lib/apiFetch";
 import {
   buildFunkoHref,
@@ -81,6 +82,7 @@ function FunkoClientInner() {
   const [editItem, setEditItem] = useState<FunkoItem | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
   const [pickerItem, setPickerItem] = useState<FunkoItem | null>(null);
+  const [navOpen, setNavOpen] = useState(false);
   const [searchInput, setSearchInput] = useState(q);
 
   useEffect(() => {
@@ -206,13 +208,19 @@ function FunkoClientInner() {
 
   return (
     <div className={DASHBOARD_PAGE_CLASS}>
+      <FunkoMobileDrawer open={navOpen} onClose={() => setNavOpen(false)} />
       <header className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0">
-          <h1 className={DASHBOARD_PAGE_TITLE_CLASS}>Funko</h1>
-          <p className="text-sm text-muted-foreground">
-            {categoryLabel} · {filterLabel}
-            {q.trim() ? ` · «${q.trim()}»` : ""}
-          </p>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <FunkoMobileNavButton onClick={() => setNavOpen(true)} />
+            <div className="min-w-0">
+              <h1 className={DASHBOARD_PAGE_TITLE_CLASS}>Funko</h1>
+              <p className="text-sm text-muted-foreground">
+                {categoryLabel} · {filterLabel}
+                {q.trim() ? ` · «${q.trim()}»` : ""}
+              </p>
+            </div>
+          </div>
         </div>
         <div className="relative w-full shrink-0 sm:w-64 lg:w-72">
           <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -232,8 +240,8 @@ function FunkoClientInner() {
       ) : stats.total === 0 ? (
         <p className="py-12 text-center text-sm text-muted-foreground">
           {category === "animation"
-            ? "Коллекция пуста — импортируйте PDF в меню слева"
-            : "Каталог пуст — импортируйте каталог в меню слева"}
+            ? "Коллекция пуста — импортируйте PDF через «Категории»"
+            : "Каталог пуст — импортируйте каталог через «Категории»"}
         </p>
       ) : items.length === 0 ? (
         <p className="py-12 text-center text-sm text-muted-foreground">

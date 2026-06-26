@@ -24,7 +24,6 @@ export const dynamic = 'force-dynamic'
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
   viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: PWA_THEME_COLOR },
@@ -95,7 +94,12 @@ export default function RootLayout({
       <body className="min-h-full bg-background text-foreground font-sans">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <AuthProvider>{children}</AuthProvider>
-          <Toaster richColors position="top-right" />
+          <Toaster
+            richColors
+            position="top-center"
+            closeButton
+            offset={{ top: "max(0.75rem, env(safe-area-inset-top))" }}
+          />
         </ThemeProvider>
       </body>
     </html>

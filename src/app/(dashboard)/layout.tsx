@@ -19,7 +19,7 @@ export default function DashboardLayout({
             <MobileSubNav />
             <div className="flex min-h-0 flex-1 overflow-hidden [@media(display-mode:standalone)]:pb-[env(safe-area-inset-bottom)]">
               <Sidebar />
-              <main className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain">{children}</main>
+              <main className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain touch-pan-y">{children}</main>
             </div>
           </div>
         </OverviewNavProvider>

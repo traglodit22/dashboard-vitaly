@@ -37,6 +37,7 @@ import { getStatusName, isRefusal, DELIVERING_STATUS_ID } from "@/lib/delivery/s
 import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
 import { EditOrderDialog } from "@/components/orders/EditOrderDialog";
+import { OrderMobileCard } from "@/components/orders/OrderMobileCard";
 import { staleShipmentRowClass } from "@/lib/orders/staleHighlight";
 
 const yuan = new Intl.NumberFormat("ru-RU", {
@@ -524,7 +525,37 @@ export function OrdersClient() {
                 : "В этой вкладке пока пусто."}
           </p>
         ) : (
-          <Table className="table-fixed text-xs sm:text-sm">
+          <>
+          <div className="space-y-2 md:hidden">
+            {paged.map((o) => {
+              const view = statusView(o);
+              const staleRow = staleShipmentRowClass(o);
+              return (
+                <OrderMobileCard
+                  key={o.id}
+                  order={o}
+                  statusLabel={view.label}
+                  statusClassName={view.className}
+                  rowClassName={cn(
+                    staleRow,
+                    !staleRow &&
+                      changedIds.has(o.id) &&
+                      "border-emerald-500/30 bg-emerald-500/10",
+                  )}
+                  showWeight={showWeight}
+                  trackValue={tracks[o.id] ?? ""}
+                  onTrackChange={(v) => setTracks((t) => ({ ...t, [o.id]: v }))}
+                  busy={busy === o.id}
+                  onAddTrack={() => addTrack(o.id)}
+                  onSend={() => send(o.id)}
+                  onEdit={() => setEditing(o)}
+                  onCopy={() => copy(o)}
+                  onRemove={() => remove(o.id)}
+                />
+              );
+            })}
+          </div>
+          <Table className="hidden table-fixed text-xs md:table sm:text-sm">
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[3.25rem] px-1.5">Дата</TableHead>
@@ -742,6 +773,7 @@ export function OrdersClient() {
               })}
             </TableBody>
           </Table>
+          </>
         )}
 
         {!loading && visible.length > PAGE_SIZE && (
