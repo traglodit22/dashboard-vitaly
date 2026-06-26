@@ -13,7 +13,12 @@ fi
 
 if crontab -l >/dev/null 2>&1; then
   if crontab -l | grep -qE 'dashboard-cron\.sh|cron-refresh-warehouse\.sh'; then
-    crontab -l | grep -vE 'dashboard-cron\.sh|cron-refresh-warehouse\.sh' | crontab -
+    cleaned="$(crontab -l | grep -vE 'dashboard-cron\.sh|cron-refresh-warehouse\.sh' || true)"
+    if [[ -n "${cleaned// }" ]]; then
+      printf '%s\n' "$cleaned" | crontab -
+    else
+      crontab -r 2>/dev/null || true
+    fi
     echo "removed legacy root crontab dashboard cron entry"
   fi
 fi
