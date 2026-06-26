@@ -37,7 +37,12 @@ export function fileDownloadUrl(fileId: string): string {
   return `/api/files/${fileId}/content?download=1`
 }
 
-/** Текст заметки через сервер (без редиректа в GCS). */
-export function fileTextContentUrl(fileId: string): string {
+/** Контент через сервер (без редиректа в GCS) — текст, PDF для просмотра. */
+export function fileInlineContentUrl(fileId: string): string {
   return `/api/files/${fileId}/content?inline=1`
+}
+
+/** @deprecated используйте fileInlineContentUrl */
+export function fileTextContentUrl(fileId: string): string {
+  return fileInlineContentUrl(fileId)
 }

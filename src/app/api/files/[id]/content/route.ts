@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth/requireAuth'
 import { fetchFileRow, readFileContent, writeFileContent } from '@/lib/files/fileService'
 import { getGcsReadSignedUrl } from '@/lib/files/gcsStorage'
-import { isTextMime } from '@/lib/files/mimeDetect'
+import { isTextMime, isPdfMime } from '@/lib/files/mimeDetect'
 import { rowToFileItem } from '@/lib/files/mapRow'
 
 export const runtime = 'nodejs'
@@ -32,6 +32,17 @@ export async function GET(
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',
         'Cache-Control': 'private, max-age=0',
+      },
+    })
+  }
+
+  if (inline && isPdfMime(mime, name)) {
+    const buffer = await readFileContent(row)
+    return new NextResponse(new Uint8Array(buffer), {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'inline',
+        'Cache-Control': 'private, max-age=3600',
       },
     })
   }
