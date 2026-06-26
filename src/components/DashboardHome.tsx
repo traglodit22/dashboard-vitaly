@@ -26,6 +26,7 @@ import { LasLegasStats } from "@/components/laslegas/LasLegasStats";
 import { toast } from "sonner";
 import { filesCategoryPath, FILES_CHANGED_EVENT } from "@/lib/files/routes";
 import { CLOUD_SLUG } from "@/lib/files/types";
+import { useOverviewSection } from "@/components/overview/overviewNav";
 
 interface FavoriteFolder {
   id: string;
@@ -60,14 +61,28 @@ interface BalanceProvider {
 
 function effectivePanelUrl(p: BalanceProvider): string {
   if (p.panelUrl) return p.panelUrl;
-  try { return new URL(p.apiUrl).origin; } catch { return ""; }
+  try {
+    return new URL(p.apiUrl).origin;
+  } catch {
+    return "";
+  }
 }
 
 const numFmt = new Intl.NumberFormat("ru-RU");
-const decFmt = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const balFmt = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const decFmt = new Intl.NumberFormat("ru-RU", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+const balFmt = new Intl.NumberFormat("ru-RU", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+const FLUID_GRID =
+  "grid gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(12.5rem,1fr))]";
 
 export function DashboardHome() {
+  const activeSection = useOverviewSection();
   const [stats, setStats] = useState<OrderStats | null>(null);
   const [balances, setBalances] = useState<BalanceProvider[]>([]);
   const [favoriteFolders, setFavoriteFolders] = useState<FavoriteFolder[]>([]);
@@ -89,8 +104,12 @@ export function DashboardHome() {
     let active = true;
     loadAll()
       .catch(() => {})
-      .finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
   }, [loadAll]);
 
   useEffect(() => {
@@ -108,7 +127,7 @@ export function DashboardHome() {
       if (data.low?.length > 0) {
         toast.warning(`Низкий баланс у ${data.low.length} панелей`);
       } else {
-        toast.success(`Балансы обновлены`);
+        toast.success("Балансы обновлены");
       }
     } catch {
       toast.error("Не удалось обновить балансы");
@@ -119,7 +138,7 @@ export function DashboardHome() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 py-16 text-muted-foreground">
+      <div className="flex min-h-[40vh] items-center justify-center gap-2 text-muted-foreground">
         <Loader2 className="size-5 animate-spin" />
         Загрузка…
       </div>
@@ -127,169 +146,348 @@ export function DashboardHome() {
   }
 
   if (!stats) {
-    return <p className="py-16 text-center text-sm text-muted-foreground">Не удалось загрузить статистику.</p>;
+    return (
+      <p className="py-16 text-center text-sm text-muted-foreground">
+        Не удалось загрузить статистику.
+      </p>
+    );
   }
 
-  const cards = [
-    { label: "Всего заказов",  value: numFmt.format(stats.total),                   icon: Package,      highlight: false, color: "" },
-    { label: "На складе",      value: numFmt.format(stats.onWarehouse),              icon: Warehouse,    highlight: true,  color: "text-sky-400" },
-    { label: "В пути",         value: numFmt.format(stats.inTransit),                icon: Truck,        highlight: true,  color: "text-amber-400" },
-    { label: "Доставлено",     value: numFmt.format(stats.delivered),                icon: CheckCircle2, highlight: false, color: "text-emerald-400" },
-    { label: "Ожидают трек",   value: numFmt.format(stats.awaitingTrack),            icon: Clock,        highlight: false, color: "text-muted-foreground" },
-    { label: "Общий вес",      value: `${decFmt.format(stats.totalWeightKg)} кг`,    icon: Scale,        highlight: false, color: "text-muted-foreground" },
-    { label: "Сумма заказов",  value: `¥${decFmt.format(stats.totalValueCny)}`,      icon: DollarSign,   highlight: false, color: "text-muted-foreground" },
+  const orderCards = [
+    {
+      label: "Всего заказов",
+      value: numFmt.format(stats.total),
+      icon: Package,
+      highlight: false,
+      color: "",
+    },
+    {
+      label: "На складе",
+      value: numFmt.format(stats.onWarehouse),
+      icon: Warehouse,
+      highlight: true,
+      color: "text-sky-400",
+    },
+    {
+      label: "В пути",
+      value: numFmt.format(stats.inTransit),
+      icon: Truck,
+      highlight: true,
+      color: "text-amber-400",
+    },
+    {
+      label: "Доставлено",
+      value: numFmt.format(stats.delivered),
+      icon: CheckCircle2,
+      highlight: false,
+      color: "text-emerald-400",
+    },
+    {
+      label: "Ожидают трек",
+      value: numFmt.format(stats.awaitingTrack),
+      icon: Clock,
+      highlight: false,
+      color: "text-muted-foreground",
+    },
+    {
+      label: "Общий вес",
+      value: `${decFmt.format(stats.totalWeightKg)} кг`,
+      icon: Scale,
+      highlight: false,
+      color: "text-muted-foreground",
+    },
+    {
+      label: "Сумма заказов",
+      value: `¥${decFmt.format(stats.totalValueCny)}`,
+      icon: DollarSign,
+      highlight: false,
+      color: "text-muted-foreground",
+    },
   ] as const;
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-
-      {favoriteFolders.length > 0 && (
-        <Card>
-          <CardContent className="py-4 sm:py-5">
-            <div className="mb-3 flex items-center justify-between gap-2">
-              <p className="flex items-center gap-2 text-sm font-medium">
-                <Star className="size-4 fill-amber-400 text-amber-400" />
-                Быстрый доступ к файлам
-              </p>
-              <Link
-                href={filesCategoryPath(CLOUD_SLUG)}
-                className="text-xs text-muted-foreground hover:text-foreground"
+    <div className="min-w-0 flex-1">
+      {activeSection === "orders" && (
+        <OverviewBlock
+          id="orders"
+          title="Заказы"
+          description="Сводная статистика по всем отправкам и заказам."
+        >
+          <div className={FLUID_GRID}>
+            {orderCards.map(({ label, value, icon: Icon, highlight, color }) => (
+              <Card
+                key={label}
+                className={cn(
+                  "border-border/80 bg-card/80 shadow-sm backdrop-blur-sm transition-colors",
+                  highlight && "border-primary/25 bg-primary/[0.04] ring-1 ring-primary/15",
+                )}
               >
-                Все файлы →
-              </Link>
-            </div>
-            <div className="flex flex-wrap gap-2">
+                <CardContent className="flex flex-col gap-3 py-4 sm:py-5">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Icon className={cn("size-4 shrink-0", color || "text-primary")} />
+                    <span className="leading-snug">{label}</span>
+                  </div>
+                  <p
+                    className={cn(
+                      "text-2xl font-semibold tabular-nums leading-none sm:text-3xl",
+                      color && color !== "text-muted-foreground" ? color : "",
+                    )}
+                  >
+                    {value}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </OverviewBlock>
+      )}
+
+      {activeSection === "favorites" && (
+        <OverviewBlock
+          id="favorites"
+          title="Быстрый доступ"
+          description="Избранные папки из облака — один клик до нужных файлов."
+          action={
+            <Link
+              href={filesCategoryPath(CLOUD_SLUG)}
+              className="text-xs text-muted-foreground transition-colors hover:text-foreground sm:text-sm"
+            >
+              Все файлы →
+            </Link>
+          }
+        >
+          {favoriteFolders.length === 0 ? (
+            <EmptyHint>
+              Отметьте папку звёздочкой в разделе «Файлы», и она появится здесь.
+            </EmptyHint>
+          ) : (
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {favoriteFolders.map((folder) => (
                 <Link
                   key={folder.id}
                   href={filesCategoryPath(folder.categorySlug, folder.id)}
-                  className="flex max-w-full items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-2 text-xs font-medium transition-colors hover:border-primary/40 hover:bg-primary/5 sm:px-3 sm:text-sm"
+                  className="group flex items-center gap-3 rounded-xl border border-border/80 bg-muted/20 px-4 py-3.5 transition-all hover:border-primary/35 hover:bg-primary/[0.04] hover:shadow-sm"
                   title={folder.name}
                 >
-                  <Folder className="size-3.5 shrink-0 text-amber-500" />
-                  <span className="truncate">{folder.name}</span>
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/15">
+                    <Folder className="size-4 text-amber-500" />
+                  </div>
+                  <span className="min-w-0 truncate font-medium group-hover:text-primary">
+                    {folder.name}
+                  </span>
                 </Link>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          )}
+        </OverviewBlock>
       )}
 
-      {/* Balances — top */}
-      {balances.length > 0 && (
-        <Card>
-          <CardContent className="py-5">
-            <div className="mb-4 flex items-center justify-between">
-              <p className="flex items-center gap-2 text-sm font-medium">
-                <Wallet className="size-4 text-primary" />
-                Балансы панелей
-              </p>
+      {activeSection === "balances" && (
+        <OverviewBlock
+          id="balances"
+          title="Балансы панелей"
+          description="SmmLaba и другие панели — актуальные остатки и пороги."
+          action={
+            balances.length > 0 ? (
               <Button
                 variant="secondary"
                 size="sm"
                 onClick={refreshBalances}
                 disabled={refreshing}
               >
-                {refreshing
-                  ? <Loader2 className="size-4 animate-spin" />
-                  : <RefreshCw className="size-4" />}
+                {refreshing ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="size-4" />
+                )}
                 Обновить все
               </Button>
+            ) : undefined
+          }
+        >
+          {balances.length === 0 ? (
+            <EmptyHint>Нет активных панелей в разделе «Балансы».</EmptyHint>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+              {balances.map((p) => (
+                <BalanceTile key={p.id} provider={p} />
+              ))}
             </div>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
-              {balances.map((p) => {
-                const isLow = p.lastBalance !== null && p.lastBalance < p.threshold;
-                const hasError = Boolean(p.lastError);
-                const noData = p.lastBalance === null && !hasError;
-                const url = effectivePanelUrl(p);
-                const inner = (
-                  <>
-                    <div className="flex items-center justify-between gap-1">
-                      <span className="truncate text-xs text-muted-foreground">{p.name}</span>
-                      {hasError
-                        ? <AlertCircle className="size-3.5 shrink-0 text-destructive" />
-                        : isLow && <AlertTriangle className="size-3.5 shrink-0 text-red-500" />}
-                    </div>
-                    <span className={cn(
-                      "font-mono text-lg font-semibold tabular-nums",
-                      hasError ? "text-destructive" : isLow ? "text-red-500" : noData ? "text-muted-foreground" : "",
-                    )}>
-                      {hasError ? "Ошибка" : noData ? "—" : `${balFmt.format(p.lastBalance!)} ${p.currency}`}
-                    </span>
-                    {hasError && (
-                      <span className="truncate text-xs text-destructive/80" title={p.lastError!}>
-                        {p.lastError}
-                      </span>
-                    )}
-                    {!hasError && isLow && (
-                      <span className="text-xs text-red-400">
-                        Порог: {balFmt.format(p.threshold)} {p.currency}
-                      </span>
-                    )}
-                  </>
-                );
-                const cls = cn(
-                  "flex flex-col gap-1.5 rounded-lg border p-3 transition-colors",
-                  hasError ? "border-destructive/40 bg-destructive/10"
-                    : isLow ? "border-red-500/40 bg-red-500/10"
-                    : "border-border bg-muted/30",
-                  url && "cursor-pointer hover:border-primary/40",
-                );
-                return url ? (
-                  <a key={p.id} href={url} target="_blank" rel="noopener noreferrer" className={cls}>
-                    {inner}
-                  </a>
-                ) : (
-                  <div key={p.id} className={cls}>{inner}</div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+          )}
+        </OverviewBlock>
       )}
 
-      <LasLegasStats />
+      {activeSection === "laslegas" && (
+        <OverviewBlock
+          id="laslegas"
+          title="Las Legas"
+          description="Статистика музея LEGO — посетители, билеты и выручка."
+          unboxed
+        >
+          <LasLegasStats embedded />
+        </OverviewBlock>
+      )}
 
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
-        {cards.map(({ label, value, icon: Icon, highlight, color }) => (
-          <Card key={label} className={cn("transition-colors", highlight && "ring-primary/30 bg-primary/5")}>
-            <CardContent className="flex flex-col gap-3 py-5">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Icon className={cn("size-4 shrink-0", color || "text-primary")} />
-                <span>{label}</span>
-              </div>
-              <p className={cn("text-2xl font-semibold tabular-nums leading-none", color && color !== "text-muted-foreground" ? color : "")}>
-                {value}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Quick status breakdown */}
-      <Card>
-        <CardContent className="py-5">
-          <p className="mb-4 text-sm font-medium">Быстрый срез по статусам</p>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <StatusRow label="Отправлено в ДоброПост" value={stats.sentTotal}    color="text-emerald-400" />
-            <StatusRow label="Ожидают трек-код"       value={stats.awaitingTrack} color="text-amber-400" />
-            <StatusRow label="На складе"              value={stats.onWarehouse}   color="text-sky-400" />
-            <StatusRow label="Доставлено"             value={stats.delivered}     color="text-emerald-400" />
+      {activeSection === "statuses" && (
+        <OverviewBlock
+          id="statuses"
+          title="Статусы отправок"
+          description="Быстрый срез по ключевым этапам доставки."
+        >
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <StatusRow
+              label="Отправлено в ДоброПост"
+              value={stats.sentTotal}
+              color="text-emerald-400"
+              accent="from-emerald-500/15"
+            />
+            <StatusRow
+              label="Ожидают трек-код"
+              value={stats.awaitingTrack}
+              color="text-amber-400"
+              accent="from-amber-500/15"
+            />
+            <StatusRow
+              label="На складе"
+              value={stats.onWarehouse}
+              color="text-sky-400"
+              accent="from-sky-500/15"
+            />
+            <StatusRow
+              label="Доставлено"
+              value={stats.delivered}
+              color="text-emerald-400"
+              accent="from-emerald-500/15"
+            />
           </div>
-        </CardContent>
-      </Card>
-
+        </OverviewBlock>
+      )}
     </div>
   );
 }
 
-function StatusRow({ label, value, color }: { label: string; value: number; color: string }) {
+function OverviewBlock({
+  id,
+  title,
+  description,
+  action,
+  unboxed,
+  children,
+}: {
+  id: string;
+  title: string;
+  description?: string;
+  action?: React.ReactNode;
+  unboxed?: boolean;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="flex flex-col gap-1 rounded-lg bg-muted/40 p-3">
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <span className={cn("text-xl font-semibold tabular-nums", color)}>
-        {new Intl.NumberFormat("ru-RU").format(value)}
+    <section id={id} className="scroll-mt-4">
+      <header className="mb-4 flex flex-wrap items-start justify-between gap-3 sm:mb-6">
+        <div className="min-w-0">
+          <h2 className="text-lg font-semibold tracking-tight sm:text-xl">{title}</h2>
+          {description ? (
+            <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{description}</p>
+          ) : null}
+        </div>
+        {action ? <div className="shrink-0">{action}</div> : null}
+      </header>
+      {unboxed ? (
+        children
+      ) : (
+        <div className="rounded-xl border border-border/80 bg-card/50 p-4 shadow-sm backdrop-blur-sm sm:p-6">
+          {children}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function EmptyHint({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="rounded-lg border border-dashed border-border/80 bg-muted/20 px-4 py-10 text-center text-sm text-muted-foreground">
+      {children}
+    </p>
+  );
+}
+
+function BalanceTile({ provider: p }: { provider: BalanceProvider }) {
+  const isLow = p.lastBalance !== null && p.lastBalance < p.threshold;
+  const hasError = Boolean(p.lastError);
+  const noData = p.lastBalance === null && !hasError;
+  const url = effectivePanelUrl(p);
+
+  const inner = (
+    <>
+      <div className="flex items-center justify-between gap-2">
+        <span className="truncate text-xs text-muted-foreground">{p.name}</span>
+        {hasError ? (
+          <AlertCircle className="size-3.5 shrink-0 text-destructive" />
+        ) : (
+          isLow && <AlertTriangle className="size-3.5 shrink-0 text-red-500" />
+        )}
+      </div>
+      <span
+        className={cn(
+          "font-mono text-xl font-semibold tabular-nums sm:text-2xl",
+          hasError ? "text-destructive" : isLow ? "text-red-500" : noData ? "text-muted-foreground" : "",
+        )}
+      >
+        {hasError ? "Ошибка" : noData ? "—" : `${balFmt.format(p.lastBalance!)} ${p.currency}`}
+      </span>
+      {hasError && (
+        <span className="truncate text-xs text-destructive/80" title={p.lastError!}>
+          {p.lastError}
+        </span>
+      )}
+      {!hasError && isLow && (
+        <span className="text-xs text-red-400">
+          Порог: {balFmt.format(p.threshold)} {p.currency}
+        </span>
+      )}
+    </>
+  );
+
+  const cls = cn(
+    "flex min-h-[7rem] flex-col justify-center gap-2 rounded-xl border p-4 transition-all",
+    hasError
+      ? "border-destructive/40 bg-destructive/10"
+      : isLow
+        ? "border-red-500/40 bg-red-500/10"
+        : "border-border/80 bg-muted/25 hover:border-primary/30 hover:bg-muted/40",
+    url && "cursor-pointer",
+  );
+
+  return url ? (
+    <a href={url} target="_blank" rel="noopener noreferrer" className={cls}>
+      {inner}
+    </a>
+  ) : (
+    <div className={cls}>{inner}</div>
+  );
+}
+
+function StatusRow({
+  label,
+  value,
+  color,
+  accent,
+}: {
+  label: string;
+  value: number;
+  color: string;
+  accent: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex flex-col gap-2 rounded-xl border border-border/70 bg-gradient-to-br to-transparent p-4 sm:p-5",
+        accent,
+      )}
+    >
+      <span className="text-xs leading-snug text-muted-foreground sm:text-sm">{label}</span>
+      <span className={cn("text-2xl font-semibold tabular-nums sm:text-3xl", color)}>
+        {numFmt.format(value)}
       </span>
     </div>
   );

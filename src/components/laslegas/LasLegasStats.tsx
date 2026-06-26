@@ -75,7 +75,7 @@ function shiftMonth(month: string, delta: number): string {
   return `${yy}-${mm}`;
 }
 
-export function LasLegasStats() {
+export function LasLegasStats({ embedded = false }: { embedded?: boolean }) {
   const [configured, setConfigured] = useState<boolean | null>(null);
   const [overview, setOverview] = useState<LasLegasOverview | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -236,85 +236,119 @@ export function LasLegasStats() {
     ];
   }, [overview]);
 
-  if (configured === false) return null;
+  if (configured === false) {
+    if (embedded) {
+      return (
+        <p className="rounded-lg border border-dashed border-border/80 bg-muted/20 px-4 py-10 text-center text-sm text-muted-foreground">
+          Las Legas не настроен. Добавьте LAS_LEGAS_API_URL и LAS_LEGAS_API_KEY на сервере.
+        </p>
+      );
+    }
+    return null;
+  }
+
+  const body = (
+    <>
+      {!embedded && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <p className="flex items-center gap-2 text-sm font-medium">
+            <Building2 className="size-4 text-primary" />
+            Las Legas — музей LEGO
+          </p>
+          {overview?.generatedAt && (
+            <span className="text-xs text-muted-foreground">
+              Обновлено:{" "}
+              {new Intl.DateTimeFormat("ru-RU", {
+                day: "2-digit",
+                month: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                timeZone: "Europe/Minsk",
+              }).format(new Date(overview.generatedAt))}
+            </span>
+          )}
+        </div>
+      )}
+
+      {embedded && overview?.generatedAt && (
+        <p className="mb-4 text-xs text-muted-foreground">
+          Обновлено:{" "}
+          {new Intl.DateTimeFormat("ru-RU", {
+            day: "2-digit",
+            month: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            timeZone: "Europe/Minsk",
+          }).format(new Date(overview.generatedAt))}
+        </p>
+      )}
+
+      {loading && (
+        <div className="flex items-center gap-2 py-8 text-muted-foreground">
+          <Loader2 className="size-4 animate-spin" />
+          Загрузка статистики…
+        </div>
+      )}
+
+      {!loading && error && (
+        <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          {error}
+          <Button
+            variant="secondary"
+            size="sm"
+            className="ml-3"
+            onClick={() => void loadOverview()}
+          >
+            Повторить
+          </Button>
+        </div>
+      )}
+
+      {!loading && !error && sections.length > 0 && (
+        <div className="space-y-4">
+          {sections.map((section) => (
+            <StatsPeriodSection
+              key={section.id}
+              section={section}
+              onOpen={(modal) => setModal(modal)}
+            />
+          ))}
+
+          {overview?.last30d && (
+            <button
+              type="button"
+              onClick={() =>
+                setModal({
+                  kind: "period",
+                  title: overview.last30d.label ?? "Последние 30 дней",
+                  period: "30d",
+                })
+              }
+              className="flex w-full flex-wrap items-center justify-between gap-2 rounded-lg border border-dashed border-border/80 px-3 py-2.5 text-left text-xs text-muted-foreground transition-colors hover:border-primary/30 hover:bg-muted/30 hover:text-foreground"
+            >
+              <span>За 30 дней</span>
+              <span className="tabular-nums">
+                {numFmt.format(overview.last30d.visitors ?? 0)} пос. ·{" "}
+                {formatByn(overview.last30d.revenue?.total)}
+              </span>
+            </button>
+          )}
+        </div>
+      )}
+    </>
+  );
 
   return (
     <>
-      <Card>
-        <CardContent className="py-5">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-            <p className="flex items-center gap-2 text-sm font-medium">
-              <Building2 className="size-4 text-primary" />
-              Las Legas — музей LEGO
-            </p>
-            {overview?.generatedAt && (
-              <span className="text-xs text-muted-foreground">
-                Обновлено:{" "}
-                {new Intl.DateTimeFormat("ru-RU", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  timeZone: "Europe/Minsk",
-                }).format(new Date(overview.generatedAt))}
-              </span>
-            )}
-          </div>
-
-          {loading && (
-            <div className="flex items-center gap-2 py-8 text-muted-foreground">
-              <Loader2 className="size-4 animate-spin" />
-              Загрузка статистики…
-            </div>
-          )}
-
-          {!loading && error && (
-            <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              {error}
-              <Button
-                variant="secondary"
-                size="sm"
-                className="ml-3"
-                onClick={() => void loadOverview()}
-              >
-                Повторить
-              </Button>
-            </div>
-          )}
-
-          {!loading && !error && sections.length > 0 && (
-            <div className="space-y-4">
-              {sections.map((section) => (
-                <StatsPeriodSection
-                  key={section.id}
-                  section={section}
-                  onOpen={(modal) => setModal(modal)}
-                />
-              ))}
-
-              {overview?.last30d && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    setModal({
-                      kind: "period",
-                      title: overview.last30d.label ?? "Последние 30 дней",
-                      period: "30d",
-                    })
-                  }
-                  className="flex w-full flex-wrap items-center justify-between gap-2 rounded-lg border border-dashed border-border/80 px-3 py-2.5 text-left text-xs text-muted-foreground transition-colors hover:border-primary/30 hover:bg-muted/30 hover:text-foreground"
-                >
-                  <span>За 30 дней</span>
-                  <span className="tabular-nums">
-                    {numFmt.format(overview.last30d.visitors ?? 0)} пос. ·{" "}
-                    {formatByn(overview.last30d.revenue?.total)}
-                  </span>
-                </button>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {embedded ? (
+        <div className="rounded-xl border border-border/80 bg-card/50 p-4 shadow-sm backdrop-blur-sm sm:p-6">
+          {body}
+        </div>
+      ) : (
+        <Card>
+          <CardContent className="py-5">{body}</CardContent>
+        </Card>
+      )}
 
       {modal && (
         <LasLegasModal

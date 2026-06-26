@@ -12,6 +12,7 @@ import { FilesSidebarTree } from "@/components/files/FilesSidebarTree";
 import { GallerySidebarCalendar } from "@/components/gallery/GallerySidebarCalendar";
 import { FunkoSidebar } from "@/components/funko/FunkoSidebar";
 import { SettingsSidebarNav } from "@/components/settings/SettingsSidebarNav";
+import { OverviewSidebarNav } from "@/components/overview/OverviewSidebarNav";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -19,6 +20,7 @@ export function Sidebar() {
 
   const sections = useNavSections();
   const isSettingsPage = pathname === "/settings";
+  const isOverviewPage = pathname === "/";
   const section = sectionForPath(pathname, sections);
   const current = activeItem(section.items, pathname);
   const settingsActive = isSettingsPage;
@@ -36,10 +38,12 @@ export function Sidebar() {
     >
       <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-hidden p-3">
         <div className="shrink-0 px-3 pb-1 pt-2 text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
-          {isSettingsPage ? "Настройки" : section.label}
+          {isSettingsPage ? "Настройки" : isOverviewPage ? "Обзор" : section.label}
         </div>
         {isSettingsPage ? (
           <SettingsSidebarNav variant="sidebar" />
+        ) : isOverviewPage ? (
+          <OverviewSidebarNav variant="sidebar" />
         ) : (
           <>
             {!isGallerySection && !isFunkoSection &&
