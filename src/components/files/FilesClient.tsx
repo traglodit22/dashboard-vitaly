@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
-import { IMPORTANT_DOCS_SLUG, CLOUD_SLUG, MAX_FILE_MB, type FileFolder, isInternalFileDrag, preventExternalFileDrag, FILE_REORDER_DRAG_TYPE } from "@/lib/files/types";
+import { IMPORTANT_DOCS_SLUG, CLOUD_SLUG, MAX_FILE_MB, type FileFolder, FILE_REORDER_DRAG_TYPE } from "@/lib/files/types";
 import { FILES_CHANGED_EVENT, filesCategoryPath, notifyFilesChanged, fileDownloadUrl } from "@/lib/files/routes";
 import { reorderById } from "@/lib/files/reorderList";
 import { uploadFileToGcsWithFallback } from "@/lib/files/gcsDirectUpload";
@@ -442,43 +442,39 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     await uploadStructuredDrop(parseFileListWithPaths(fileList));
   }
 
-  async function handleDrop(e: React.DragEvent) {
+  async function handleUploadDrop(e: React.DragEvent) {
     e.preventDefault();
     e.stopPropagation();
+    if (uploading) return;
 
     const dt = e.nativeEvent.dataTransfer ?? e.dataTransfer;
-    const snapshot = captureDropSnapshot(dt);
 
-    if (uploading) return;
-    if (isInternalFileDrag(dt)) return;
-
-    let parsed;
-    try {
-      parsed = await parseDropSnapshot(snapshot);
-    } catch {
-      parsed =
-        snapshot.flatFiles.length > 0
-          ? parseFileListWithPaths(snapshot.flatFiles)
-          : { files: [], directoryPaths: [] };
+    if (dt.files.length > 0) {
+      await uploadStructuredDrop(parseFileListWithPaths(dt.files));
+      return;
     }
-    if (!parsed.files.length && !parsed.directoryPaths.length) {
+
+    const snapshot = captureDropSnapshot(dt);
+    if (!snapshot.flatFiles.length && !snapshot.directoryEntries.length) {
       toast.error("Не удалось прочитать файлы для загрузки");
       return;
     }
-    await uploadStructuredDrop(parsed);
-  }
 
-  const bindExternalDrop = {
-    onDragEnter: preventExternalFileDrag,
-    onDragOver: preventExternalFileDrag,
-    onDragOverCapture: preventExternalFileDrag,
-    onDropCapture: (e: React.DragEvent) => {
-      if (isInternalFileDrag(e.dataTransfer)) return;
-      e.preventDefault();
-      e.stopPropagation();
-      void handleDrop(e);
-    },
-  };
+    try {
+      const parsed = await parseDropSnapshot(snapshot);
+      if (parsed.files.length || parsed.directoryPaths.length) {
+        await uploadStructuredDrop(parsed);
+        return;
+      }
+    } catch {
+      if (snapshot.flatFiles.length) {
+        await uploadStructuredDrop(parseFileListWithPaths(snapshot.flatFiles));
+        return;
+      }
+    }
+
+    toast.error("Не удалось прочитать файлы для загрузки");
+  }
 
   async function removeItem(item: FileItem) {
     if (!confirm(`Удалить «${item.title}»?`)) return;
@@ -516,8 +512,13 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
         uploading ? "opacity-60" : "cursor-pointer hover:border-primary/50 hover:bg-muted/30 active:bg-muted/40",
       )}
       onClick={() => !uploading && inputRef.current?.click()}
-      onDragEnter={preventExternalFileDrag}
-      onDragOver={preventExternalFileDrag}
+      onDragOver={(e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "copy";
+      }}
+      onDrop={(e) => {
+        void handleUploadDrop(e);
+      }}
     >
       <input
         ref={inputRef}
@@ -570,10 +571,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
   }
 
   return (
-    <div
-      className="w-full min-w-0 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-6 lg:p-8"
-      {...bindExternalDrop}
-    >
+    <div className="w-full min-w-0 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-6 lg:p-8">
       <FilesMobileFolderDrawer
         open={foldersDrawerOpen}
         onClose={() => setFoldersDrawerOpen(false)}
@@ -753,12 +751,10 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
               onDragEnd={() => setDragItemId(null)}
               onDragOver={(e) => {
                 if (!dragItemId || dragItemId === item.id) return;
-                if (!isInternalFileDrag(e.dataTransfer)) return;
                 e.preventDefault();
                 e.dataTransfer.dropEffect = "move";
               }}
               onDrop={(e) => {
-                if (!isInternalFileDrag(e.dataTransfer)) return;
                 e.preventDefault();
                 e.stopPropagation();
                 onFileDrop(item.id);
@@ -861,8 +857,8 @@ function FileCard({
 
   return (
     <Card
-      onDragOver={onDragOver}
-      onDrop={onDrop}
+      onDragOver={draggable ? onDragOver : undefined}
+      onDrop={draggable ? onDrop : undefined}
       size="sm"
       className={cn(
         "gap-0 py-0 [--card-spacing:0]",
