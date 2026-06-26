@@ -86,6 +86,54 @@ const balFmt = new Intl.NumberFormat("ru-RU", {
 const FLUID_GRID =
   "grid gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(12.5rem,1fr))]";
 
+const PIPELINE_STAGES = [
+  {
+    key: "awaitingTrack",
+    label: "Ожидают трек",
+    hint: "Ещё не отправлены в ДоброПост",
+    icon: Clock,
+    color: "text-amber-400",
+    accent: "from-amber-500/12",
+    border: "border-amber-500/20",
+  },
+  {
+    key: "sentTotal",
+    label: "В ДоброПост",
+    hint: "Отправлено на склад перевозчика",
+    icon: Package,
+    color: "text-emerald-400",
+    accent: "from-emerald-500/12",
+    border: "border-emerald-500/20",
+  },
+  {
+    key: "onWarehouse",
+    label: "На складе",
+    hint: "Ожидают отправки клиенту",
+    icon: Warehouse,
+    color: "text-sky-400",
+    accent: "from-sky-500/12",
+    border: "border-sky-500/20",
+  },
+  {
+    key: "inTransit",
+    label: "В пути",
+    hint: "Уже ушли со склада",
+    icon: Truck,
+    color: "text-amber-400",
+    accent: "from-amber-500/12",
+    border: "border-amber-500/25",
+  },
+  {
+    key: "delivered",
+    label: "Доставлено",
+    hint: "Получены получателем",
+    icon: CheckCircle2,
+    color: "text-emerald-400",
+    accent: "from-emerald-500/12",
+    border: "border-emerald-500/20",
+  },
+] as const;
+
 export function DashboardHome() {
   const { setVisibleIds } = useOverviewNav()!;
   const [stats, setStats] = useState<OrderStats | null>(null);
@@ -126,7 +174,7 @@ export function DashboardHome() {
   useEffect(() => {
     if (loading || !stats) return;
 
-    const visible = new Set<OverviewSectionId>(["orders", "laslegas", "statuses"]);
+    const visible = new Set<OverviewSectionId>(["orders", "laslegas"]);
     if (favoriteFolders.length > 0) visible.add("favorites");
     if (balances.length > 0) visible.add("balances");
     setVisibleIds(visible);
@@ -175,55 +223,24 @@ export function DashboardHome() {
     );
   }
 
-  const orderCards = [
+  const summaryCards = [
     {
       label: "Всего заказов",
       value: numFmt.format(stats.total),
       icon: Package,
-      highlight: false,
-      color: "",
-    },
-    {
-      label: "На складе",
-      value: numFmt.format(stats.onWarehouse),
-      icon: Warehouse,
-      highlight: true,
-      color: "text-sky-400",
-    },
-    {
-      label: "В пути",
-      value: numFmt.format(stats.inTransit),
-      icon: Truck,
-      highlight: true,
-      color: "text-amber-400",
-    },
-    {
-      label: "Доставлено",
-      value: numFmt.format(stats.delivered),
-      icon: CheckCircle2,
-      highlight: false,
-      color: "text-emerald-400",
-    },
-    {
-      label: "Ожидают трек",
-      value: numFmt.format(stats.awaitingTrack),
-      icon: Clock,
-      highlight: false,
-      color: "text-muted-foreground",
+      hint: "Все записи в системе",
     },
     {
       label: "Общий вес",
       value: `${decFmt.format(stats.totalWeightKg)} кг`,
       icon: Scale,
-      highlight: false,
-      color: "text-muted-foreground",
+      hint: "Суммарный вес отправлений",
     },
     {
       label: "Сумма заказов",
       value: `¥${decFmt.format(stats.totalValueCny)}`,
       icon: DollarSign,
-      highlight: false,
-      color: "text-muted-foreground",
+      hint: "Стоимость товаров в юанях",
     },
   ] as const;
 
@@ -304,66 +321,84 @@ export function DashboardHome() {
       <OverviewBlock
         id="orders"
         title="Заказы"
-        description="Сводная статистика по всем отправкам и заказам."
+        description="Сводка по отправкам: от ожидания трека до доставки, плюс вес и сумма."
+        action={
+          <Link
+            href="/orders"
+            className="text-xs text-muted-foreground transition-colors hover:text-foreground sm:text-sm"
+          >
+            Все заказы →
+          </Link>
+        }
       >
-        <div className={FLUID_GRID}>
-          {orderCards.map(({ label, value, icon: Icon, highlight, color }) => (
-            <Card
-              key={label}
-              className={cn(
-                "border-border/80 bg-card/80 shadow-sm backdrop-blur-sm transition-colors",
-                highlight && "border-primary/25 bg-primary/[0.04] ring-1 ring-primary/15",
-              )}
-            >
-              <CardContent className="flex flex-col gap-3 py-4 sm:py-5">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Icon className={cn("size-4 shrink-0", color || "text-primary")} />
-                  <span className="leading-snug">{label}</span>
-                </div>
-                <p
-                  className={cn(
-                    "text-2xl font-semibold tabular-nums leading-none sm:text-3xl",
-                    color && color !== "text-muted-foreground" ? color : "",
-                  )}
-                >
-                  {value}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </OverviewBlock>
+        <div className="space-y-6">
+          <div className={FLUID_GRID}>
+            {summaryCards.map(({ label, value, icon: Icon, hint }) => (
+              <Card
+                key={label}
+                className="border-border/80 bg-card/80 shadow-sm backdrop-blur-sm"
+                title={hint}
+              >
+                <CardContent className="flex flex-col gap-3 py-4 sm:py-5">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Icon className="size-4 shrink-0 text-primary" />
+                    <span className="leading-snug">{label}</span>
+                  </div>
+                  <p className="text-2xl font-semibold tabular-nums leading-none sm:text-3xl">
+                    {value}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
 
-      <OverviewBlock
-        id="statuses"
-        title="Статусы отправок"
-        description="Быстрый срез по ключевым этапам доставки."
-      >
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <StatusRow
-            label="Отправлено в ДоброПост"
-            value={stats.sentTotal}
-            color="text-emerald-400"
-            accent="from-emerald-500/15"
-          />
-          <StatusRow
-            label="Ожидают трек-код"
-            value={stats.awaitingTrack}
-            color="text-amber-400"
-            accent="from-amber-500/15"
-          />
-          <StatusRow
-            label="На складе"
-            value={stats.onWarehouse}
-            color="text-sky-400"
-            accent="from-sky-500/15"
-          />
-          <StatusRow
-            label="Доставлено"
-            value={stats.delivered}
-            color="text-emerald-400"
-            accent="from-emerald-500/15"
-          />
+          <div>
+            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground/80">
+              Этапы доставки
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+              {PIPELINE_STAGES.map((stage, index) => {
+                const Icon = stage.icon;
+                const value = stats[stage.key];
+                return (
+                  <div key={stage.key} className="relative min-w-0">
+                    {index > 0 ? (
+                      <span
+                        className="pointer-events-none absolute -left-2 top-1/2 hidden -translate-y-1/2 text-muted-foreground/35 xl:block"
+                        aria-hidden
+                      >
+                        →
+                      </span>
+                    ) : null}
+                    <div
+                      className={cn(
+                        "flex h-full flex-col gap-2 rounded-xl border bg-gradient-to-br to-transparent p-4 sm:p-5",
+                        stage.accent,
+                        stage.border,
+                      )}
+                      title={stage.hint}
+                    >
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground sm:text-sm">
+                        <Icon className={cn("size-4 shrink-0", stage.color)} />
+                        <span className="min-w-0 leading-snug">{stage.label}</span>
+                      </div>
+                      <span
+                        className={cn(
+                          "text-2xl font-semibold tabular-nums sm:text-3xl",
+                          stage.color,
+                        )}
+                      >
+                        {numFmt.format(value)}
+                      </span>
+                      <span className="text-[11px] leading-snug text-muted-foreground/80">
+                        {stage.hint}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </OverviewBlock>
     </div>
@@ -460,31 +495,5 @@ function BalanceTile({ provider: p }: { provider: BalanceProvider }) {
     </a>
   ) : (
     <div className={cls}>{inner}</div>
-  );
-}
-
-function StatusRow({
-  label,
-  value,
-  color,
-  accent,
-}: {
-  label: string;
-  value: number;
-  color: string;
-  accent: string;
-}) {
-  return (
-    <div
-      className={cn(
-        "flex flex-col gap-2 rounded-xl border border-border/70 bg-gradient-to-br to-transparent p-4 sm:p-5",
-        accent,
-      )}
-    >
-      <span className="text-xs leading-snug text-muted-foreground sm:text-sm">{label}</span>
-      <span className={cn("text-2xl font-semibold tabular-nums sm:text-3xl", color)}>
-        {numFmt.format(value)}
-      </span>
-    </div>
   );
 }

@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import {
   Building2,
   Package,
-  PieChart,
   Star,
   Wallet,
 } from "lucide-react";
@@ -16,7 +15,6 @@ export const OVERVIEW_SECTIONS = [
   { id: "favorites", label: "Быстрый доступ", icon: Star },
   { id: "balances", label: "Балансы", icon: Wallet },
   { id: "laslegas", label: "Las Legas", icon: Building2 },
-  { id: "statuses", label: "Статусы", icon: PieChart },
 ] as const;
 
 export type OverviewSectionId = (typeof OVERVIEW_SECTIONS)[number]["id"];

@@ -6,7 +6,6 @@ import type { OverviewSectionId } from "@/components/overview/overviewNav";
 const DEFAULT_VISIBLE = new Set<OverviewSectionId>([
   "orders",
   "laslegas",
-  "statuses",
 ]);
 
 type OverviewNavContextValue = {

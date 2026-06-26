@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
-import { IMPORTANT_DOCS_SLUG, CLOUD_SLUG, MAX_FILE_MB, type FileFolder, isInternalFileDrag, isExternalFileDrop, allowExternalFileDragOver, FILE_REORDER_DRAG_TYPE } from "@/lib/files/types";
+import { IMPORTANT_DOCS_SLUG, CLOUD_SLUG, MAX_FILE_MB, type FileFolder, isInternalFileDrag, preventExternalFileDrag, FILE_REORDER_DRAG_TYPE } from "@/lib/files/types";
 import { FILES_CHANGED_EVENT, filesCategoryPath, notifyFilesChanged, fileDownloadUrl } from "@/lib/files/routes";
 import { reorderById } from "@/lib/files/reorderList";
 import { uploadFileToGcsWithFallback } from "@/lib/files/gcsDirectUpload";
@@ -452,10 +452,6 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     if (uploading) return;
     if (isInternalFileDrag(dt)) return;
 
-    const hasPayload =
-      snapshot.flatFiles.length > 0 || snapshot.directoryEntries.length > 0;
-    if (!hasPayload && !isExternalFileDrop(dt)) return;
-
     let parsed;
     try {
       parsed = await parseDropSnapshot(snapshot);
@@ -473,13 +469,13 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
   }
 
   const bindExternalDrop = {
-    onDragEnter: (e: React.DragEvent) => {
-      allowExternalFileDragOver(e);
-    },
-    onDragOver: (e: React.DragEvent) => {
-      allowExternalFileDragOver(e);
-    },
-    onDrop: (e: React.DragEvent) => {
+    onDragEnter: preventExternalFileDrag,
+    onDragOver: preventExternalFileDrag,
+    onDragOverCapture: preventExternalFileDrag,
+    onDropCapture: (e: React.DragEvent) => {
+      if (isInternalFileDrag(e.dataTransfer)) return;
+      e.preventDefault();
+      e.stopPropagation();
       void handleDrop(e);
     },
   };
@@ -520,7 +516,8 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
         uploading ? "opacity-60" : "cursor-pointer hover:border-primary/50 hover:bg-muted/30 active:bg-muted/40",
       )}
       onClick={() => !uploading && inputRef.current?.click()}
-      {...bindExternalDrop}
+      onDragEnter={preventExternalFileDrag}
+      onDragOver={preventExternalFileDrag}
     >
       <input
         ref={inputRef}
@@ -755,13 +752,13 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
               onDragStart={() => setDragItemId(item.id)}
               onDragEnd={() => setDragItemId(null)}
               onDragOver={(e) => {
-                if (allowExternalFileDragOver(e)) return;
                 if (!dragItemId || dragItemId === item.id) return;
+                if (!isInternalFileDrag(e.dataTransfer)) return;
                 e.preventDefault();
                 e.dataTransfer.dropEffect = "move";
               }}
               onDrop={(e) => {
-                if (isExternalFileDrop(e.dataTransfer)) return;
+                if (!isInternalFileDrag(e.dataTransfer)) return;
                 e.preventDefault();
                 e.stopPropagation();
                 onFileDrop(item.id);

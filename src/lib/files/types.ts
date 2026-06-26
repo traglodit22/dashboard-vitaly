@@ -59,31 +59,12 @@ export function isInternalFileDrag(dataTransfer: DataTransfer): boolean {
   )
 }
 
-function dataTransferHasFileItems(dataTransfer: DataTransfer): boolean {
-  const items = dataTransfer.items
-  for (let i = 0; i < items.length; i++) {
-    if (items[i]?.kind === 'file') return true
-  }
-  return false
-}
-
-/** Файлы с рабочего стола / Finder (не внутренний drag карточки или папки). */
-export function isExternalFileDrop(dataTransfer: DataTransfer): boolean {
-  if (isInternalFileDrag(dataTransfer)) return false
-  if (dataTransfer.files.length > 0 || dataTransferHasFileItems(dataTransfer)) return true
-  const types = getDataTransferTypes(dataTransfer)
-  return (
-    types.includes('Files') ||
-    types.includes('public.file-url') ||
-    types.includes('application/x-moz-file')
-  )
-}
-
-export function allowExternalFileDragOver(e: {
+/** Разрешает drop файлов с рабочего стола (Safari: types/files часто пустые на dragover). */
+export function preventExternalFileDrag(e: {
   dataTransfer: DataTransfer
   preventDefault(): void
 }): boolean {
-  if (!isExternalFileDrop(e.dataTransfer)) return false
+  if (isInternalFileDrag(e.dataTransfer)) return false
   e.preventDefault()
   e.dataTransfer.dropEffect = 'copy'
   return true

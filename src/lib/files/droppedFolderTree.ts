@@ -111,13 +111,6 @@ export function captureDropSnapshot(dataTransfer: DataTransfer | null): DropSnap
 
   if (!dataTransfer) return { flatFiles, directoryEntries };
 
-  for (let i = 0; i < dataTransfer.files.length; i++) {
-    const file = dataTransfer.files[i];
-    if (!file || SKIP_FILE_NAMES.has(file.name) || seen.has(file)) continue;
-    seen.add(file);
-    flatFiles.push(file);
-  }
-
   const items = dataTransfer.items;
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
@@ -129,7 +122,6 @@ export function captureDropSnapshot(dataTransfer: DataTransfer | null): DropSnap
       continue;
     }
 
-    // Safari надёжнее отдаёт файл через getAsFile(), чем через entry.file().
     const file = item.getAsFile();
     if (file && !SKIP_FILE_NAMES.has(file.name) && !seen.has(file)) {
       seen.add(file);
@@ -140,6 +132,13 @@ export function captureDropSnapshot(dataTransfer: DataTransfer | null): DropSnap
     if (entry?.isFile) {
       directoryEntries.push(entry);
     }
+  }
+
+  for (let i = 0; i < dataTransfer.files.length; i++) {
+    const file = dataTransfer.files[i];
+    if (!file || SKIP_FILE_NAMES.has(file.name) || seen.has(file)) continue;
+    seen.add(file);
+    flatFiles.push(file);
   }
 
   return { flatFiles, directoryEntries };
