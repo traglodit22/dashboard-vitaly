@@ -8,6 +8,9 @@ export const EXT_TO_MIME: Record<string, string> = {
   png: 'image/png',
   webp: 'image/webp',
   gif: 'image/gif',
+  tiff: 'image/tiff',
+  tif: 'image/tiff',
+  ai: 'application/postscript',
   doc: 'application/msword',
   docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   xls: 'application/vnd.ms-excel',
@@ -45,7 +48,7 @@ export function resolveUploadMime(fileName: string, reportedType: string): strin
   }
 
   throw new Error(
-    'Допустимы PDF, изображения, DOC/DOCX, XLS/XLSX, Pages, TXT, ZIP и DWG',
+    'Допустимы PDF, изображения (в т.ч. TIFF), DOC/DOCX, XLS/XLSX, Pages, TXT, ZIP, DWG и AI',
   )
 }
 

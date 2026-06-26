@@ -42,6 +42,9 @@ const EXT_LABELS: Record<string, string> = {
   png: "PNG",
   webp: "WebP",
   gif: "GIF",
+  tiff: "TIFF",
+  tif: "TIFF",
+  ai: "AI",
   doc: "DOC",
   docx: "DOCX",
   xls: "XLS",
@@ -78,6 +81,13 @@ export function fileExtension(item: Pick<FileListRow, "originalName" | "mimeType
   if (item.mimeType === "image/png") return "png";
   if (item.mimeType === "image/webp") return "webp";
   if (item.mimeType === "image/gif") return "gif";
+  if (item.mimeType === "image/tiff") return "tiff";
+  if (
+    item.mimeType === "application/postscript" ||
+    item.mimeType === "application/vnd.adobe.illustrator"
+  ) {
+    return "ai";
+  }
   return "other";
 }
 
