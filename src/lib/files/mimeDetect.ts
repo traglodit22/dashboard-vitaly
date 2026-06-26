@@ -13,6 +13,7 @@ export const EXT_TO_MIME: Record<string, string> = {
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   txt: 'text/plain',
   zip: 'application/zip',
+  pages: 'application/x-iwork-pages-sffpages',
   dwg: 'image/vnd.dwg',
 }
 
@@ -42,7 +43,7 @@ export function resolveUploadMime(fileName: string, reportedType: string): strin
   }
 
   throw new Error(
-    'Допустимы PDF, изображения, DOC/DOCX, XLS/XLSX, TXT, ZIP и DWG',
+    'Допустимы PDF, изображения, DOC/DOCX, XLS/XLSX, Pages, TXT, ZIP и DWG',
   )
 }
 

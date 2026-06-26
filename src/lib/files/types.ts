@@ -82,6 +82,8 @@ export const LOCAL_ALLOWED_MIMES = new Set([
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   'application/vnd.ms-excel',
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/x-iwork-pages-sffpages',
+  'application/vnd.apple.pages',
   'text/plain',
   'application/zip',
   'image/vnd.dwg',
