@@ -28,7 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
-import { SettingsShell } from "@/components/settings/SettingsShell";
+import { useSettingsSection } from "@/components/settings/settingsNav";
 import {
   ConfiguredBadge,
   SettingsActions,
@@ -47,6 +47,7 @@ import { orderNavSections } from "@/lib/navigation/orderSections";
 export function SettingsClient() {
   const [settings, setSettings] = useState<SettingsData>(EMPTY_SETTINGS);
   const [loading, setLoading] = useState(true);
+  const activeSection = useSettingsSection();
 
   const reload = useCallback(async () => {
     const res = await apiFetch("/api/settings", { cache: "no-store" });
@@ -91,14 +92,22 @@ export function SettingsClient() {
   }
 
   return (
-    <SettingsShell>
-      <AppearanceSection settings={settings} onSaved={reload} />
-      <AccountSection />
-      <ShippingSection settings={settings} onSaved={reload} />
-      <AutomationSection settings={settings} onSaved={reload} />
-      <IntegrationsSection settings={settings} onSaved={reload} />
-      <BackupSection />
-    </SettingsShell>
+    <div className="min-w-0 flex-1">
+      {activeSection === "appearance" && (
+        <AppearanceSection settings={settings} onSaved={reload} />
+      )}
+      {activeSection === "account" && <AccountSection />}
+      {activeSection === "shipping" && (
+        <ShippingSection settings={settings} onSaved={reload} />
+      )}
+      {activeSection === "automation" && (
+        <AutomationSection settings={settings} onSaved={reload} />
+      )}
+      {activeSection === "integrations" && (
+        <IntegrationsSection settings={settings} onSaved={reload} />
+      )}
+      {activeSection === "backup" && <BackupSection />}
+    </div>
   );
 }
 
