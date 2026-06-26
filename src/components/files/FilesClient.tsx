@@ -14,6 +14,8 @@ import { IMPORTANT_DOCS_SLUG, CLOUD_SLUG, MAX_FILE_MB, type FileFolder } from "@
 import { FILES_CHANGED_EVENT, filesCategoryPath, notifyFilesChanged, fileDownloadUrl } from "@/lib/files/routes";
 import { reorderById } from "@/lib/files/reorderList";
 import { uploadFileToGcsWithFallback } from "@/lib/files/gcsDirectUpload";
+import { parseDroppedItems, parseFileListWithPaths, splitRelativePath } from "@/lib/files/droppedFolderTree";
+import { ensureFolderPath, type FolderPathCache } from "@/lib/files/ensureFolderPath";
 import { CloudFolderView } from "@/components/files/CloudFolderView";
 import { FilesListToolbar } from "@/components/files/FilesListToolbar";
 import { FilesSubfolderGrid } from "@/components/files/FilesSubfolderGrid";
@@ -96,6 +98,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadLabel, setUploadLabel] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<{ done: number; total: number } | null>(null);
   const [dragItemId, setDragItemId] = useState<string | null>(null);
   const [folder, setFolder] = useState<FileFolder | null>(null);
   const [childFolders, setChildFolders] = useState<ChildFolder[]>([]);
@@ -290,7 +293,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     void persistFileOrder(next, "files");
   }
 
-  async function uploadGcsFile(file: File): Promise<FileItem> {
+  async function uploadGcsFile(file: File, targetFolderId: string | null): Promise<FileItem> {
     const initRes = await apiFetch(
       "/api/files/gcs-upload-url",
       {
@@ -298,7 +301,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           categorySlug,
-          folderId: currentFolderId,
+          folderId: targetFolderId,
           fileName: file.name,
           size: file.size,
           mime: file.type || "",
@@ -326,7 +329,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
         body: JSON.stringify({
           fileId: init.fileId,
           categorySlug,
-          folderId: currentFolderId,
+          folderId: targetFolderId,
           fileName: file.name,
           size: file.size,
           mime: init.mime,
@@ -341,10 +344,10 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     return done.item as FileItem;
   }
 
-  async function uploadLocalFile(file: File): Promise<FileItem> {
+  async function uploadLocalFile(file: File, targetFolderId: string | null): Promise<FileItem> {
     const fd = new FormData();
     fd.append("categorySlug", categorySlug);
-    if (currentFolderId) fd.append("folderId", currentFolderId);
+    if (targetFolderId) fd.append("folderId", targetFolderId);
     fd.append("file", file);
     const res = await apiFetch("/api/files", { method: "POST", body: fd }, 300_000);
     const data = await res.json();
@@ -354,41 +357,91 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     return data.item as FileItem;
   }
 
-  async function uploadFiles(fileList: FileList | File[]) {
+  async function uploadStructuredDrop(parsed: ReturnType<typeof parseFileListWithPaths>) {
     if (!category) return;
     if (category.storageType === "gcs" && !gcsConfigured) {
       toast.error("Google Cloud Storage не настроен");
       return;
     }
 
-    const files = Array.from(fileList);
-    if (!files.length) return;
+    const { files, directoryPaths } = parsed;
+    if (!files.length && !directoryPaths.length) return;
 
     setUploading(true);
+    setUploadProgress(null);
+    const folderCache: FolderPathCache = new Map();
     let ok = 0;
+
     try {
-      for (const file of files) {
-        setUploadLabel(file.name);
+      for (const dirPath of directoryPaths) {
+        setUploadLabel(dirPath);
+        const segments = dirPath.split("/").filter(Boolean);
+        await ensureFolderPath(categorySlug, currentFolderId, segments, folderCache);
+      }
+
+      const total = files.length;
+      if (total > 0) setUploadProgress({ done: 0, total });
+
+      for (const { file, relativePath } of files) {
+        setUploadLabel(relativePath);
+        const { folderSegments } = splitRelativePath(relativePath);
+        let targetFolderId = currentFolderId;
         try {
+          if (folderSegments.length) {
+            targetFolderId = await ensureFolderPath(
+              categorySlug,
+              currentFolderId,
+              folderSegments,
+              folderCache,
+            );
+          }
           const item =
             category.storageType === "gcs"
-              ? await uploadGcsFile(file)
-              : await uploadLocalFile(file);
+              ? await uploadGcsFile(file, targetFolderId)
+              : await uploadLocalFile(file, targetFolderId);
           ok += 1;
-          setItems((prev) => [...prev, item]);
+          if (targetFolderId === currentFolderId) {
+            setItems((prev) => [...prev, item]);
+          }
+          if (total > 0) {
+            setUploadProgress((prev) =>
+              prev ? { done: prev.done + 1, total: prev.total } : { done: 1, total },
+            );
+          }
         } catch (err) {
           const message = err instanceof Error ? err.message : "Ошибка загрузки";
-          toast.error(`«${file.name}»`, { description: message });
+          toast.error(`«${relativePath}»`, { description: message });
         }
       }
-      if (ok > 0) {
+
+      if (ok > 0 || directoryPaths.length > 0) {
         notifyFilesChanged();
-        toast.success(ok === 1 ? "Файл загружен" : `Загружено файлов: ${ok}`);
+        await refresh();
+        if (ok > 0) {
+          const extra = directoryPaths.length ? " · структура папок сохранена" : "";
+          toast.success(
+            (ok === 1 ? "Файл загружен" : `Загружено файлов: ${ok}`) + extra,
+          );
+        } else {
+          toast.success("Папки созданы");
+        }
       }
     } finally {
       setUploading(false);
       setUploadLabel(null);
+      setUploadProgress(null);
     }
+  }
+
+  async function uploadFiles(fileList: FileList | File[]) {
+    await uploadStructuredDrop(parseFileListWithPaths(fileList));
+  }
+
+  async function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    if (uploading) return;
+    const parsed = await parseDroppedItems(e.dataTransfer);
+    await uploadStructuredDrop(parsed);
   }
 
   async function removeItem(item: FileItem) {
@@ -432,8 +485,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
         e.dataTransfer.dropEffect = "copy";
       }}
       onDrop={(e) => {
-        e.preventDefault();
-        if (!uploading && e.dataTransfer.files.length) void uploadFiles(e.dataTransfer.files);
+        void handleDrop(e);
       }}
     >
       <input
@@ -455,12 +507,16 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
       <p className="text-xs font-medium sm:text-sm">
         {uploading
           ? uploadLabel
-            ? `Загрузка «${uploadLabel}»…`
+            ? uploadProgress
+              ? `Загрузка «${uploadLabel}» (${uploadProgress.done}/${uploadProgress.total})…`
+              : `Подготовка «${uploadLabel}»…`
             : "Загрузка…"
           : (
             <>
               <span className="sm:hidden">Нажмите, чтобы загрузить</span>
-              <span className="hidden sm:inline">Перетащите файлы сюда или нажмите «Загрузить»</span>
+              <span className="hidden sm:inline">
+                Перетащите файлы или папки сюда или нажмите «Загрузить»
+              </span>
             </>
           )}
       </p>
