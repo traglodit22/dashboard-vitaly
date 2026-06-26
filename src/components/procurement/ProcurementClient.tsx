@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Loader2,
   Plus,
@@ -9,10 +9,7 @@ import {
   Search,
   GripVertical,
   Pencil,
-  ImageIcon,
   Copy,
-  ChevronUp,
-  ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -45,52 +42,8 @@ import {
   NO_STATUS_FILTER,
   ProcurementStatusBar,
 } from "@/components/procurement/ProcurementStatusBar";
-
-const QTY_INPUT =
-  "h-8 w-[4.5rem] min-w-[4.5rem] shrink-0 px-1.5 text-right tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none";
-
-function QtyStepper({
-  value,
-  onChange,
-  onBlur,
-  onBump,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  onBlur: () => void;
-  onBump: (delta: number) => void;
-}) {
-  return (
-    <div className="flex items-center gap-0.5">
-      <Input
-        type="number"
-        min={0}
-        className={QTY_INPUT}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onBlur={onBlur}
-      />
-      <div className="flex shrink-0 flex-col gap-px">
-        <button
-          type="button"
-          aria-label="Увеличить на 1"
-          onClick={() => onBump(1)}
-          className="flex size-3.5 items-center justify-center rounded-sm text-muted-foreground hover:bg-muted hover:text-foreground"
-        >
-          <ChevronUp className="size-3" />
-        </button>
-        <button
-          type="button"
-          aria-label="Уменьшить на 1"
-          onClick={() => onBump(-1)}
-          className="flex size-3.5 items-center justify-center rounded-sm text-muted-foreground hover:bg-muted hover:text-foreground"
-        >
-          <ChevronDown className="size-3" />
-        </button>
-      </div>
-    </div>
-  );
-}
+import { ItemImageCell, LinkCell, QtyStepper } from "@/components/procurement/ProcurementCells";
+import { ProcurementMobileList } from "@/components/procurement/ProcurementMobileList";
 
 function buildTypeByItemId(items: ProcurementItem[]): Map<string, string | null> {
   const sorted = [...items].sort(
@@ -695,7 +648,7 @@ export function ProcurementClient() {
             />
           )}
         </CardHeader>
-        <CardContent className="min-w-0 overflow-x-auto p-0">
+        <CardContent className="min-w-0 p-0 md:overflow-x-auto">
           {sortedItems.length === 0 ? (
             <p className="px-6 py-10 text-center text-sm text-muted-foreground">
               {items.length === 0
@@ -703,7 +656,22 @@ export function ProcurementClient() {
                 : "Ничего не найдено по запросу."}
             </p>
           ) : (
-            <Table className="w-full min-w-[900px] table-fixed">
+            <>
+              <ProcurementMobileList
+                items={sortedItems}
+                typeByItemId={typeByItemId}
+                statuses={statuses}
+                draggable={!searchActive}
+                dragItemId={dragItemId}
+                onDragStart={setDragItemId}
+                onDragEnd={() => setDragItemId(null)}
+                onItemDrop={onItemDrop}
+                onPatch={patchItem}
+                onRemove={removeItem}
+                onDuplicate={duplicateType}
+                onItemReplace={replaceItem}
+              />
+              <Table className="hidden w-full min-w-[900px] table-fixed md:table">
               <colgroup>
                 <col className="w-8" />
                 <col className="w-14" />
@@ -782,6 +750,7 @@ export function ProcurementClient() {
                 )}
               </TableBody>
             </Table>
+            </>
           )}
         </CardContent>
       </Card>
@@ -1209,289 +1178,5 @@ function ItemRow({
         </Button>
       </TableCell>
     </TableRow>
-  );
-}
-
-function ItemImageCell({
-  item,
-  onUpdated,
-}: {
-  item: ProcurementItem;
-  onUpdated: (item: ProcurementItem) => void;
-}) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [dragOver, setDragOver] = useState(false);
-  const [uploading, setUploading] = useState(false);
-
-  const hasImage = Boolean(item.imageMime);
-  const imageUrl = hasImage
-    ? `/api/procurement/items/${item.id}/image?v=${encodeURIComponent(item.imageUpdatedAt ?? "")}`
-    : null;
-
-  async function uploadFile(file: File) {
-    if (!file.type.startsWith("image/")) {
-      toast.error("Нужен файл изображения");
-      return;
-    }
-    setUploading(true);
-    try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await apiFetch(`/api/procurement/items/${item.id}/image`, {
-        method: "POST",
-        body: fd,
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        toast.error("Не удалось загрузить фото", { description: data.error });
-        return;
-      }
-      onUpdated(data.item);
-      toast.success("Фото загружено");
-    } finally {
-      setUploading(false);
-    }
-  }
-
-  async function removeImage() {
-    const res = await apiFetch(`/api/procurement/items/${item.id}/image`, {
-      method: "DELETE",
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      toast.error("Не удалось удалить фото");
-      return;
-    }
-    onUpdated(data.item);
-  }
-
-  function onDropFile(e: React.DragEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) void uploadFile(file);
-  }
-
-  return (
-    <div
-      className={cn(
-        "group relative flex size-11 items-center justify-center overflow-hidden rounded-md border border-dashed bg-muted/30 transition-colors",
-        dragOver && "border-primary bg-primary/10",
-        hasImage && "border-solid border-border bg-background",
-      )}
-      onDragOver={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setDragOver(true);
-      }}
-      onDragLeave={(e) => {
-        e.stopPropagation();
-        setDragOver(false);
-      }}
-      onDrop={onDropFile}
-    >
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/jpeg,image/png,image/webp,image/gif"
-        className="hidden"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) void uploadFile(file);
-          e.target.value = "";
-        }}
-      />
-      {uploading ? (
-        <Loader2 className="size-4 animate-spin text-muted-foreground" />
-      ) : hasImage && imageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={imageUrl} alt="" className="size-full object-cover" />
-      ) : (
-        <button
-          type="button"
-          className="flex size-full flex-col items-center justify-center text-muted-foreground hover:text-foreground"
-          title="Перетащите фото или нажмите"
-          onClick={() => inputRef.current?.click()}
-        >
-          <ImageIcon className="size-4" />
-        </button>
-      )}
-      {!uploading && hasImage && (
-        <div className="absolute inset-0 flex items-center justify-center gap-0.5 bg-black/45 opacity-0 transition-opacity group-hover:opacity-100">
-          <button
-            type="button"
-            className="rounded p-1 text-white hover:bg-white/20"
-            title="Заменить"
-            onClick={() => inputRef.current?.click()}
-          >
-            <Pencil className="size-3" />
-          </button>
-          <button
-            type="button"
-            className="rounded p-1 text-white hover:bg-white/20"
-            title="Удалить"
-            onClick={() => void removeImage()}
-          >
-            <Trash2 className="size-3" />
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function LinkCell({
-  link,
-  store,
-  onSave,
-}: {
-  link: string | null;
-  store: StoreType | null;
-  onSave: (link: string | null, store: StoreType | null) => Promise<void>;
-}) {
-  const [open, setOpen] = useState(false);
-  const [url, setUrl] = useState(link ?? "");
-  const [shop, setShop] = useState(store ?? "");
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setUrl(link ?? "");
-    setShop(store ?? "");
-  }, [link, store]);
-
-  useEffect(() => {
-    if (!open) return;
-    function onDown(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    }
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, [open]);
-
-  const href = link?.trim() ?? "";
-  const valid = Boolean(href && /^https?:\/\//i.test(href));
-  const display = store || (valid ? "ссылка" : "");
-
-  function onUrlChange(next: string) {
-    setUrl(next);
-    const detected = detectStoreFromUrl(next);
-    if (detected) setShop(detected);
-  }
-
-  async function save() {
-    const u = url.trim();
-    const s = shop.trim();
-    if (u && !/^https?:\/\//i.test(u)) {
-      toast.error("URL должен начинаться с http:// или https://");
-      return;
-    }
-    const storeValue =
-      s && (STORES as readonly string[]).includes(s) ? (s as StoreType) : null;
-    await onSave(u || null, storeValue);
-    setOpen(false);
-  }
-
-  async function clear() {
-    await onSave(null, null);
-    setUrl("");
-    setShop("");
-    setOpen(false);
-  }
-
-  return (
-    <div className="relative min-w-0" ref={ref}>
-      <div className="flex min-w-0 items-center gap-0.5">
-        {valid && display ? (
-          <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="min-w-0 truncate text-xs text-primary underline-offset-2 hover:underline"
-            title={href}
-          >
-            {display}
-          </a>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            className="truncate text-xs text-muted-foreground hover:text-foreground"
-          >
-            + ссылка
-          </button>
-        )}
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="shrink-0 rounded p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground"
-          title="Изменить ссылку"
-        >
-          <Pencil className="size-3" />
-        </button>
-      </div>
-      {open && (
-        <div className="absolute right-0 top-full z-30 mt-1 w-56 rounded-lg border bg-card p-2.5 shadow-lg ring-1 ring-foreground/10">
-          <div className="space-y-2">
-            <div>
-              <Label className="text-xs">URL</Label>
-              <Input
-                autoFocus
-                className="h-8 text-xs"
-                value={url}
-                onChange={(e) => onUrlChange(e.target.value)}
-                placeholder="https://…"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    void save();
-                  }
-                }}
-              />
-            </div>
-            <div>
-              <Label className="text-xs">Магазин</Label>
-              <Select value={shop} onValueChange={(v) => setShop(v ?? "")}>
-                <SelectTrigger className="h-8 w-full text-xs">
-                  <SelectValue placeholder="Выберите магазин" />
-                </SelectTrigger>
-                <SelectContent>
-                  {STORES.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {s}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex flex-wrap gap-1">
-              <Button type="button" size="sm" className="h-7 text-xs" onClick={() => void save()}>
-                OK
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                className="h-7 text-xs"
-                onClick={() => setOpen(false)}
-              >
-                Отмена
-              </Button>
-              {valid && (
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="ghost"
-                  className="h-7 text-xs text-destructive"
-                  onClick={() => void clear()}
-                >
-                  Удалить
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
   );
 }
