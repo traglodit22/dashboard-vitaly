@@ -98,37 +98,62 @@ function byPathDepth(a: string, b: string): number {
   return da !== db ? da - db : a.localeCompare(b, "ru");
 }
 
-/** Разбирает drop: папки через webkitGetAsEntry, иначе — files / webkitRelativePath. */
-export async function parseDroppedItems(
-  dataTransfer: DataTransfer,
-): Promise<ParsedFolderDrop> {
-  // Safari очищает DataTransfer после drop — снимок синхронно, до await.
-  const fileList = Array.from(dataTransfer.files);
-  const items = Array.from(dataTransfer.items).filter((i) => i.kind === "file");
+/** Синхронный снимок drop — Safari очищает DataTransfer сразу после обработчика. */
+export interface DropSnapshot {
+  flatFiles: File[];
+  directoryEntries: FsEntry[];
+}
 
-  const files: ParsedFolderDrop["files"] = [];
-  const directoryPaths = new Set<string>();
-  const entryWalks: Promise<void>[] = [];
+export function captureDropSnapshot(dataTransfer: DataTransfer | null): DropSnapshot {
+  const flatFiles: File[] = [];
+  const directoryEntries: FsEntry[] = [];
+  const seen = new Set<File>();
 
-  for (const item of items) {
+  if (!dataTransfer) return { flatFiles, directoryEntries };
+
+  for (let i = 0; i < dataTransfer.files.length; i++) {
+    const file = dataTransfer.files[i];
+    if (!file || SKIP_FILE_NAMES.has(file.name) || seen.has(file)) continue;
+    seen.add(file);
+    flatFiles.push(file);
+  }
+
+  const items = dataTransfer.items;
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    if (!item || item.kind !== "file") continue;
+
     const entry = asEntry(item);
-    if (entry?.isDirectory || entry?.isFile) {
-      entryWalks.push(walkEntry(entry, "", files, directoryPaths));
+    if (entry?.isDirectory) {
+      directoryEntries.push(entry);
       continue;
     }
+
+    // Safari надёжнее отдаёт файл через getAsFile(), чем через entry.file().
     const file = item.getAsFile();
-    if (file && !SKIP_FILE_NAMES.has(file.name)) {
-      files.push({ file, relativePath: file.name });
+    if (file && !SKIP_FILE_NAMES.has(file.name) && !seen.has(file)) {
+      seen.add(file);
+      flatFiles.push(file);
+      continue;
+    }
+
+    if (entry?.isFile) {
+      directoryEntries.push(entry);
     }
   }
 
-  if (entryWalks.length) {
-    await Promise.all(entryWalks);
-    if (files.length || directoryPaths.size) {
-      return {
-        files,
-        directoryPaths: [...directoryPaths].sort(byPathDepth),
-      };
+  return { flatFiles, directoryEntries };
+}
+
+export async function parseDropSnapshot(snapshot: DropSnapshot): Promise<ParsedFolderDrop> {
+  const files: ParsedFolderDrop["files"] = [];
+  const directoryPaths = new Set<string>();
+
+  for (const entry of snapshot.directoryEntries) {
+    try {
+      await walkEntry(entry, "", files, directoryPaths);
+    } catch {
+      // Safari иногда отдаёт битую entry — пробуем остальные.
     }
   }
 
@@ -139,11 +164,18 @@ export async function parseDroppedItems(
     };
   }
 
-  if (fileList.length) {
-    return parseFromFileList(fileList);
+  if (snapshot.flatFiles.length) {
+    return parseFromFileList(snapshot.flatFiles);
   }
 
   return { files: [], directoryPaths: [] };
+}
+
+/** Разбирает drop: папки через webkitGetAsEntry, иначе — files / webkitRelativePath. */
+export async function parseDroppedItems(
+  dataTransfer: DataTransfer,
+): Promise<ParsedFolderDrop> {
+  return parseDropSnapshot(captureDropSnapshot(dataTransfer));
 }
 
 export function splitRelativePath(relativePath: string): {

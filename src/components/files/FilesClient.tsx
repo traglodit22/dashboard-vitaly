@@ -14,7 +14,12 @@ import { IMPORTANT_DOCS_SLUG, CLOUD_SLUG, MAX_FILE_MB, type FileFolder, isIntern
 import { FILES_CHANGED_EVENT, filesCategoryPath, notifyFilesChanged, fileDownloadUrl } from "@/lib/files/routes";
 import { reorderById } from "@/lib/files/reorderList";
 import { uploadFileToGcsWithFallback } from "@/lib/files/gcsDirectUpload";
-import { parseDroppedItems, parseFileListWithPaths, splitRelativePath } from "@/lib/files/droppedFolderTree";
+import {
+  captureDropSnapshot,
+  parseDropSnapshot,
+  parseFileListWithPaths,
+  splitRelativePath,
+} from "@/lib/files/droppedFolderTree";
 import { ensureFolderPath, type FolderPathCache } from "@/lib/files/ensureFolderPath";
 import { CloudFolderView } from "@/components/files/CloudFolderView";
 import { FilesListToolbar } from "@/components/files/FilesListToolbar";
@@ -440,16 +445,25 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
   async function handleDrop(e: React.DragEvent) {
     e.preventDefault();
     e.stopPropagation();
+
+    const dt = e.nativeEvent.dataTransfer ?? e.dataTransfer;
+    const snapshot = captureDropSnapshot(dt);
+
     if (uploading) return;
-    if (isInternalFileDrag(e.dataTransfer)) return;
-    if (!isExternalFileDrop(e.dataTransfer)) return;
+    if (isInternalFileDrag(dt)) return;
+
+    const hasPayload =
+      snapshot.flatFiles.length > 0 || snapshot.directoryEntries.length > 0;
+    if (!hasPayload && !isExternalFileDrop(dt)) return;
 
     let parsed;
     try {
-      parsed = await parseDroppedItems(e.dataTransfer);
+      parsed = await parseDropSnapshot(snapshot);
     } catch {
-      toast.error("Не удалось прочитать файлы для загрузки");
-      return;
+      parsed =
+        snapshot.flatFiles.length > 0
+          ? parseFileListWithPaths(snapshot.flatFiles)
+          : { files: [], directoryPaths: [] };
     }
     if (!parsed.files.length && !parsed.directoryPaths.length) {
       toast.error("Не удалось прочитать файлы для загрузки");
