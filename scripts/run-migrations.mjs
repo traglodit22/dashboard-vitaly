@@ -3,9 +3,13 @@
  * Прогон SQL-миграций из src/lib/db/migrations/*.sql
  * DATABASE_URL — из окружения или из .env в корне проекта.
  */
-const { readFileSync, readdirSync, existsSync } = require('fs')
-const { join } = require('path')
-const { Client } = require('pg')
+import { readFileSync, readdirSync, existsSync } from 'fs'
+import { join, dirname } from 'path'
+import { fileURLToPath } from 'url'
+import pg from 'pg'
+
+const { Client } = pg
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 function loadDatabaseUrl() {
   if (process.env.DATABASE_URL) return process.env.DATABASE_URL
@@ -52,7 +56,16 @@ async function main() {
     for (const file of files) {
       const sql = readFileSync(join(dir, file), 'utf8')
       console.log(`    ${file}`)
-      await client.query(sql)
+      try {
+        await client.query(sql)
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err)
+        if (message.includes('must be owner of table')) {
+          console.log(`    skip ${file} (needs postgres owner — use deploy/apply-migrations-postgres.sh)`)
+          continue
+        }
+        throw err
+      }
     }
   } finally {
     await client.end()

@@ -40,20 +40,6 @@ CREATE TABLE IF NOT EXISTS vps_backup_runs (
 CREATE INDEX IF NOT EXISTS vps_backup_runs_created_idx
   ON vps_backup_runs (created_at DESC);
 
-ALTER TABLE system_settings
-  ADD COLUMN IF NOT EXISTS backup_daily_enabled BOOLEAN NOT NULL DEFAULT TRUE;
-ALTER TABLE system_settings
-  ADD COLUMN IF NOT EXISTS backup_weekly_enabled BOOLEAN NOT NULL DEFAULT TRUE;
-ALTER TABLE system_settings
-  ADD COLUMN IF NOT EXISTS backup_retention_count INTEGER NOT NULL DEFAULT 30;
-ALTER TABLE system_settings
-  ADD COLUMN IF NOT EXISTS backup_daily_hour INTEGER NOT NULL DEFAULT 3;
-ALTER TABLE system_settings
-  ADD COLUMN IF NOT EXISTS backup_weekly_day INTEGER NOT NULL DEFAULT 0;
-ALTER TABLE system_settings
-  ADD COLUMN IF NOT EXISTS backup_last_daily_at TIMESTAMPTZ;
-ALTER TABLE system_settings
-  ADD COLUMN IF NOT EXISTS backup_last_weekly_at TIMESTAMPTZ;
 ALTER TABLE vps_backup_runs
   ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'manual';
 `

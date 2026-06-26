@@ -48,10 +48,14 @@ echo "==> Database migrations"
 set +e
 node scripts/run-migrations.mjs
 migrate_rc=$?
-set -e
 if [[ $migrate_rc -ne 0 ]]; then
-  echo "WARNING: migrations exited with code $migrate_rc (deploy continues)"
+  echo "WARNING: app-user migrations exited with code $migrate_rc"
 fi
+if [[ -f deploy/apply-migrations-postgres.sh ]]; then
+  bash deploy/apply-migrations-postgres.sh "$APP_DIR" || \
+    echo "WARNING: postgres migrations failed (deploy continues)"
+fi
+set -e
 
 echo "==> Ensure upload directories"
 mkdir -p uploads/procurement uploads/files runtime
