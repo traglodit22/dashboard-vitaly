@@ -1,4 +1,6 @@
 /** Файлы и пустые папки из drag-and-drop (сохраняется относительная структура). */
+import { normalizeDroppedRelativePath } from '@/lib/files/uploadNames';
+
 export interface ParsedFolderDrop {
   files: { file: File; relativePath: string }[];
   /** Относительные пути папок, например «Project/docs». */
@@ -6,6 +8,13 @@ export interface ParsedFolderDrop {
 }
 
 const SKIP_FILE_NAMES = new Set([".DS_Store", "Thumbs.db", "desktop.ini"]);
+
+function droppedRelativePath(file: File): string {
+  const raw =
+    (file as File & { webkitRelativePath?: string }).webkitRelativePath?.replace(/\\/g, "/") ||
+    file.name;
+  return normalizeDroppedRelativePath(raw);
+}
 
 type FsEntry = {
   isFile: boolean;
@@ -77,9 +86,7 @@ function parseFromFileList(fileList: FileList | File[]): ParsedFolderDrop {
 
   for (const file of Array.from(fileList)) {
     if (SKIP_FILE_NAMES.has(file.name)) continue;
-    const rel =
-      (file as File & { webkitRelativePath?: string }).webkitRelativePath?.replace(/\\/g, "/") ||
-      file.name;
+    const rel = droppedRelativePath(file);
     files.push({ file, relativePath: rel });
     const parts = rel.split("/");
     if (parts.length > 1) {

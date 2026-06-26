@@ -21,6 +21,7 @@ import {
   splitRelativePath,
 } from "@/lib/files/droppedFolderTree";
 import { ensureFolderPath, type FolderPathCache } from "@/lib/files/ensureFolderPath";
+import { uploadBaseName } from "@/lib/files/uploadNames";
 import { CloudFolderView } from "@/components/files/CloudFolderView";
 import { FilesListToolbar } from "@/components/files/FilesListToolbar";
 import { FilesSubfolderGrid } from "@/components/files/FilesSubfolderGrid";
@@ -299,6 +300,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
   }
 
   async function uploadGcsFile(file: File, targetFolderId: string | null): Promise<FileItem> {
+    const fileName = uploadBaseName(file.name);
     const initRes = await apiFetch(
       "/api/files/gcs-upload-url",
       {
@@ -307,7 +309,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
         body: JSON.stringify({
           categorySlug,
           folderId: targetFolderId,
-          fileName: file.name,
+          fileName,
           size: file.size,
           mime: file.type || "",
         }),
@@ -323,7 +325,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
       uploadUrl: init.uploadUrl as string,
       file,
       mime: init.mime as string,
-      fileName: file.name,
+      fileName,
     });
 
     const doneRes = await apiFetch(
@@ -335,7 +337,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
           fileId: init.fileId,
           categorySlug,
           folderId: targetFolderId,
-          fileName: file.name,
+          fileName,
           size: file.size,
           mime: init.mime,
         }),

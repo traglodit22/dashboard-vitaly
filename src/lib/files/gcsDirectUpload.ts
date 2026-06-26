@@ -2,6 +2,15 @@ import { apiFetch } from '@/lib/apiFetch'
 
 const DIRECT_UPLOAD_TIMEOUT_MS = 600_000
 
+function prefersGcsProxyUpload(): boolean {
+  if (typeof navigator === 'undefined') return false
+  const ua = navigator.userAgent
+  return (
+    (/Safari/i.test(ua) && !/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS/i.test(ua)) ||
+    /iPhone|iPad|iPod/i.test(ua)
+  )
+}
+
 export class GcsUploadError extends Error {
   constructor(
     message: string,
@@ -90,6 +99,11 @@ export async function uploadFileToGcsWithFallback(opts: {
   mime: string
   fileName: string
 }): Promise<'direct' | 'proxy'> {
+  if (prefersGcsProxyUpload()) {
+    await putFileToGcsViaProxy(opts.uploadUrl, opts.file, opts.mime, opts.fileName)
+    return 'proxy'
+  }
+
   try {
     await putFileToGcsSignedUrl(opts.uploadUrl, opts.file, opts.mime)
     return 'direct'

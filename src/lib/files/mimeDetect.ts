@@ -1,4 +1,5 @@
 import { LOCAL_ALLOWED_MIMES } from '@/lib/files/types'
+import { uploadBaseName } from '@/lib/files/uploadNames'
 
 export const EXT_TO_MIME: Record<string, string> = {
   pdf: 'application/pdf',
@@ -27,8 +28,9 @@ export function mimeFromFileName(fileName: string): string | null {
 
 /** Браузер часто отдаёт пустой type или octet-stream — определяем по расширению. */
 export function resolveUploadMime(fileName: string, reportedType: string): string {
+  const baseName = uploadBaseName(fileName)
   const trimmed = reportedType.trim().toLowerCase()
-  const fromName = mimeFromFileName(fileName)
+  const fromName = mimeFromFileName(baseName)
 
   if (fromName && (!trimmed || GENERIC_BINARY.has(trimmed))) {
     return fromName
