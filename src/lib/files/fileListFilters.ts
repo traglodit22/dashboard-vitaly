@@ -45,6 +45,9 @@ const EXT_LABELS: Record<string, string> = {
   tiff: "TIFF",
   tif: "TIFF",
   ai: "AI",
+  mp4: "MP4",
+  mov: "MOV",
+  m4v: "M4V",
   doc: "DOC",
   docx: "DOCX",
   xls: "XLS",
@@ -88,6 +91,8 @@ export function fileExtension(item: Pick<FileListRow, "originalName" | "mimeType
   ) {
     return "ai";
   }
+  if (item.mimeType === "video/mp4") return "mp4";
+  if (item.mimeType === "video/quicktime") return "mov";
   return "other";
 }
 

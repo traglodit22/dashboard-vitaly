@@ -81,6 +81,8 @@ export const LOCAL_ALLOWED_MIMES = new Set([
   'image/tiff',
   'application/postscript',
   'application/vnd.adobe.illustrator',
+  'video/mp4',
+  'video/quicktime',
   'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   'application/vnd.ms-excel',

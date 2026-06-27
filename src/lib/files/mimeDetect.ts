@@ -11,6 +11,9 @@ export const EXT_TO_MIME: Record<string, string> = {
   tiff: 'image/tiff',
   tif: 'image/tiff',
   ai: 'application/postscript',
+  mp4: 'video/mp4',
+  mov: 'video/quicktime',
+  m4v: 'video/mp4',
   doc: 'application/msword',
   docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   xls: 'application/vnd.ms-excel',
@@ -48,7 +51,7 @@ export function resolveUploadMime(fileName: string, reportedType: string): strin
   }
 
   throw new Error(
-    'Допустимы PDF, изображения (в т.ч. TIFF), DOC/DOCX, XLS/XLSX, Pages, TXT, ZIP, DWG и AI',
+    'Допустимы PDF, изображения (в т.ч. TIFF), видео MP4/MOV, DOC/DOCX, XLS/XLSX, Pages, TXT, ZIP, DWG и AI',
   )
 }
 
