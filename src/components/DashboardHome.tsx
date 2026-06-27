@@ -285,23 +285,25 @@ export function DashboardHome() {
           id="balances"
           title="Балансы панелей"
           description="SmmLaba и другие панели — актуальные остатки и пороги."
+          compact
           action={
             <Button
-              variant="secondary"
+              variant="ghost"
               size="sm"
+              className="h-8 gap-1.5 px-2.5 text-xs sm:text-sm"
               onClick={refreshBalances}
               disabled={refreshing}
             >
               {refreshing ? (
-                <Loader2 className="size-4 animate-spin" />
+                <Loader2 className="size-3.5 animate-spin" />
               ) : (
-                <RefreshCw className="size-4" />
+                <RefreshCw className="size-3.5" />
               )}
-              Обновить все
+              Обновить
             </Button>
           }
         >
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-2.5 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
             {balances.map((p) => (
               <BalanceTile key={p.id} provider={p} />
             ))}
@@ -411,6 +413,7 @@ function OverviewBlock({
   description,
   action,
   unboxed,
+  compact,
   children,
 }: {
   id: string;
@@ -418,15 +421,35 @@ function OverviewBlock({
   description?: string;
   action?: React.ReactNode;
   unboxed?: boolean;
+  compact?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <section id={id} className="scroll-mt-6">
-      <header className="mb-4 flex flex-wrap items-start justify-between gap-3 sm:mb-6">
+      <header
+        className={cn(
+          "flex flex-wrap items-start justify-between gap-2 sm:gap-3",
+          compact ? "mb-2.5 sm:mb-3" : "mb-4 sm:mb-6",
+        )}
+      >
         <div className="min-w-0">
-          <h2 className="text-lg font-semibold tracking-tight sm:text-xl">{title}</h2>
+          <h2
+            className={cn(
+              "font-semibold tracking-tight",
+              compact ? "text-base sm:text-lg" : "text-lg sm:text-xl",
+            )}
+          >
+            {title}
+          </h2>
           {description ? (
-            <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{description}</p>
+            <p
+              className={cn(
+                "mt-0.5 max-w-3xl text-muted-foreground",
+                compact ? "text-xs sm:text-sm" : "text-sm",
+              )}
+            >
+              {description}
+            </p>
           ) : null}
         </div>
         {action ? <div className="shrink-0">{action}</div> : null}
@@ -434,7 +457,12 @@ function OverviewBlock({
       {unboxed ? (
         children
       ) : (
-        <div className="rounded-xl border border-border/80 bg-card/50 p-4 shadow-sm backdrop-blur-sm sm:p-6">
+        <div
+          className={cn(
+            "rounded-xl border border-border/80 bg-card/50 shadow-sm backdrop-blur-sm",
+            compact ? "p-2.5 sm:p-3" : "p-4 sm:p-6",
+          )}
+        >
           {children}
         </div>
       )}
@@ -448,52 +476,68 @@ function BalanceTile({ provider: p }: { provider: BalanceProvider }) {
   const noData = p.lastBalance === null && !hasError;
   const url = effectivePanelUrl(p);
 
+  const statusTone = hasError
+    ? "border-l-destructive/70 bg-destructive/[0.06] hover:bg-destructive/10"
+    : isLow
+      ? "border-l-red-500/70 bg-red-500/[0.06] hover:bg-red-500/10"
+      : "border-l-emerald-500/50 bg-muted/20 hover:border-l-primary/50 hover:bg-muted/35";
+
   const inner = (
     <>
-      <div className="flex items-center justify-between gap-2">
-        <span className="truncate text-xs text-muted-foreground">{p.name}</span>
+      <div className="flex items-start justify-between gap-1">
+        <span className="min-w-0 truncate text-[10px] font-medium leading-tight text-muted-foreground sm:text-[11px]">
+          {p.name}
+        </span>
         {hasError ? (
-          <AlertCircle className="size-3.5 shrink-0 text-destructive" />
+          <AlertCircle className="size-3 shrink-0 text-destructive" />
+        ) : isLow ? (
+          <AlertTriangle className="size-3 shrink-0 text-red-500" />
         ) : (
-          isLow && <AlertTriangle className="size-3.5 shrink-0 text-red-500" />
+          <Wallet className="size-3 shrink-0 text-muted-foreground/50" />
         )}
       </div>
-      <span
-        className={cn(
-          "font-mono text-xl font-semibold tabular-nums sm:text-2xl",
-          hasError ? "text-destructive" : isLow ? "text-red-500" : noData ? "text-muted-foreground" : "",
+
+      <div className="mt-1 flex min-w-0 items-baseline gap-1">
+        <span
+          className={cn(
+            "truncate font-mono text-sm font-semibold tabular-nums leading-none sm:text-base",
+            hasError ? "text-destructive" : isLow ? "text-red-500" : noData ? "text-muted-foreground" : "",
+          )}
+        >
+          {hasError ? "—" : noData ? "—" : balFmt.format(p.lastBalance!)}
+        </span>
+        {!hasError && !noData && (
+          <span className="shrink-0 text-[10px] font-medium uppercase tracking-wide text-muted-foreground/80">
+            {p.currency}
+          </span>
         )}
-      >
-        {hasError ? "Ошибка" : noData ? "—" : `${balFmt.format(p.lastBalance!)} ${p.currency}`}
-      </span>
-      {hasError && (
-        <span className="truncate text-xs text-destructive/80" title={p.lastError!}>
-          {p.lastError}
+      </div>
+
+      {hasError ? (
+        <span className="mt-0.5 truncate text-[10px] leading-tight text-destructive/80" title={p.lastError!}>
+          Ошибка
         </span>
-      )}
-      {!hasError && isLow && (
-        <span className="text-xs text-red-400">
-          Порог: {balFmt.format(p.threshold)} {p.currency}
+      ) : isLow ? (
+        <span className="mt-0.5 text-[10px] leading-tight text-red-400/90">
+          &lt; {balFmt.format(p.threshold)}
         </span>
-      )}
+      ) : null}
     </>
   );
 
   const cls = cn(
-    "flex min-h-[7rem] flex-col justify-center gap-2 rounded-xl border p-4 transition-all",
-    hasError
-      ? "border-destructive/40 bg-destructive/10"
-      : isLow
-        ? "border-red-500/40 bg-red-500/10"
-        : "border-border/80 bg-muted/25 hover:border-primary/30 hover:bg-muted/40",
-    url && "cursor-pointer",
+    "flex flex-col rounded-lg border border-border/60 border-l-[3px] px-2 py-2 transition-colors sm:px-2.5 sm:py-2.5",
+    statusTone,
+    url && "cursor-pointer active:scale-[0.98]",
   );
 
   return url ? (
-    <a href={url} target="_blank" rel="noopener noreferrer" className={cls}>
+    <a href={url} target="_blank" rel="noopener noreferrer" className={cls} title={p.name}>
       {inner}
     </a>
   ) : (
-    <div className={cls}>{inner}</div>
+    <div className={cls} title={p.name}>
+      {inner}
+    </div>
   );
 }
