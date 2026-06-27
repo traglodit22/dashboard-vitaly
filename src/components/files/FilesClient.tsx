@@ -673,7 +673,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
             <p className="text-xs text-muted-foreground sm:text-sm">
               {category.storageType === "local"
                 ? `PDF и фото на сервере · до ${MAX_FILE_MB} МБ`
-                : `Файлы в Google Cloud · до ${MAX_FILE_MB} МБ через сервер, крупные — напрямую`}
+                : `Файлы в Google Cloud · до ${MAX_FILE_MB} МБ`}
               {currentFolderId && " · вложенная папка"}
             </p>
           </div>

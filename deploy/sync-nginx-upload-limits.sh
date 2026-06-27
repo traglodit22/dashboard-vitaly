@@ -3,7 +3,7 @@
 set -euo pipefail
 
 CONF="${1:-/etc/nginx/sites-available/dashboard}"
-MAX_BODY="${2:-50M}"
+MAX_BODY="${2:-500M}"
 
 if [[ ! -f "$CONF" ]]; then
   echo "nginx config not found: $CONF"

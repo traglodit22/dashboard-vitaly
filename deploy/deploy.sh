@@ -157,7 +157,7 @@ fi
 
 if [[ -f /etc/nginx/sites-available/dashboard ]] && [[ -f deploy/sync-nginx-upload-limits.sh ]]; then
   echo "==> Sync nginx upload limits"
-  bash deploy/sync-nginx-upload-limits.sh /etc/nginx/sites-available/dashboard 50M
+  bash deploy/sync-nginx-upload-limits.sh /etc/nginx/sites-available/dashboard 500M
 fi
 
 if [[ -f /etc/nginx/sites-available/dashboard ]] && [[ -f deploy/sync-nginx-security-headers.sh ]]; then
