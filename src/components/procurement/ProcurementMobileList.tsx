@@ -25,6 +25,7 @@ import { ItemImageCell, LinkCell, QtyStepper } from "@/components/procurement/Pr
 
 export function ProcurementMobileTypeCard({
   item,
+  showCategoryName,
   draggable,
   dragging,
   onDragStart,
@@ -36,6 +37,7 @@ export function ProcurementMobileTypeCard({
   onDuplicate,
 }: {
   item: ProcurementItem;
+  showCategoryName?: boolean;
   draggable: boolean;
   dragging: boolean;
   onDragStart: () => void;
@@ -85,7 +87,12 @@ export function ProcurementMobileTypeCard({
           <GripVertical className="size-5 shrink-0 cursor-grab text-muted-foreground active:cursor-grabbing" />
         )}
         <div className="h-6 w-1 shrink-0 rounded-full bg-primary/70" aria-hidden />
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 space-y-1">
+          {showCategoryName && item.categoryName ? (
+            <span className="inline-block max-w-full truncate rounded-md border border-border/60 bg-muted/60 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+              {item.categoryName}
+            </span>
+          ) : null}
           {editing ? (
             <Input
               autoFocus
@@ -159,6 +166,7 @@ export function ProcurementMobileItemCard({
   item,
   statuses,
   typeName,
+  showCategoryName,
   draggable,
   dragging,
   onDragStart,
@@ -173,6 +181,7 @@ export function ProcurementMobileItemCard({
   item: ProcurementItem;
   statuses: ProcurementStatus[];
   typeName: string | null;
+  showCategoryName?: boolean;
   draggable: boolean;
   dragging: boolean;
   onDragStart: () => void;
@@ -331,6 +340,11 @@ export function ProcurementMobileItemCard({
                 {item.name}
               </button>
             )}
+            {showCategoryName && item.categoryName ? (
+              <span className="inline-block max-w-full truncate rounded-md border border-border/60 bg-muted/60 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                {item.categoryName}
+              </span>
+            ) : null}
             {typeName ? (
               <span className="inline-block max-w-full truncate rounded-md bg-muted/80 px-2 py-0.5 text-xs text-muted-foreground">
                 {typeName}
@@ -452,6 +466,7 @@ export function ProcurementMobileList({
   items,
   typeByItemId,
   statuses,
+  showCategoryName,
   draggable,
   dragItemId,
   onDragStart,
@@ -465,6 +480,7 @@ export function ProcurementMobileList({
   items: ProcurementItem[];
   typeByItemId: Map<string, string | null>;
   statuses: ProcurementStatus[];
+  showCategoryName?: boolean;
   draggable: boolean;
   dragItemId: string | null;
   onDragStart: (id: string) => void;
@@ -482,6 +498,7 @@ export function ProcurementMobileList({
           <ProcurementMobileTypeCard
             key={item.id}
             item={item}
+            showCategoryName={showCategoryName}
             draggable={draggable}
             dragging={dragItemId === item.id}
             onDragStart={() => onDragStart(item.id)}
@@ -504,6 +521,7 @@ export function ProcurementMobileList({
             item={item}
             statuses={statuses}
             typeName={typeByItemId.get(item.id) ?? null}
+            showCategoryName={showCategoryName}
             draggable={draggable}
             dragging={dragItemId === item.id}
             onDragStart={() => onDragStart(item.id)}

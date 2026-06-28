@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Loader2,
   Plus,
@@ -49,14 +50,28 @@ import {
 } from "@/components/procurement/ProcurementStatusBar";
 import { ItemImageCell, LinkCell, QtyStepper } from "@/components/procurement/ProcurementCells";
 import { ProcurementMobileList } from "@/components/procurement/ProcurementMobileList";
+import {
+  ALL_PROCUREMENT_CATEGORY,
+  isAllProcurementCategory,
+  parseProcurementCategory,
+  procurementHref,
+} from "@/lib/procurement/procurementRoutes";
 
-function buildTypeByItemId(items: ProcurementItem[]): Map<string, string | null> {
+function buildTypeByItemId(items: ProcurementItem[], categoryOrder: Map<string, number>): Map<string, string | null> {
   const sorted = [...items].sort(
-    (a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, "ru"),
+    (a, b) =>
+      (categoryOrder.get(a.categoryId) ?? 0) - (categoryOrder.get(b.categoryId) ?? 0) ||
+      a.sortOrder - b.sortOrder ||
+      a.name.localeCompare(b.name, "ru"),
   );
   const map = new Map<string, string | null>();
   let currentType: string | null = null;
+  let currentCategoryId: string | null = null;
   for (const row of sorted) {
+    if (row.categoryId !== currentCategoryId) {
+      currentCategoryId = row.categoryId;
+      currentType = null;
+    }
     if (row.rowType === "type") {
       currentType = row.name;
     } else {
@@ -67,18 +82,34 @@ function buildTypeByItemId(items: ProcurementItem[]): Map<string, string | null>
 }
 
 export function ProcurementClient() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center gap-2 py-12 text-muted-foreground">
+          <Loader2 className="size-4 animate-spin" />
+          Загрузка…
+        </div>
+      }
+    >
+      <ProcurementClientInner />
+    </Suspense>
+  );
+}
+
+function ProcurementClientInner() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const categoryId = parseProcurementCategory(searchParams);
+  const isAllView = isAllProcurementCategory(categoryId);
   const [categories, setCategories] = useState<ProcurementCategory[]>([]);
   const [items, setItems] = useState<ProcurementItem[]>([]);
   const [statuses, setStatuses] = useState<ProcurementStatus[]>([]);
-  const [categoryId, setCategoryId] = useState<string>("");
   const [statusFilterId, setStatusFilterId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showAdd, setShowAdd] = useState(false);
   const [showAddType, setShowAddType] = useState(false);
   const [typeDraftName, setTypeDraftName] = useState("");
-  const [newCategoryName, setNewCategoryName] = useState("");
-  const [dragCatId, setDragCatId] = useState<string | null>(null);
   const [dragItemId, setDragItemId] = useState<string | null>(null);
   const [draft, setDraft] = useState({
     name: "",
@@ -99,12 +130,14 @@ export function ProcurementClient() {
     }
     const list: ProcurementCategory[] = data.categories ?? [];
     setCategories(list);
-    setCategoryId((prev) => {
-      if (prev && list.some((c) => c.id === prev)) return prev;
-      return list[0]?.id ?? "";
-    });
     return list;
   }, []);
+
+  useEffect(() => {
+    if (!searchParams.get("cat")) {
+      router.replace(procurementHref(ALL_PROCUREMENT_CATEGORY));
+    }
+  }, [router, searchParams]);
 
   const loadStatuses = useCallback(async (catId: string) => {
     if (!catId) {
@@ -119,13 +152,11 @@ export function ProcurementClient() {
   }, []);
 
   const loadItems = useCallback(async (catId: string) => {
-    if (!catId) {
-      setItems([]);
-      return;
-    }
-    const res = await apiFetch(`/api/procurement/items?categoryId=${catId}`, {
-      cache: "no-store",
-    });
+    const url =
+      isAllProcurementCategory(catId)
+        ? "/api/procurement/items"
+        : `/api/procurement/items?categoryId=${encodeURIComponent(catId)}`;
+    const res = await apiFetch(url, { cache: "no-store" });
     const data = await res.json();
     setItems(data.items ?? []);
   }, []);
@@ -135,16 +166,27 @@ export function ProcurementClient() {
   }, [loadCategories]);
 
   useEffect(() => {
-    if (categoryId) {
-      setStatusFilterId(null);
-      loadItems(categoryId);
-      loadStatuses(categoryId);
+    setStatusFilterId(null);
+    void loadItems(categoryId);
+    if (isAllView) {
+      setStatuses([]);
+    } else {
+      void loadStatuses(categoryId);
     }
-  }, [categoryId, loadItems, loadStatuses]);
+  }, [categoryId, isAllView, loadItems, loadStatuses]);
 
   const searchActive = search.trim().length > 0;
+  const reorderEnabled = !searchActive && !isAllView;
 
-  const typeByItemId = useMemo(() => buildTypeByItemId(items), [items]);
+  const categoryOrder = useMemo(
+    () => new Map(categories.map((c) => [c.id, c.sortOrder])),
+    [categories],
+  );
+
+  const typeByItemId = useMemo(
+    () => buildTypeByItemId(items, categoryOrder),
+    [items, categoryOrder],
+  );
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -161,6 +203,7 @@ export function ProcurementClient() {
           (i.notes?.toLowerCase().includes(q) ?? false) ||
           (i.link?.toLowerCase().includes(q) ?? false) ||
           (i.store?.toLowerCase().includes(q) ?? false) ||
+          (i.categoryName?.toLowerCase().includes(q) ?? false) ||
           (i.status?.name.toLowerCase().includes(q) ?? false)
         );
       });
@@ -174,8 +217,14 @@ export function ProcurementClient() {
   }, [items, search, typeByItemId, statusFilterId]);
 
   const sortedItems = useMemo(
-    () => [...filtered].sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, "ru")),
-    [filtered],
+    () =>
+      [...filtered].sort(
+        (a, b) =>
+          (categoryOrder.get(a.categoryId) ?? 0) - (categoryOrder.get(b.categoryId) ?? 0) ||
+          a.sortOrder - b.sortOrder ||
+          a.name.localeCompare(b.name, "ru"),
+      ),
+    [filtered, categoryOrder],
   );
 
   const statusCounts = useMemo(() => {
@@ -207,22 +256,11 @@ export function ProcurementClient() {
     );
   }
 
-  const stats = useMemo(() => {
-    let need = 0;
-    let have = 0;
-    let transit = 0;
-    let open = 0;
-    let total = 0;
-    for (const i of items) {
-      if (i.rowType === "type") continue;
-      total += 1;
-      need += i.needQty;
-      have += i.haveQty;
-      transit += i.inTransitQty;
-      if (i.remaining > 0) open += 1;
-    }
-    return { need, have, transit, open, total };
-  }, [items]);
+  function requireSingleCategory(action: string): boolean {
+    if (!isAllView) return true;
+    toast.error(`Выберите категорию слева — ${action}`);
+    return false;
+  }
 
   async function patchItem(id: string, patch: Partial<ProcurementItem>) {
     const res = await apiFetch(`/api/procurement/items/${id}`, {
@@ -253,18 +291,6 @@ export function ProcurementClient() {
     }
   }
 
-  async function persistCategoryOrder(next: ProcurementCategory[]) {
-    const res = await apiFetch("/api/procurement/categories/reorder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ids: next.map((c) => c.id) }),
-    });
-    if (!res.ok) {
-      toast.error("Не удалось сохранить порядок категорий");
-      loadCategories();
-    }
-  }
-
   async function persistItemOrder(next: ProcurementItem[]) {
     const res = await apiFetch("/api/procurement/items/reorder", {
       method: "POST",
@@ -289,43 +315,17 @@ export function ProcurementClient() {
     });
   }
 
-  function onCategoryDrop(targetId: string) {
-    if (!dragCatId || dragCatId === targetId) return;
-    const next = reorderById(categories, dragCatId, targetId);
-    setCategories(next);
-    setDragCatId(null);
-    persistCategoryOrder(next);
-  }
-
   function onItemDrop(targetId: string) {
-    if (!dragItemId || dragItemId === targetId || searchActive) return;
+    if (!dragItemId || dragItemId === targetId || !reorderEnabled) return;
     const next = reorderById(sortedItems, dragItemId, targetId);
     setDragItemId(null);
     persistItemOrder(next);
   }
 
-  async function addCategory() {
-    const name = newCategoryName.trim();
-    if (!name) return;
-    const res = await apiFetch("/api/procurement/categories", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
-    });
-    if (!res.ok) {
-      toast.error("Не удалось создать категорию");
-      return;
-    }
-    const data = await res.json();
-    setNewCategoryName("");
-    setCategories((prev) => [...prev, data.category]);
-    setCategoryId(data.category.id);
-    toast.success("Категория создана", { description: name });
-  }
-
   async function addItem(e: React.FormEvent) {
     e.preventDefault();
-    if (!categoryId || !draft.name.trim()) return;
+    if (!requireSingleCategory("чтобы добавить позицию")) return;
+    if (!draft.name.trim()) return;
     const res = await apiFetch("/api/procurement/items", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -361,7 +361,8 @@ export function ProcurementClient() {
 
   async function addTypeRow(e: React.FormEvent) {
     e.preventDefault();
-    if (!categoryId || !typeDraftName.trim()) return;
+    if (!requireSingleCategory("чтобы добавить тип")) return;
+    if (!typeDraftName.trim()) return;
     const res = await apiFetch("/api/procurement/items", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -453,70 +454,29 @@ export function ProcurementClient() {
 
   return (
     <div className="min-w-0 space-y-6">
-      <div className="space-y-2">
-        <Label className="text-xs text-muted-foreground">
-          Категории — перетащите для сортировки, кликните для выбора
-        </Label>
-        <div className="flex flex-wrap items-center gap-2">
-          {categories.map((c) => (
-            <button
-              key={c.id}
-              type="button"
-              draggable={categories.length > 1}
-              onDragStart={() => setDragCatId(c.id)}
-              onDragEnd={() => setDragCatId(null)}
-              onDragOver={(e) => {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = "move";
-              }}
-              onDrop={(e) => {
-                e.preventDefault();
-                onCategoryDrop(c.id);
-              }}
-              onClick={() => setCategoryId(c.id)}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-colors",
-                categoryId === c.id
-                  ? "border-primary bg-primary/10 font-medium"
-                  : "border-border bg-background hover:bg-muted/50",
-                dragCatId === c.id && "opacity-50",
-              )}
-            >
-              <GripVertical className="size-3.5 shrink-0 cursor-grab text-muted-foreground active:cursor-grabbing" />
-              {c.name}
-            </button>
-          ))}
-          {categories.length === 0 && (
-            <span className="text-sm text-muted-foreground">Нет категорий</span>
+      <div className="flex gap-1.5 overflow-x-auto pb-1 md:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <button
+          type="button"
+          onClick={() => router.push(procurementHref(ALL_PROCUREMENT_CATEGORY))}
+          className={cn(
+            "shrink-0 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors",
+            isAllView ? "border-primary bg-primary/10 text-primary" : "border-border",
           )}
-        </div>
-        <div className="flex gap-2 pt-1">
-          <Input
-            placeholder="Новая категория"
-            value={newCategoryName}
-            onChange={(e) => setNewCategoryName(e.target.value)}
-            className="max-w-xs"
-          />
-          <Button type="button" variant="outline" onClick={addCategory}>
-            <Plus className="mr-1 size-4" />
-            Категория
-          </Button>
-        </div>
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-4">
-        {[
-          { label: "Позиций", value: stats.total },
-          { label: "Надо (сумма)", value: stats.need },
-          { label: "Есть + едут", value: stats.have + stats.transit },
-          { label: "Не закрыто", value: stats.open },
-        ].map((s) => (
-          <Card key={s.label}>
-            <CardContent className="pt-4">
-              <div className="text-xs text-muted-foreground">{s.label}</div>
-              <div className="text-2xl font-semibold tabular-nums">{s.value}</div>
-            </CardContent>
-          </Card>
+        >
+          Все
+        </button>
+        {categories.map((c) => (
+          <button
+            key={c.id}
+            type="button"
+            onClick={() => router.push(procurementHref(c.id))}
+            className={cn(
+              "shrink-0 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors",
+              categoryId === c.id ? "border-primary bg-primary/10 text-primary" : "border-border",
+            )}
+          >
+            {c.name}
+          </button>
         ))}
       </div>
 
@@ -530,11 +490,24 @@ export function ProcurementClient() {
             className="pl-9"
           />
         </div>
-        <Button type="button" variant="outline" onClick={() => setShowAddType((v) => !v)}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => {
+            if (!requireSingleCategory("чтобы добавить тип")) return;
+            setShowAddType((v) => !v);
+          }}
+        >
           <Plus className="mr-1 size-4" />
           Тип
         </Button>
-        <Button type="button" onClick={() => setShowAdd((v) => !v)}>
+        <Button
+          type="button"
+          onClick={() => {
+            if (!requireSingleCategory("чтобы добавить позицию")) return;
+            setShowAdd((v) => !v);
+          }}
+        >
           <Plus className="mr-1 size-4" />
           Позиция
         </Button>
@@ -568,7 +541,13 @@ export function ProcurementClient() {
 
       {searchActive && (
         <p className="text-xs text-muted-foreground">
-          Сортировка перетаскиванием отключена при активном поиске.
+          Сортировка перетаскиванием отключена при активном поиске
+          {isAllView ? " и в режиме «Все»." : "."}
+        </p>
+      )}
+      {!searchActive && isAllView && (
+        <p className="text-xs text-muted-foreground">
+          В режиме «Все» показаны позиции из всех категорий. Для добавления и сортировки выберите категорию слева.
         </p>
       )}
 
@@ -670,12 +649,14 @@ export function ProcurementClient() {
         <CardHeader className="space-y-4">
           <CardTitle className="flex items-center gap-2 text-lg">
             <ShoppingCart className="size-5 text-primary" />
-            {categories.find((c) => c.id === categoryId)?.name ?? "Закупки"}
+            {isAllView
+              ? "Все категории"
+              : (categories.find((c) => c.id === categoryId)?.name ?? "Закупки")}
             <span className="font-mono text-sm font-normal text-muted-foreground">
               {sortedItems.filter((i) => i.rowType !== "type").length}
             </span>
           </CardTitle>
-          {categoryId && (
+          {!isAllView && (
             <ProcurementStatusBar
               categoryId={categoryId}
               statuses={statuses}
@@ -700,7 +681,8 @@ export function ProcurementClient() {
                 items={sortedItems}
                 typeByItemId={typeByItemId}
                 statuses={statuses}
-                draggable={!searchActive}
+                showCategoryName={isAllView}
+                draggable={reorderEnabled}
                 dragItemId={dragItemId}
                 onDragStart={setDragItemId}
                 onDragEnd={() => setDragItemId(null)}
@@ -747,7 +729,8 @@ export function ProcurementClient() {
                     <TypeRow
                       key={item.id}
                       item={item}
-                      draggable={!searchActive}
+                      showCategoryName={isAllView}
+                      draggable={reorderEnabled}
                       dragging={dragItemId === item.id}
                       onDragStart={() => setDragItemId(item.id)}
                       onDragEnd={() => setDragItemId(null)}
@@ -769,7 +752,8 @@ export function ProcurementClient() {
                       item={item}
                       statuses={statuses}
                       typeName={typeByItemId.get(item.id) ?? null}
-                      draggable={!searchActive}
+                      showCategoryName={isAllView}
+                      draggable={reorderEnabled}
                       dragging={dragItemId === item.id}
                       onDragStart={() => setDragItemId(item.id)}
                       onDragEnd={() => setDragItemId(null)}
@@ -800,6 +784,7 @@ export function ProcurementClient() {
 
 function TypeRow({
   item,
+  showCategoryName,
   draggable,
   dragging,
   onDragStart,
@@ -811,6 +796,7 @@ function TypeRow({
   onDuplicate,
 }: {
   item: ProcurementItem;
+  showCategoryName?: boolean;
   draggable: boolean;
   dragging: boolean;
   onDragStart: () => void;
@@ -863,6 +849,11 @@ function TypeRow({
       <TableCell colSpan={8} className="whitespace-normal py-2.5">
         <div className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 flex-1 items-center gap-2.5">
+            {showCategoryName && item.categoryName ? (
+              <span className="shrink-0 rounded-md border border-border/60 bg-muted/60 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                {item.categoryName}
+              </span>
+            ) : null}
             <div className="h-5 w-1 shrink-0 rounded-full bg-primary/70" aria-hidden />
             {editing ? (
               <Input
@@ -954,6 +945,7 @@ function ItemRow({
   item,
   statuses,
   typeName,
+  showCategoryName,
   draggable,
   dragging,
   onDragStart,
@@ -968,6 +960,7 @@ function ItemRow({
   item: ProcurementItem;
   statuses: ProcurementStatus[];
   typeName: string | null;
+  showCategoryName?: boolean;
   draggable: boolean;
   dragging: boolean;
   onDragStart: () => void;
@@ -1133,16 +1126,23 @@ function ItemRow({
         )}
       </TableCell>
       <TableCell className="whitespace-normal">
-        {typeName ? (
-          <span
-            className="inline-block max-w-full truncate rounded-md bg-muted/80 px-2 py-0.5 text-xs text-muted-foreground"
-            title={typeName}
-          >
-            {typeName}
-          </span>
-        ) : (
-          <span className="text-xs text-muted-foreground/40">—</span>
-        )}
+        <div className="flex flex-col gap-1">
+          {showCategoryName && item.categoryName ? (
+            <span className="inline-block max-w-full truncate rounded-md border border-border/60 bg-muted/60 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+              {item.categoryName}
+            </span>
+          ) : null}
+          {typeName ? (
+            <span
+              className="inline-block max-w-full truncate rounded-md bg-muted/80 px-2 py-0.5 text-xs text-muted-foreground"
+              title={typeName}
+            >
+              {typeName}
+            </span>
+          ) : (
+            <span className="text-xs text-muted-foreground/40">—</span>
+          )}
+        </div>
       </TableCell>
       <TableCell className="px-1">
         <QtyStepper

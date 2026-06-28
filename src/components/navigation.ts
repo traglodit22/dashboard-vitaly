@@ -52,12 +52,12 @@ export const SECTIONS: NavSection[] = [
   {
     key: "china",
     label: "Китай",
-    basePath: "/procurement",
+    basePath: "/orders",
     items: [
-      { href: "/procurement", label: "Закупки", icon: ShoppingCart },
       { href: "/orders", label: "Отправки", icon: Boxes },
       { href: "/orders/new", label: "Создать", icon: Package },
       { href: "/recipients", label: "Получатели", icon: Users },
+      { href: "/procurement", label: "Закупки", icon: ShoppingCart },
     ],
   },
   {

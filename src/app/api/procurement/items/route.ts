@@ -26,7 +26,7 @@ export async function GET(req: Request) {
     `SELECT ${ITEM_SELECT_SQL}
      ${ITEM_FROM_SQL}
      ${categoryId ? 'WHERE i.category_id = $1' : ''}
-     ORDER BY i.sort_order ASC, i.name ASC`,
+     ORDER BY c.sort_order ASC, i.sort_order ASC, i.name ASC`,
     categoryId ? [categoryId] : [],
   )
 

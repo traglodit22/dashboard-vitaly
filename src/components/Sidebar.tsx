@@ -13,6 +13,7 @@ import { GallerySidebarCalendar } from "@/components/gallery/GallerySidebarCalen
 import { FunkoSidebar } from "@/components/funko/FunkoSidebar";
 import { SettingsSidebarNav } from "@/components/settings/SettingsSidebarNav";
 import { OverviewSidebarNav } from "@/components/overview/OverviewSidebarNav";
+import { ProcurementSidebar } from "@/components/procurement/ProcurementSidebar";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -28,12 +29,13 @@ export function Sidebar() {
   const isFilesSection = section.key === "files";
   const isGallerySection = section.key === "gallery";
   const isFunkoSection = section.key === "funko";
+  const isProcurementPage = pathname === "/procurement" || pathname.startsWith("/procurement/");
 
   return (
     <aside
       className={cn(
         "hidden h-full min-h-0 shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar md:flex",
-        isFilesSection ? "w-72 xl:w-80" : isGallerySection || isFunkoSection ? "w-64 xl:w-72" : "w-56",
+        isFilesSection ? "w-72 xl:w-80" : isGallerySection || isFunkoSection || isProcurementPage ? "w-64 xl:w-72" : "w-56",
       )}
     >
       <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-hidden p-3">
@@ -65,6 +67,7 @@ export function Sidebar() {
                   </Link>
                 );
               })}
+            {isProcurementPage && <ProcurementSidebar />}
             {section.key === "files" && (
               <Suspense fallback={null}>
                 <FilesSidebarTree />
