@@ -62,8 +62,8 @@ export async function POST(req: Request) {
 
   const rows = await query<Record<string, unknown>>(
     `INSERT INTO procurement_items
-      (category_id, group_name, name, need_qty, have_qty, in_transit_qty, notes, link, store, row_type, sort_order)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
+      (category_id, group_name, name, need_qty, have_qty, in_transit_qty, notes, link, store, row_type, status_id, sort_order)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11,
        COALESCE((SELECT MAX(sort_order) + 10 FROM procurement_items WHERE category_id = $1), 0))
      RETURNING id`,
     [
@@ -77,6 +77,7 @@ export async function POST(req: Request) {
       rowType === 'type' ? null : body.link ? String(body.link).trim() : null,
       store,
       rowType,
+      rowType === 'type' ? null : body.statusId ? String(body.statusId) : null,
     ],
   )
 

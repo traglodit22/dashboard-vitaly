@@ -15,6 +15,11 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { STATUS_ROW_CLASS, STATUS_SWATCH_CLASS } from "@/lib/procurement/statusColors";
+import {
+  normalizedQtyStrings,
+  qtyPatchForField,
+  type QtyField,
+} from "@/lib/procurement/qtySave";
 import type { ProcurementItem, ProcurementStatus } from "@/lib/procurement/mapRow";
 import { ItemImageCell, LinkCell, QtyStepper } from "@/components/procurement/ProcurementCells";
 
@@ -162,6 +167,7 @@ export function ProcurementMobileItemCard({
   onDrop,
   onPatch,
   onRemove,
+  onDuplicate,
   onItemReplace,
 }: {
   item: ProcurementItem;
@@ -175,6 +181,7 @@ export function ProcurementMobileItemCard({
   onDrop: (e: React.DragEvent) => void;
   onPatch: (id: string, patch: Partial<ProcurementItem>) => Promise<boolean>;
   onRemove: (id: string, name: string) => void;
+  onDuplicate: (item: ProcurementItem) => void;
   onItemReplace: (item: ProcurementItem) => void;
 }) {
   const [need, setNeed] = useState(String(item.needQty));
@@ -188,9 +195,12 @@ export function ProcurementMobileItemCard({
     setNeed(String(item.needQty));
     setHave(String(item.haveQty));
     setTransit(String(item.inTransitQty));
+  }, [item.id, item.needQty, item.haveQty, item.inTransitQty]);
+
+  useEffect(() => {
     setNotes(item.notes ?? "");
     setDraftName(item.name);
-  }, [item]);
+  }, [item.id, item.notes, item.name]);
 
   const remaining =
     (Number(need) || 0) - (Number(have) || 0) - (Number(transit) || 0);
@@ -211,12 +221,27 @@ export function ProcurementMobileItemCard({
     if (ok) setEditingName(false);
   }
 
-  async function saveQty() {
-    await onPatch(item.id, {
-      needQty: Number(need) || 0,
-      haveQty: Number(have) || 0,
-      inTransitQty: Number(transit) || 0,
-    });
+  async function saveQtyField(field: QtyField) {
+    const patch = qtyPatchForField(field, { need, have, transit }, item);
+    if (Object.keys(patch).length === 0) {
+      const normalized = normalizedQtyStrings({ need, have, transit }, item);
+      setNeed(normalized.need);
+      setHave(normalized.have);
+      setTransit(normalized.transit);
+      return;
+    }
+    const ok = await onPatch(item.id, patch);
+    if (ok) {
+      const normalized = normalizedQtyStrings({ need, have, transit }, {
+        ...item,
+        needQty: patch.needQty ?? item.needQty,
+        haveQty: patch.haveQty ?? item.haveQty,
+        inTransitQty: patch.inTransitQty ?? item.inTransitQty,
+      });
+      setNeed(normalized.need);
+      setHave(normalized.have);
+      setTransit(normalized.transit);
+    }
   }
 
   async function bumpQty(field: "need" | "have" | "transit", delta: number) {
@@ -312,15 +337,26 @@ export function ProcurementMobileItemCard({
               </span>
             ) : null}
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-10 shrink-0 text-muted-foreground hover:text-destructive"
-            onClick={() => onRemove(item.id, item.name)}
-            title="Удалить"
-          >
-            <Trash2 className="size-4" />
-          </Button>
+          <div className="flex shrink-0 items-center gap-0.5">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-10 text-muted-foreground hover:text-foreground"
+              onClick={() => void onDuplicate(item)}
+              title="Копировать"
+            >
+              <Copy className="size-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-10 shrink-0 text-muted-foreground hover:text-destructive"
+              onClick={() => onRemove(item.id, item.name)}
+              title="Удалить"
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          </div>
         </div>
 
         <Select value={item.statusId ?? "__none__"} onValueChange={(v) => void saveStatus(v)}>
@@ -368,7 +404,7 @@ export function ProcurementMobileItemCard({
                 size="comfortable"
                 value={value}
                 onChange={set}
-                onBlur={saveQty}
+                onBlur={() => void saveQtyField(key)}
                 onBump={(d) => void bumpQty(key, d)}
               />
             </div>
@@ -482,6 +518,7 @@ export function ProcurementMobileList({
             }}
             onPatch={onPatch}
             onRemove={onRemove}
+            onDuplicate={onDuplicate}
             onItemReplace={onItemReplace}
           />
         ),

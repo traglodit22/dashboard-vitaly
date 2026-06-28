@@ -35,6 +35,11 @@ import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
 import { reorderById } from "@/lib/procurement/reorderList";
 import { STATUS_ROW_CLASS, STATUS_SWATCH_CLASS } from "@/lib/procurement/statusColors";
+import {
+  normalizedQtyStrings,
+  qtyPatchForField,
+  type QtyField,
+} from "@/lib/procurement/qtySave";
 import type { ProcurementCategory, ProcurementItem, ProcurementStatus } from "@/lib/procurement/mapRow";
 import { STORES, type StoreType } from "@/types";
 import { detectStoreFromUrl } from "@/lib/stores/detectStoreFromUrl";
@@ -392,7 +397,37 @@ export function ProcurementClient() {
       return;
     }
     const data = await res.json();
-    const newItem: ProcurementItem = data.item;
+    await insertDuplicateAfter(source, data.item as ProcurementItem);
+    toast.success("Тип скопирован");
+  }
+
+  async function duplicateItem(source: ProcurementItem) {
+    const res = await apiFetch("/api/procurement/items", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        categoryId: source.categoryId,
+        name: source.name,
+        rowType: "item",
+        needQty: source.needQty,
+        haveQty: source.haveQty,
+        inTransitQty: source.inTransitQty,
+        notes: source.notes,
+        link: source.link,
+        store: source.store,
+        statusId: source.statusId,
+      }),
+    });
+    if (!res.ok) {
+      toast.error("Не удалось скопировать позицию");
+      return;
+    }
+    const data = await res.json();
+    await insertDuplicateAfter(source, data.item as ProcurementItem);
+    toast.success("Позиция скопирована");
+  }
+
+  async function insertDuplicateAfter(source: ProcurementItem, newItem: ProcurementItem) {
     const ordered = [...items].sort(
       (a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, "ru"),
     );
@@ -400,7 +435,11 @@ export function ProcurementClient() {
     const next = [...ordered];
     next.splice(idx + 1, 0, newItem);
     await persistItemOrder(next);
-    toast.success("Тип скопирован");
+  }
+
+  function duplicateRow(source: ProcurementItem) {
+    if (source.rowType === "type") void duplicateType(source);
+    else void duplicateItem(source);
   }
 
   if (loading) {
@@ -668,7 +707,7 @@ export function ProcurementClient() {
                 onItemDrop={onItemDrop}
                 onPatch={patchItem}
                 onRemove={removeItem}
-                onDuplicate={duplicateType}
+                onDuplicate={duplicateRow}
                 onItemReplace={replaceItem}
               />
               <Table className="hidden w-full min-w-[900px] table-fixed md:table">
@@ -722,7 +761,7 @@ export function ProcurementClient() {
                       }}
                       onPatch={patchItem}
                       onRemove={removeItem}
-                      onDuplicate={duplicateType}
+                      onDuplicate={duplicateRow}
                     />
                   ) : (
                     <ItemRow
@@ -744,6 +783,7 @@ export function ProcurementClient() {
                       }}
                       onPatch={patchItem}
                       onRemove={removeItem}
+                      onDuplicate={duplicateRow}
                       onItemReplace={replaceItem}
                     />
                   ),
@@ -922,6 +962,7 @@ function ItemRow({
   onDrop,
   onPatch,
   onRemove,
+  onDuplicate,
   onItemReplace,
 }: {
   item: ProcurementItem;
@@ -935,6 +976,7 @@ function ItemRow({
   onDrop: (e: React.DragEvent) => void;
   onPatch: (id: string, patch: Partial<ProcurementItem>) => Promise<boolean>;
   onRemove: (id: string, name: string) => void;
+  onDuplicate: (item: ProcurementItem) => void;
   onItemReplace: (item: ProcurementItem) => void;
 }) {
   const [need, setNeed] = useState(String(item.needQty));
@@ -948,9 +990,12 @@ function ItemRow({
     setNeed(String(item.needQty));
     setHave(String(item.haveQty));
     setTransit(String(item.inTransitQty));
+  }, [item.id, item.needQty, item.haveQty, item.inTransitQty]);
+
+  useEffect(() => {
     setNotes(item.notes ?? "");
     setDraftName(item.name);
-  }, [item]);
+  }, [item.id, item.notes, item.name]);
 
   const remaining =
     (Number(need) || 0) - (Number(have) || 0) - (Number(transit) || 0);
@@ -971,12 +1016,27 @@ function ItemRow({
     if (ok) setEditingName(false);
   }
 
-  async function saveQty() {
-    await onPatch(item.id, {
-      needQty: Number(need) || 0,
-      haveQty: Number(have) || 0,
-      inTransitQty: Number(transit) || 0,
-    });
+  async function saveQtyField(field: QtyField) {
+    const patch = qtyPatchForField(field, { need, have, transit }, item);
+    if (Object.keys(patch).length === 0) {
+      const normalized = normalizedQtyStrings({ need, have, transit }, item);
+      setNeed(normalized.need);
+      setHave(normalized.have);
+      setTransit(normalized.transit);
+      return;
+    }
+    const ok = await onPatch(item.id, patch);
+    if (ok) {
+      const normalized = normalizedQtyStrings({ need, have, transit }, {
+        ...item,
+        needQty: patch.needQty ?? item.needQty,
+        haveQty: patch.haveQty ?? item.haveQty,
+        inTransitQty: patch.inTransitQty ?? item.inTransitQty,
+      });
+      setNeed(normalized.need);
+      setHave(normalized.have);
+      setTransit(normalized.transit);
+    }
   }
 
   async function bumpQty(
@@ -1088,7 +1148,7 @@ function ItemRow({
         <QtyStepper
           value={need}
           onChange={setNeed}
-          onBlur={saveQty}
+          onBlur={() => void saveQtyField("need")}
           onBump={(d) => void bumpQty("need", d)}
         />
       </TableCell>
@@ -1096,7 +1156,7 @@ function ItemRow({
         <QtyStepper
           value={have}
           onChange={setHave}
-          onBlur={saveQty}
+          onBlur={() => void saveQtyField("have")}
           onBump={(d) => void bumpQty("have", d)}
         />
       </TableCell>
@@ -1104,7 +1164,7 @@ function ItemRow({
         <QtyStepper
           value={transit}
           onChange={setTransit}
-          onBlur={saveQty}
+          onBlur={() => void saveQtyField("transit")}
           onBump={(d) => void bumpQty("transit", d)}
         />
       </TableCell>
@@ -1167,15 +1227,26 @@ function ItemRow({
         </Select>
       </TableCell>
       <TableCell>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-muted-foreground hover:text-destructive"
-          onClick={() => onRemove(item.id, item.name)}
-          title="Удалить"
-        >
-          <Trash2 className="size-4" />
-        </Button>
+        <div className="flex items-center gap-0.5">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-muted-foreground hover:text-foreground"
+            onClick={() => void onDuplicate(item)}
+            title="Копировать"
+          >
+            <Copy className="size-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-muted-foreground hover:text-destructive"
+            onClick={() => onRemove(item.id, item.name)}
+            title="Удалить"
+          >
+            <Trash2 className="size-4" />
+          </Button>
+        </div>
       </TableCell>
     </TableRow>
   );
