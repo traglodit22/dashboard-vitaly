@@ -105,10 +105,9 @@ echo "==> Start PM2"
 pm2 delete dashboard 2>/dev/null || true
 pm2 start ecosystem.config.cjs --only dashboard --update-env
 if pm2 describe dashboard-bot >/dev/null 2>&1; then
-  pm2 restart dashboard-bot --update-env
-else
-  pm2 start ecosystem.config.cjs --only dashboard-bot --update-env
+  pm2 delete dashboard-bot
 fi
+pm2 start ecosystem.config.cjs --only dashboard-bot --update-env
 pm2 save
 
 echo "==> Health check"
