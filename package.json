@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "start:bot": "tsx bot/index.ts",
+    "start:bot": "tsx bot/deepseekBot.ts",
     "lint": "eslint",
     "db:setup": "bash scripts/setup-local-db.sh",
     "db:tunnel": "bash scripts/db-tunnel.sh",

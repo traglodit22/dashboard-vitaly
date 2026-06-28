@@ -26,15 +26,26 @@ function getProxyUrl(): string | undefined {
 
 async function telegramFetch(url: string, init?: RequestInit): Promise<Response> {
   const proxy = getProxyUrl()
-  if (!proxy) return fetch(url, init)
-  const dispatcher = new ProxyAgent(proxy)
-  // undici fetch options differ slightly from DOM RequestInit
-  return undiciFetch(url, {
-    method: init?.method,
-    headers: init?.headers,
-    body: init?.body as string | undefined,
-    dispatcher,
-  }) as unknown as Response
+  const attempts = proxy ? 3 : 1
+  let lastErr: unknown
+
+  for (let i = 0; i < attempts; i++) {
+    try {
+      if (!proxy) return await fetch(url, init)
+      const dispatcher = new ProxyAgent(proxy)
+      return (await undiciFetch(url, {
+        method: init?.method,
+        headers: init?.headers,
+        body: init?.body as string | undefined,
+        dispatcher,
+      })) as unknown as Response
+    } catch (err) {
+      lastErr = err
+      if (i < attempts - 1) await new Promise((r) => setTimeout(r, 400 * (i + 1)))
+    }
+  }
+
+  throw lastErr
 }
 
 // Escape chars that are literal in MarkdownV2 context (not inside formatting)
@@ -118,30 +129,34 @@ function toMarkdownV2(input: string): string {
 }
 
 export async function sendMessage(chatId: string | number, text: string) {
-  const token = await getBotToken()
-  const api = `https://api.telegram.org/bot${token}`
-  const mdv2 = toMarkdownV2(text)
+  try {
+    const token = await getBotToken()
+    const api = `https://api.telegram.org/bot${token}`
+    const mdv2 = toMarkdownV2(text)
 
-  // Try MarkdownV2 first; fall back to plain text if Telegram rejects it
-  let res = await telegramFetch(`${api}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text: mdv2, parse_mode: 'MarkdownV2' }),
-  })
-
-  if (!res.ok) {
-    res = await telegramFetch(`${api}/sendMessage`, {
+    let res = await telegramFetch(`${api}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text }),
+      body: JSON.stringify({ chat_id: chatId, text: mdv2, parse_mode: 'MarkdownV2' }),
     })
-  }
 
-  const data = await res.json()
-  if (!res.ok || !data.ok) {
-    console.error('Telegram sendMessage failed:', { chatId, status: res.status, data })
+    if (!res.ok) {
+      res = await telegramFetch(`${api}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text }),
+      })
+    }
+
+    const data = await res.json()
+    if (!res.ok || !data.ok) {
+      console.error('Telegram sendMessage failed:', { chatId, status: res.status, data })
+    }
+    return data
+  } catch (err) {
+    console.error('Telegram sendMessage error:', { chatId, err })
+    return { ok: false, error: err instanceof Error ? err.message : String(err) }
   }
-  return data
 }
 
 export async function setWebhook(url: string) {

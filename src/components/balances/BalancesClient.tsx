@@ -112,7 +112,7 @@ export function BalancesClient() {
   async function checkAll() {
     setChecking(true);
     try {
-      const res = await apiFetch("/api/balances/check", { method: "POST" });
+      const res = await apiFetch("/api/balances/check", { method: "POST" }, 300_000);
       const data = await res.json();
       if (!res.ok) {
         toast.error("Ошибка при проверке", { description: data.error });

@@ -44,5 +44,16 @@ module.exports = {
       },
       max_memory_restart: "512M",
     },
+    {
+      name: "dashboard-bot",
+      cwd: appDir,
+      script: path.join(appDir, "node_modules/.bin/tsx"),
+      args: "bot/deepseekBot.ts",
+      env: {
+        NODE_ENV: "production",
+        ...fileEnv,
+      },
+      max_memory_restart: "200M",
+    },
   ],
 };

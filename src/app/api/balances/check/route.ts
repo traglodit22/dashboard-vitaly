@@ -10,6 +10,7 @@ import {
 } from '@/lib/balances/fetchBalance'
 
 export const runtime = 'nodejs'
+export const maxDuration = 300
 
 export async function POST(req: Request) {
   const unauth = await requireAuth(req)
@@ -79,7 +80,11 @@ export async function POST(req: Request) {
         '',
         ...low.map((p) => `📉 ${p.name}: ${p.balance} ${p.currency} (порог: ${p.threshold})`),
       ]
-      await Promise.all(chatIds.map((id) => sendMessage(id, lines.join('\n'))))
+      try {
+        await Promise.all(chatIds.map((id) => sendMessage(id, lines.join('\n'))))
+      } catch (e) {
+        console.error('Balance check telegram notify failed:', e)
+      }
     }
   }
 

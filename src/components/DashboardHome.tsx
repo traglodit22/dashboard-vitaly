@@ -191,16 +191,24 @@ export function DashboardHome() {
   async function refreshBalances() {
     setRefreshing(true);
     try {
-      const res = await apiFetch("/api/balances/check", { method: "POST" });
-      const data = await res.json();
+      const res = await apiFetch("/api/balances/check", { method: "POST" }, 300_000);
+      const data = await res.json().catch(() => ({}));
+      const payload = data as { error?: string; results?: { error?: string }[]; low?: unknown[] };
+      if (!res.ok) {
+        throw new Error(String(payload.error ?? `HTTP ${res.status}`));
+      }
       await loadAll();
-      if (data.low?.length > 0) {
-        toast.warning(`Низкий баланс у ${data.low.length} панелей`);
+      const failed = (payload.results ?? []).filter((r) => r.error).length;
+      if (failed > 0) {
+        toast.warning(`Обновлено с ошибками у ${failed} панелей`);
+      } else if ((payload.low?.length ?? 0) > 0) {
+        toast.warning(`Низкий баланс у ${payload.low!.length} панелей`);
       } else {
         toast.success("Балансы обновлены");
       }
-    } catch {
-      toast.error("Не удалось обновить балансы");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Не удалось обновить балансы";
+      toast.error(message);
     } finally {
       setRefreshing(false);
     }
