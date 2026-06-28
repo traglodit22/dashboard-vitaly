@@ -465,7 +465,7 @@ export function ProcurementMobileItemCard({
 export function ProcurementMobileList({
   items,
   typeByItemId,
-  statuses,
+  statusesByCategory,
   showCategoryName,
   draggable,
   dragItemId,
@@ -479,7 +479,7 @@ export function ProcurementMobileList({
 }: {
   items: ProcurementItem[];
   typeByItemId: Map<string, string | null>;
-  statuses: ProcurementStatus[];
+  statusesByCategory: Map<string, ProcurementStatus[]>;
   showCategoryName?: boolean;
   draggable: boolean;
   dragItemId: string | null;
@@ -519,7 +519,7 @@ export function ProcurementMobileList({
           <ProcurementMobileItemCard
             key={item.id}
             item={item}
-            statuses={statuses}
+            statuses={statusesByCategory.get(item.categoryId) ?? []}
             typeName={typeByItemId.get(item.id) ?? null}
             showCategoryName={showCategoryName}
             draggable={draggable}

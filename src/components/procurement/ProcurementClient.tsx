@@ -139,16 +139,13 @@ function ProcurementClientInner() {
     }
   }, [router, searchParams]);
 
-  const loadStatuses = useCallback(async (catId: string) => {
-    if (!catId) {
-      setStatuses([]);
-      return;
-    }
-    const res = await apiFetch(`/api/procurement/statuses?categoryId=${catId}`, {
-      cache: "no-store",
-    });
+  const loadStatuses = useCallback(async (catId?: string) => {
+    const url = catId
+      ? `/api/procurement/statuses?categoryId=${encodeURIComponent(catId)}`
+      : "/api/procurement/statuses";
+    const res = await apiFetch(url, { cache: "no-store" });
     const data = await res.json();
-    setStatuses(data.statuses ?? []);
+    if (res.ok) setStatuses(data.statuses ?? []);
   }, []);
 
   const loadItems = useCallback(async (catId: string) => {
@@ -168,11 +165,7 @@ function ProcurementClientInner() {
   useEffect(() => {
     setStatusFilterId(null);
     void loadItems(categoryId);
-    if (isAllView) {
-      setStatuses([]);
-    } else {
-      void loadStatuses(categoryId);
-    }
+    void loadStatuses(isAllView ? undefined : categoryId);
   }, [categoryId, isAllView, loadItems, loadStatuses]);
 
   const searchActive = search.trim().length > 0;
@@ -187,6 +180,16 @@ function ProcurementClientInner() {
     () => buildTypeByItemId(items, categoryOrder),
     [items, categoryOrder],
   );
+
+  const statusesByCategory = useMemo(() => {
+    const map = new Map<string, ProcurementStatus[]>();
+    for (const status of statuses) {
+      const list = map.get(status.categoryId) ?? [];
+      list.push(status);
+      map.set(status.categoryId, list);
+    }
+    return map;
+  }, [statuses]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -680,7 +683,7 @@ function ProcurementClientInner() {
               <ProcurementMobileList
                 items={sortedItems}
                 typeByItemId={typeByItemId}
-                statuses={statuses}
+                statusesByCategory={statusesByCategory}
                 showCategoryName={isAllView}
                 draggable={reorderEnabled}
                 dragItemId={dragItemId}
@@ -705,7 +708,7 @@ function ProcurementClientInner() {
                 <col className="w-[5.5rem]" />
                 <col />
                 <col className="w-[7.5rem]" />
-                <col className="w-10" />
+                <col className="w-[4.5rem]" />
               </colgroup>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
@@ -750,7 +753,7 @@ function ProcurementClientInner() {
                     <ItemRow
                       key={item.id}
                       item={item}
-                      statuses={statuses}
+                      statuses={statusesByCategory.get(item.categoryId) ?? statuses}
                       typeName={typeByItemId.get(item.id) ?? null}
                       showCategoryName={isAllView}
                       draggable={reorderEnabled}
@@ -972,6 +975,21 @@ function ItemRow({
   onDuplicate: (item: ProcurementItem) => void;
   onItemReplace: (item: ProcurementItem) => void;
 }) {
+  const rowStatuses = useMemo(() => {
+    if (!item.statusId || !item.status) return statuses;
+    if (statuses.some((s) => s.id === item.statusId)) return statuses;
+    return [
+      ...statuses,
+      {
+        id: item.status.id,
+        categoryId: item.categoryId,
+        name: item.status.name,
+        colorKey: item.status.colorKey,
+        sortOrder: 0,
+      },
+    ];
+  }, [item, statuses]);
+
   const [need, setNeed] = useState(String(item.needQty));
   const [have, setHave] = useState(String(item.haveQty));
   const [transit, setTransit] = useState(String(item.inTransitQty));
@@ -1212,7 +1230,7 @@ function ItemRow({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__none__">—</SelectItem>
-            {statuses.map((s) => (
+            {rowStatuses.map((s) => (
               <SelectItem key={s.id} value={s.id}>
                 <span
                   className={cn(

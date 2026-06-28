@@ -21,16 +21,20 @@ export async function GET(req: Request) {
 
   const { searchParams } = new URL(req.url)
   const categoryId = searchParams.get('categoryId')
-  if (!categoryId) {
-    return NextResponse.json({ error: 'Укажите categoryId' }, { status: 400 })
-  }
 
-  const rows = await query<Record<string, unknown>>(
-    `SELECT * FROM procurement_statuses
-     WHERE category_id = $1
-     ORDER BY sort_order ASC, name ASC`,
-    [categoryId],
-  )
+  const rows = categoryId
+    ? await query<Record<string, unknown>>(
+        `SELECT * FROM procurement_statuses
+         WHERE category_id = $1
+         ORDER BY sort_order ASC, name ASC`,
+        [categoryId],
+      )
+    : await query<Record<string, unknown>>(
+        `SELECT s.*
+         FROM procurement_statuses s
+         JOIN procurement_categories c ON c.id = s.category_id
+         ORDER BY c.sort_order ASC, s.sort_order ASC, s.name ASC`,
+      )
 
   return NextResponse.json({ statuses: rows.map(rowToStatus) })
 }
