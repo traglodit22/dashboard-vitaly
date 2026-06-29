@@ -114,6 +114,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
   const [foldersDrawerOpen, setFoldersDrawerOpen] = useState(false);
   const [noteCreateOpen, setNoteCreateOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const loadItemsSeqRef = useRef(0);
 
   const noteDisabled =
     uploading || (category?.storageType === "gcs" && !gcsConfigured);
@@ -140,10 +141,13 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
   }, [categorySlug]);
 
   const loadItems = useCallback(async () => {
+    const seq = ++loadItemsSeqRef.current;
     const params = new URLSearchParams({ categorySlug });
     if (currentFolderId) params.set("folderId", currentFolderId);
     const res = await apiFetch(`/api/files?${params}`, { cache: "no-store" });
     const data = await res.json();
+    if (seq !== loadItemsSeqRef.current) return;
+    if (!res.ok) return;
     setItems(data.items ?? []);
   }, [categorySlug, currentFolderId]);
 
@@ -317,7 +321,10 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     void persistFileOrder(next, "files");
   }
 
-  async function uploadGcsFile(file: File, targetFolderId: string | null): Promise<FileItem> {
+  async function uploadGcsFile(
+    file: File,
+    targetFolderId: string | null,
+  ): Promise<{ item: FileItem; duplicate: boolean }> {
     const fileName = uploadBaseName(file.name);
     const initRes = await apiFetch(
       "/api/files/gcs-upload-url",
@@ -363,13 +370,16 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
           mime: init.mime,
         }),
       },
-      20_000,
+      120_000,
     );
     const done = await doneRes.json();
     if (!doneRes.ok) {
       throw new Error(String(done.error ?? "Не удалось сохранить файл"));
     }
-    return done.item as FileItem;
+    return {
+      item: done.item as FileItem,
+      duplicate: Boolean(done.duplicate),
+    };
   }
 
   async function uploadLocalFile(file: File, targetFolderId: string | null): Promise<FileItem> {
@@ -423,13 +433,19 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
               folderCache,
             );
           }
-          const item =
+          const { item, duplicate } =
             category.storageType === "gcs"
               ? await uploadGcsFile(file, targetFolderId)
-              : await uploadLocalFile(file, targetFolderId);
+              : { item: await uploadLocalFile(file, targetFolderId), duplicate: false };
           ok += 1;
-          if (targetFolderId === currentFolderId) {
-            setItems((prev) => [...prev, item]);
+          if (duplicate && item.folderId !== targetFolderId) {
+            toast.info(`«${relativePath}»`, {
+              description: "Такой файл уже есть в другой папке",
+            });
+          } else if (item.folderId === currentFolderId) {
+            setItems((prev) =>
+              prev.some((i) => i.id === item.id) ? prev : [...prev, item],
+            );
           }
           if (total > 0) {
             setUploadProgress((prev) =>
@@ -442,8 +458,8 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
       }
 
       if (ok > 0 || directoryPaths.length > 0) {
-        notifyFilesChanged();
         await refresh();
+        notifyFilesChanged();
         if (ok > 0) {
           const extra = directoryPaths.length ? " · структура папок сохранена" : "";
           toast.success(
