@@ -1,7 +1,7 @@
 import { ensureFilePreview, fetchFileRow } from '@/lib/files/fileService'
 
-const MAX_CONCURRENT = 2
-const MAX_QUEUE = 24
+const MAX_CONCURRENT = 4
+const MAX_QUEUE = 48
 const queued = new Set<string>()
 const inFlight = new Set<string>()
 let active = 0
