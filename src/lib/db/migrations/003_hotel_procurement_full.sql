@@ -1,4 +1,5 @@
--- Полный список «Отель» из PDF + ссылки. Идемпотентно: новые позиции и обновление qty/notes/link.
+-- Полный список «Отель» из PDF + ссылки. Идемпотентно: только новые позиции (INSERT … NOT EXISTS).
+-- Не обновляем qty у существующих строк — миграции прогоняются при каждом деплое.
 
 INSERT INTO procurement_categories (name, sort_order)
 SELECT 'Отель', 0
@@ -20,94 +21,6 @@ WHERE c.name = 'Отель'
     SELECT 1 FROM procurement_items i
     WHERE i.category_id = c.id AND i.name = v.name
   );
-
--- Актуальные количества и ссылки из PDF
-UPDATE procurement_items i SET
-  need_qty = u.need_qty, have_qty = u.have_qty, in_transit_qty = u.in_transit_qty,
-  notes = COALESCE(u.notes, i.notes), link = COALESCE(u.link, i.link), updated_at = NOW()
-FROM procurement_categories c,
-(VALUES
-  ('Постельное полуторное', 100, 0, 10, NULL, NULL),
-  ('Постельное двуспальное', 100, 0, 0, NULL, NULL),
-  ('Доп. наволочки', 200, 0, 10, NULL, NULL),
-  ('Пододеяльники для зимы', 0, 0, 0, NULL, NULL),
-  ('Полотенца 40×80 cm, 180g', 200, 100, 0, NULL, NULL),
-  ('Полотенца 80×160 cm, 800g', 200, 100, 0, NULL, NULL),
-  ('Полотенца 30×30 cm, 60g', 200, 200, 0, NULL, NULL),
-  ('Полотенца на пол', 100, 0, 50, NULL, NULL),
-  ('Халат', 100, 0, 50, NULL, NULL),
-  ('Термостат отопления', 46, 2, 44, NULL, NULL),
-  ('Термостат фанкойла', 26, 0, 1, NULL, NULL),
-  ('Двери межкомнатные', 46, 0, 0, 'Ширина 600–900, глубина проёма 100–250, чёрный, запил сверху', 'https://дверная-линия.бел/flat/'),
-  ('Ручки на тумбочки 96 мм', 76, 20, 0, 'Куплено 20; докупить 76', NULL),
-  ('Ручки на шкафы 128 мм', 122, 20, 0, 'Куплено 20; докупить 122', NULL),
-  ('Мини-кухни (тест)', 17, 0, 1, '954×620, высота 2700', NULL),
-  ('Мини-холодильники', 18, 0, 0, 'Учесть размер при проектировании кухонек', NULL),
-  ('Мини-плита (2 или 1 конфорка)', 18, 1, 6, 'НОРМ, везём', 'https://mobile.yangkeduo.com/goods.html?goods_id=621269375828'),
-  ('Микроволновка', 18, 0, 0, 'Учесть размер кухонек', 'https://mobile.yangkeduo.com/goods.html?goods_id=694494721256'),
-  ('Сейф', 18, 0, 1, 'Тест', 'https://item.taobao.com/item.htm?id=838174112211'),
-  ('Чайник', 18, 0, 1, 'Не уверена насчёт реплики', 'https://mobile.yangkeduo.com/goods.html?goods_id=885933224799'),
-  ('Кофемашина Xiaomi N1', 18, 0, 1, 'Зависит от капсул', 'https://mobile.yangkeduo.com/goods.html?goods_id=927161668071'),
-  ('ТВ OLED 4K 55"', 20, 1, 5, 'Тест', NULL),
-  ('Карнизы двойные 3 м', 26, 0, 22, '26 шт по 3 м; можно с шариками', 'https://mobile.yangkeduo.com/goods2.html?goods_id=503815760614'),
-  ('Шторы (пары)', 26, 0, 1, '3×2,8 м, белые/светло-серые; тест 1 пара', 'https://detail.1688.com/offer/994396755875.html'),
-  ('Тюли', 26, 0, 3, '3×2,8 м, белые; тест 3 пары', 'https://detail.1688.com/offer/634000441443.html'),
-  ('Пуф', 20, 0, 12, NULL, 'https://item.taobao.com/item.htm?id=850162161634'),
-  ('Ковёр в гостиной 2×3 м', 6, 0, 1, 'Тест', 'https://mobile.yangkeduo.com/goods.html?goods_id=725049605668'),
-  ('Столики журнальные', 6, 0, 1, '6 пар', 'https://mobile.yangkeduo.com/goods.html?goods_id=884231120691'),
-  ('Диваны', 6, 0, 0, 'Clarins 900, светло-серый', 'https://www.divan.by/product/divan-laronso-bucle-white'),
-  ('Стол (подстолье) D款', 13, 0, 6, '13 без постирочной', 'https://detail.1688.com/offer/926922923837.html'),
-  ('Столешница Ø900', 6, 0, 0, 'Slim Line K552 или K551', NULL),
-  ('Столешница Ø700', 8, 0, 0, NULL, NULL),
-  ('Стулья', 34, 0, 27, '36 без постирочной; светлое дерево; едут 24+3', 'https://detail.1688.com/offer/1040300912591.html'),
-  ('Большая ваза на стол', 14, 0, 2, NULL, 'https://mobile.yangkeduo.com/goods.html?goods_id=719796441876'),
-  ('Табуретки', 3, 0, 0, 'Для коридора', 'https://mobile.yangkeduo.com/goods.html?goods_id=785165853840'),
-  ('Держатель для салфеток', 18, 0, 3, 'Декор', 'https://mobile.yangkeduo.com/goods.html?goods_id=764550791386'),
-  ('Скульптура (камни)', 12, 0, 2, 'Абстрактные лунные камни', 'https://detail.1688.com/offer/979580639975.html'),
-  ('Свет над скульптурой', 12, 0, 12, NULL, 'https://mobile.yangkeduo.com/goods2.html?goods_id=928028488748'),
-  ('Кровать 800 (одинарная)', 24, 2, 0, '20 двойных + 4 уборщ', NULL),
-  ('Кровать 1600 (двойная)', 8, 0, 0, NULL, NULL),
-  ('Матрасы (комплекты)', 40, 0, 0, '20 комплектов; 800 или 1600', NULL),
-  ('Изголовье', 40, 0, 0, 'Заказали на тест', 'https://mobile.yangkeduo.com/goods.html?goods_id=650221934775'),
-  ('Столики для еды в кровати', 16, 0, 1, 'Белые, круглые', 'https://detail.1688.com/offer/1044359877730.html'),
-  ('Зеркало 80×180', 18, 0, 0, '17 без постирочной', 'https://detail.1688.com/offer/861933269998.html'),
-  ('Прикроватные коврики 70×150', 38, 0, 1, NULL, 'https://mobile.yangkeduo.com/goods.html?goods_id=905217390897'),
-  ('Тумбочки', 36, 18, 0, 'Ножки отдельной позицией — 150 шт', NULL),
-  ('Торшер', 46, 0, 0, NULL, 'https://detail.1688.com/offer/553251502242.html'),
-  ('Умывальник (склад 4)', 4, 0, 0, NULL, NULL),
-  ('Умывальник (склад 14)', 14, 0, 0, NULL, NULL),
-  ('Смеситель низкий', 4, 0, 4, NULL, NULL),
-  ('Смеситель высокий', 14, 0, 8, NULL, NULL),
-  ('Душевая лейка', 18, 0, 0, 'Склад', NULL),
-  ('Унитаз', 18, 0, 0, 'Склад', NULL),
-  ('Гигиенический душ', 18, 0, 0, 'Установлены', NULL),
-  ('Душевой трап', 18, 0, 0, NULL, NULL),
-  ('Душевые карнизы', 18, 16, 2, NULL, NULL),
-  ('Фен', 18, 0, 1, '2 разных на тест', NULL),
-  ('Шторка в душевую 2,5×2,2', 18, 0, 0, 'Можно в два слоя', 'https://detail.1688.com/offer/726226856989.html'),
-  ('Зеркало в ванной', 18, 0, 0, NULL, 'https://mobile.yangkeduo.com/goods.html?goods_id=897173787191'),
-  ('Держатель для полотенец', 18, 0, 0, 'Тест', NULL),
-  ('Крючки для полотенец', 18, 0, 0, 'Мин. 6 шт в ванной', NULL),
-  ('Держатели туал. бумаги', 18, 0, 0, 'Тест', NULL),
-  ('Ёршики', 18, 0, 0, 'Тест', NULL),
-  ('Полочки для шампуней', 36, 0, 0, '36 в душевых + 8 в санузлах', NULL),
-  ('Баночки для мыла/шампуня', 16, 0, 16, NULL, NULL),
-  ('Трековые светильники', 16, 0, 16, '14 в номерах + 2 на лестнице', NULL),
-  ('Бра у дверей в комнаты', 18, 0, 0, 'Цифры CountryBlue print', NULL),
-  ('Потолочный светильник 500 мм (наклонный, тип B)', 14, 0, 0, 'Склад', NULL),
-  ('Потолочный светильник 350 мм (наклонный, тип B)', 14, 0, 0, 'Склад', NULL),
-  ('Свет на лестнице', 4, 0, 0, 'Склад', NULL),
-  ('Люстра', 26, 0, 0, 'Склад', NULL),
-  ('Люстра над зеркалом', 4, 0, 0, 'Склад', NULL),
-  ('Кресла на коридоре', 8, 0, 0, NULL, 'https://detail.1688.com/offer/813117140812.html'),
-  ('Диванчик на коридоре', 1, 0, 0, NULL, 'https://www.divan.by/product/kushetka-olten-textile-forest'),
-  ('Растения в горшках (оливки)', 12, 0, 0, 'Повыше, разные', 'https://detail.1688.com/offer/657764402749.html'),
-  ('Горшки', 12, 0, 0, NULL, 'https://mobile.yangkeduo.com/goods1.html?goods_id=869297501574'),
-  ('Декоративный молдинг на потолке', 200, 0, 0, '≈200 м, ширина/высота 120', 'https://www.21vek.by/mouldings/cx106_orac_decor.html'),
-  ('Зеркало 1200 (с ¼ луной)', 4, 0, 0, NULL, 'https://www.21vek.by/mirrors/120_belux_08.html'),
-  ('Зеркало 1200 (без луны)', 4, 0, 0, NULL, 'https://www.21vek.by/mirrors/120_belux_08.html')
-) AS u(name, need_qty, have_qty, in_transit_qty, notes, link)
-WHERE c.name = 'Отель' AND i.category_id = c.id AND i.name = u.name;
 
 -- Первичная заливка для чистой БД (если 002 ещё не применялась)
 INSERT INTO procurement_items (category_id, group_name, name, need_qty, have_qty, in_transit_qty, notes, link, sort_order)
