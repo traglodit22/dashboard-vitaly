@@ -2,13 +2,9 @@ import { NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth/requireAuth'
 import { ensureFilesSeed, getCategoryBySlug } from '@/lib/files/ensureFilesSeed'
 import { rowToFileCategory } from '@/lib/files/mapRow'
-import {
-  completeGcsDirectUpload,
-  ensureFilePreview,
-  fetchFileItem,
-  fetchFileRow,
-} from '@/lib/files/fileService'
+import { completeGcsDirectUpload } from '@/lib/files/fileService'
 import { isImageMime, isPdfMime, resolveUploadMime } from '@/lib/files/mimeDetect'
+import { schedulePreviewGeneration } from '@/lib/files/previewQueue'
 
 export const runtime = 'nodejs'
 export const maxDuration = 120
@@ -66,21 +62,17 @@ export async function POST(req: Request) {
       contentHash,
       capturedAt: capturedAtRaw,
     })
-    let item = result.item
+    const item = result.item
     if (!item) {
       return NextResponse.json({ error: 'Не удалось сохранить файл' }, { status: 500 })
     }
 
-    if (!result.duplicate && (isImageMime(mime) || isPdfMime(mime, fileName))) {
-      const row = await fetchFileRow(item.id)
-      if (row) {
-        try {
-          await ensureFilePreview(row)
-          item = (await fetchFileItem(item.id)) ?? item
-        } catch (err) {
-          console.error('[files] preview after upload failed', err)
-        }
-      }
+    if (
+      !result.duplicate &&
+      !item.hasPreview &&
+      (isImageMime(mime) || isPdfMime(mime, fileName))
+    ) {
+      schedulePreviewGeneration(item.id)
     }
 
     return NextResponse.json(

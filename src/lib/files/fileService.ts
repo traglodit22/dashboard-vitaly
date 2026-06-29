@@ -230,10 +230,11 @@ export async function completeGcsDirectUpload(opts: {
       : new Date(opts.capturedAt)
     : null
 
+  let downloadedBuffer: Buffer | null = null
   if (!contentHash && opts.mime.startsWith('image/')) {
     try {
-      const buffer = await downloadFromGcs(storagePath)
-      const meta = await analyzeImageBuffer(buffer, opts.mime)
+      downloadedBuffer = await downloadFromGcs(storagePath)
+      const meta = await analyzeImageBuffer(downloadedBuffer, opts.mime)
       contentHash = meta.contentHash
       if (!capturedAt) capturedAt = meta.capturedAt
     } catch (err) {
@@ -253,7 +254,25 @@ export async function completeGcsDirectUpload(opts: {
     }
   }
 
-  const previewPath = null
+  let previewPath: string | null = null
+  if (
+    downloadedBuffer &&
+    (isImageMime(opts.mime) || isPdfMime(opts.mime, opts.originalName))
+  ) {
+    try {
+      previewPath = await persistPreviewForUpload({
+        storageType: 'gcs',
+        categorySlug: opts.categorySlug,
+        folderPrefix,
+        fileId: opts.fileId,
+        mime: opts.mime,
+        buffer: downloadedBuffer,
+        originalName: opts.originalName,
+      })
+    } catch (err) {
+      console.error('[files] inline preview after GCS upload failed', err)
+    }
+  }
 
   const rows = await query<Record<string, unknown>>(
     `INSERT INTO file_items

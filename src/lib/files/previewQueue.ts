@@ -1,6 +1,7 @@
 import { ensureFilePreview, fetchFileRow } from '@/lib/files/fileService'
 
-const MAX_CONCURRENT = 5
+const MAX_CONCURRENT = 2
+const MAX_QUEUE = 24
 const queued = new Set<string>()
 const inFlight = new Set<string>()
 let active = 0
@@ -31,10 +32,11 @@ function pump(): void {
 /** Поставить генерацию превью в очередь (не блокирует HTTP-запрос). */
 export function schedulePreviewGeneration(fileId: string): void {
   if (inFlight.has(fileId) || queued.has(fileId)) return
+  if (queued.size >= MAX_QUEUE) return
   queued.add(fileId)
   pump()
 }
 
-export function schedulePreviewGenerationBatch(fileIds: string[]): void {
-  for (const id of fileIds) schedulePreviewGeneration(id)
+export function schedulePreviewGenerationBatch(fileIds: string[], limit = 8): void {
+  for (const id of fileIds.slice(0, limit)) schedulePreviewGeneration(id)
 }
