@@ -6,7 +6,7 @@ import {
 } from '@/lib/files/fileService'
 import { isPdfMime } from '@/lib/files/mimeDetect'
 import { getGcsReadSignedUrl } from '@/lib/files/gcsStorage'
-import { PREVIEW_CACHE_CONTROL, isThumbnailPreviewPath } from '@/lib/files/previewConstants'
+import { PREVIEW_CACHE_CONTROL, PREVIEW_MAX_SOURCE_BYTES, isThumbnailPreviewPath } from '@/lib/files/previewConstants'
 import { getCachedPreview, setCachedPreview } from '@/lib/files/previewMemoryCache'
 import { schedulePreviewGeneration } from '@/lib/files/previewQueue'
 
@@ -73,12 +73,23 @@ export async function GET(
     }
   }
 
-  if (fileMime.startsWith('image/') || isPdf) {
+  if (fileMime.startsWith('image/') && row.category_storage_type === 'gcs') {
+    const url = await getGcsReadSignedUrl(storagePath)
+    return NextResponse.redirect(url, 307)
+  }
+
+  const sizeBytes = Number(row.size_bytes ?? 0)
+  const canGeneratePreview = sizeBytes <= PREVIEW_MAX_SOURCE_BYTES
+
+  if ((fileMime.startsWith('image/') || isPdf) && canGeneratePreview) {
     schedulePreviewGeneration(id)
-    if (fileMime.startsWith('image/') && row.category_storage_type === 'gcs') {
-      const url = await getGcsReadSignedUrl(storagePath)
-      return NextResponse.redirect(url, 307)
-    }
+  }
+
+  if (isPdf) {
+    return NextResponse.json({ error: 'Превью готовится' }, { status: 404 })
+  }
+
+  if (fileMime.startsWith('image/')) {
     return NextResponse.json({ error: 'Превью готовится' }, { status: 404 })
   }
 

@@ -1,7 +1,8 @@
 import { ensureFilePreview, fetchFileRow } from '@/lib/files/fileService'
 
-const MAX_CONCURRENT = 4
-const MAX_QUEUE = 48
+const MAX_CONCURRENT = 1
+const MAX_QUEUE = 12
+const JOB_COOLDOWN_MS = 300
 const queued = new Set<string>()
 const inFlight = new Set<string>()
 let active = 0
@@ -24,6 +25,7 @@ function pump(): void {
     } finally {
       inFlight.delete(next)
       active -= 1
+      await new Promise((r) => setTimeout(r, JOB_COOLDOWN_MS))
       pump()
     }
   })()
@@ -37,6 +39,6 @@ export function schedulePreviewGeneration(fileId: string): void {
   pump()
 }
 
-export function schedulePreviewGenerationBatch(fileIds: string[], limit = 8): void {
+export function schedulePreviewGenerationBatch(fileIds: string[], limit = 2): void {
   for (const id of fileIds.slice(0, limit)) schedulePreviewGeneration(id)
 }

@@ -22,7 +22,7 @@ import {
 import { FILE_ITEM_FROM, FILE_ITEM_SELECT, rowToFileItem } from '@/lib/files/mapRow'
 import { isImageMime, isPdfMime, isTextMime } from '@/lib/files/mimeDetect'
 import type { FileStorageType } from '@/lib/files/types'
-import { isThumbnailPreviewPath } from '@/lib/files/previewConstants'
+import { isThumbnailPreviewPath, PREVIEW_MAX_SOURCE_BYTES } from '@/lib/files/previewConstants'
 import { dropCachedPreview } from '@/lib/files/previewMemoryCache'
 import { findFileByContentHash } from '@/lib/gallery/galleryService'
 import { analyzeImageBuffer } from '@/lib/gallery/imageMeta'
@@ -230,8 +230,9 @@ export async function completeGcsDirectUpload(opts: {
       : new Date(opts.capturedAt)
     : null
 
+  const HASH_MAX_BYTES = 12 * 1024 * 1024
   let downloadedBuffer: Buffer | null = null
-  if (!contentHash && opts.mime.startsWith('image/')) {
+  if (!contentHash && opts.mime.startsWith('image/') && opts.sizeBytes <= HASH_MAX_BYTES) {
     try {
       downloadedBuffer = await downloadFromGcs(storagePath)
       const meta = await analyzeImageBuffer(downloadedBuffer, opts.mime)
@@ -381,6 +382,9 @@ export async function ensureFilePreview(row: Record<string, unknown>): Promise<B
 
   if (!isPdfMime(mime, originalName) && !mime.startsWith('image/')) return null
 
+  const sizeBytes = Number(row.size_bytes ?? 0)
+  if (sizeBytes > PREVIEW_MAX_SOURCE_BYTES) return null
+
   if (isThumbnailPreviewPath(previewPath, storagePath)) {
     const existing = await readFilePreview(row)
     if (existing) return existing
@@ -395,7 +399,7 @@ export async function ensureFilePreview(row: Record<string, unknown>): Promise<B
       originalName,
       storageType: row.category_storage_type,
     })
-    return mime.startsWith('image/') ? content : null
+    return null
   }
 
   await persistFilePreview(row, previewBuffer)

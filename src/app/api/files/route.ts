@@ -4,7 +4,7 @@ import { requireAuth } from '@/lib/auth/requireAuth'
 import { ensureFilesSeed, getCategoryBySlug } from '@/lib/files/ensureFilesSeed'
 import { FILE_ITEM_FROM, FILE_ITEM_SELECT, rowToFileItem, rowToFileCategory } from '@/lib/files/mapRow'
 import { uploadFileItem } from '@/lib/files/fileService'
-import { resolveUploadMime, isImageMime, isPdfMime } from '@/lib/files/mimeDetect'
+import { resolveUploadMime, isPdfMime } from '@/lib/files/mimeDetect'
 import { isThumbnailPreviewPath } from '@/lib/files/previewConstants'
 import { schedulePreviewGenerationBatch } from '@/lib/files/previewQueue'
 import type { FileStorageType } from '@/lib/files/types'
@@ -52,7 +52,7 @@ export async function GET(req: Request) {
     const name = row.original_name as string
     if (
       !isThumbnailPreviewPath(row.preview_path as string | null, row.storage_path as string) &&
-      (isPdfMime(mime, name) || isImageMime(mime))
+      isPdfMime(mime, name)
     ) {
       missingPreviewIds.push(row.id as string)
     }
