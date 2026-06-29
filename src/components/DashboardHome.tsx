@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { apiFetch } from "@/lib/apiFetch";
 import { cn } from "@/lib/utils";
 import { LasLegasStats } from "@/components/laslegas/LasLegasStats";
+import { GcsStorageOverviewSection } from "@/components/gcs/GcsStorageStats";
 import { toast } from "sonner";
 import { filesCategoryPath, FILES_CHANGED_EVENT } from "@/lib/files/routes";
 import { CLOUD_SLUG } from "@/lib/files/types";
@@ -141,6 +142,7 @@ export function DashboardHome() {
   const [favoriteFolders, setFavoriteFolders] = useState<FavoriteFolder[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [gcsVisible, setGcsVisible] = useState(false);
 
   const loadAll = useCallback(async () => {
     const [statsData, balData, favData] = await Promise.all([
@@ -177,8 +179,9 @@ export function DashboardHome() {
     const visible = new Set<OverviewSectionId>(["orders", "laslegas"]);
     if (favoriteFolders.length > 0) visible.add("favorites");
     if (balances.length > 0) visible.add("balances");
+    if (gcsVisible) visible.add("gcs");
     setVisibleIds(visible);
-  }, [loading, stats, favoriteFolders.length, balances.length, setVisibleIds]);
+  }, [loading, stats, favoriteFolders.length, balances.length, gcsVisible, setVisibleIds]);
 
   useEffect(() => {
     if (loading || !stats) return;
@@ -318,6 +321,8 @@ export function DashboardHome() {
           </div>
         </OverviewBlock>
       )}
+
+      <GcsStorageOverviewSection onVisibleChange={setGcsVisible} />
 
       <OverviewBlock
         id="laslegas"

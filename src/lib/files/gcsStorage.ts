@@ -41,7 +41,7 @@ function sleep(ms: number): Promise<void> {
 }
 
 /** Подпись URL локально — без OAuth-запросов к Google (важно для VPS). */
-function getSigningStorage(): Storage {
+export function getSigningStorage(): Storage {
   const { projectId, credentials } = loadCredentials()
   return new Storage({ projectId, credentials })
 }

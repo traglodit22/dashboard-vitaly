@@ -9,7 +9,7 @@ export function OverviewPage() {
       <header className="mb-6 sm:mb-8">
         <h1 className={DASHBOARD_PAGE_TITLE_CLASS}>Обзор</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Сводная статистика по заказам, балансам и Las Legas.
+          Сводная статистика по заказам, балансам, облаку и Las Legas.
         </p>
       </header>
       <DashboardHome />

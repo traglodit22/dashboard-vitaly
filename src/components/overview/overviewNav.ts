@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import {
   Building2,
+  Cloud,
   Package,
   Star,
   Wallet,
@@ -14,6 +15,7 @@ export const OVERVIEW_SECTIONS = [
   { id: "orders", label: "Заказы", icon: Package },
   { id: "favorites", label: "Быстрый доступ", icon: Star },
   { id: "balances", label: "Балансы", icon: Wallet },
+  { id: "gcs", label: "Google Cloud", icon: Cloud },
   { id: "laslegas", label: "Las Legas", icon: Building2 },
 ] as const;
 
