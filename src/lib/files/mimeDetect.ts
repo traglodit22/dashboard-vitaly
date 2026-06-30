@@ -64,6 +64,12 @@ export function isImageMime(mime: string): boolean {
   return mime.startsWith('image/')
 }
 
+export function isVideoMime(mime: string, fileName?: string): boolean {
+  if (mime === 'video/mp4' || mime === 'video/quicktime') return true
+  const ext = fileName?.split('.').pop()?.toLowerCase()
+  return ext === 'mp4' || ext === 'mov' || ext === 'm4v'
+}
+
 export function isTextMime(mime: string): boolean {
   return mime === 'text/plain'
 }

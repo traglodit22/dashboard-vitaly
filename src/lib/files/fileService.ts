@@ -6,6 +6,7 @@ import {
   downloadFromGcs,
   gcsObjectKey,
   gcsPreviewKey,
+  getGcsReadSignedUrl,
   getGcsUploadSignedUrl,
   isGcsConfigured,
   uploadToGcs,
@@ -14,15 +15,17 @@ import { getFolderStoragePrefix } from '@/lib/files/folderService'
 import {
   deleteLocalRelative,
   extForMime,
+  localAbsolutePath,
   readLocalRelative,
   saveLocalFile,
   saveLocalPreview,
   writeLocalRelative,
 } from '@/lib/files/localStorage'
 import { FILE_ITEM_FROM, FILE_ITEM_SELECT, rowToFileItem } from '@/lib/files/mapRow'
-import { isImageMime, isPdfMime, isTextMime } from '@/lib/files/mimeDetect'
+import { isImageMime, isPdfMime, isTextMime, isVideoMime } from '@/lib/files/mimeDetect'
 import type { FileStorageType } from '@/lib/files/types'
 import { isThumbnailPreviewPath, PREVIEW_MAX_SOURCE_BYTES } from '@/lib/files/previewConstants'
+import { renderVideoPreview } from '@/lib/files/videoPreview'
 import { dropCachedPreview } from '@/lib/files/previewMemoryCache'
 import { findFileByContentHash } from '@/lib/gallery/galleryService'
 import { analyzeImageBuffer } from '@/lib/gallery/imageMeta'
@@ -43,6 +46,7 @@ async function buildUploadPreview(
   buffer: Buffer,
   originalName: string,
 ): Promise<Buffer | null> {
+  if (isVideoMime(mime, originalName)) return null
   if (!isImageMime(mime) && !isPdfMime(mime, originalName)) return null
   return buildFilePreview(mime, buffer, originalName)
 }
@@ -379,19 +383,31 @@ export async function ensureFilePreview(row: Record<string, unknown>): Promise<B
   const storagePath = row.storage_path as string
   const mime = row.mime_type as string
   const originalName = row.original_name as string
+  const isVideo = isVideoMime(mime, originalName)
 
-  if (!isPdfMime(mime, originalName) && !mime.startsWith('image/')) return null
+  if (!isPdfMime(mime, originalName) && !mime.startsWith('image/') && !isVideo) return null
 
   const sizeBytes = Number(row.size_bytes ?? 0)
-  if (sizeBytes > PREVIEW_MAX_SOURCE_BYTES) return null
+  if (!isVideo && sizeBytes > PREVIEW_MAX_SOURCE_BYTES) return null
 
   if (isThumbnailPreviewPath(previewPath, storagePath)) {
     const existing = await readFilePreview(row)
     if (existing) return existing
   }
 
-  const content = await readFileContent(row)
-  const previewBuffer = await buildFilePreview(mime, content, originalName)
+  let previewBuffer: Buffer | null
+  if (isVideo) {
+    const storageType = row.category_storage_type as string
+    const source =
+      storageType === 'gcs'
+        ? await getGcsReadSignedUrl(storagePath)
+        : localAbsolutePath(storagePath)
+    previewBuffer = await renderVideoPreview(source)
+  } else {
+    const content = await readFileContent(row)
+    previewBuffer = await buildFilePreview(mime, content, originalName)
+  }
+
   if (!previewBuffer) {
     console.error('[files] preview generation returned null', {
       fileId: row.id,

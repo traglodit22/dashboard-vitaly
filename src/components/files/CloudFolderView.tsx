@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import type { FileFolder } from "@/lib/files/types";
 import { CloudImageLightbox } from "@/components/files/CloudImageLightbox";
 import { FILE_GRID_CLASS } from "@/lib/files/fileCardLayout";
+import { isVideoMime } from "@/lib/files/mimeDetect";
 
 export interface CloudFileItem {
   id: string;
@@ -75,18 +76,21 @@ export function CloudFolderView({
   const [lightboxId, setLightboxId] = useState<string | null>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const imageItems = useMemo(
-    () => listItems.filter((i) => i.mimeType.startsWith("image/")),
+  const mediaItems = useMemo(
+    () =>
+      listItems.filter(
+        (i) => i.mimeType.startsWith("image/") || isVideoMime(i.mimeType, i.originalName),
+      ),
     [listItems],
   );
 
   const lightboxIndex = lightboxId
-    ? imageItems.findIndex((i) => i.id === lightboxId)
+    ? mediaItems.findIndex((i) => i.id === lightboxId)
     : -1;
 
   const openLightbox = useCallback((id: string) => {
-    if (imageItems.some((i) => i.id === id)) setLightboxId(id);
-  }, [imageItems]);
+    if (mediaItems.some((i) => i.id === id)) setLightboxId(id);
+  }, [mediaItems]);
 
   useEffect(() => {
     setTextDraft(folder.folderText);
@@ -136,9 +140,14 @@ export function CloudFolderView({
     <div className="space-y-6">
       {lightboxIndex >= 0 && (
         <CloudImageLightbox
-          images={imageItems}
+          images={mediaItems.map((i) => ({
+            id: i.id,
+            title: i.title,
+            createdAt: i.createdAt,
+            mimeType: i.mimeType,
+          }))}
           index={lightboxIndex}
-          onIndexChange={(i) => setLightboxId(imageItems[i]!.id)}
+          onIndexChange={(i) => setLightboxId(mediaItems[i]!.id)}
           onClose={() => setLightboxId(null)}
         />
       )}
@@ -214,9 +223,11 @@ export function CloudFolderView({
                 },
                 onRemove: () => {},
                 onRename: () => {},
-                onImageClick: item.mimeType.startsWith("image/")
-                  ? () => openLightbox(item.id)
-                  : undefined,
+                onImageClick:
+                  item.mimeType.startsWith("image/") ||
+                  isVideoMime(item.mimeType, item.originalName)
+                    ? () => openLightbox(item.id)
+                    : undefined,
               }),
             )}
           </div>

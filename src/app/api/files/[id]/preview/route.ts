@@ -4,7 +4,7 @@ import {
   fetchFileRow,
   readFilePreview,
 } from '@/lib/files/fileService'
-import { isPdfMime } from '@/lib/files/mimeDetect'
+import { isPdfMime, isVideoMime } from '@/lib/files/mimeDetect'
 import { getGcsReadSignedUrl } from '@/lib/files/gcsStorage'
 import { PREVIEW_CACHE_CONTROL, PREVIEW_MAX_SOURCE_BYTES, isThumbnailPreviewPath } from '@/lib/files/previewConstants'
 import { getCachedPreview, setCachedPreview } from '@/lib/files/previewMemoryCache'
@@ -50,6 +50,7 @@ export async function GET(
   const previewPath = row.preview_path as string | null
   const storagePath = row.storage_path as string
   const isPdf = isPdfMime(fileMime, originalName)
+  const isVideo = isVideoMime(fileMime, originalName)
   const etag = previewEtag(row)
 
   if (req.headers.get('if-none-match') === etag) {
@@ -81,11 +82,11 @@ export async function GET(
   const sizeBytes = Number(row.size_bytes ?? 0)
   const canGeneratePreview = sizeBytes <= PREVIEW_MAX_SOURCE_BYTES
 
-  if ((fileMime.startsWith('image/') || isPdf) && canGeneratePreview) {
+  if ((fileMime.startsWith('image/') || isPdf || isVideo) && (canGeneratePreview || isVideo)) {
     schedulePreviewGeneration(id)
   }
 
-  if (isPdf) {
+  if (isPdf || isVideo) {
     return NextResponse.json({ error: 'Превью готовится' }, { status: 404 })
   }
 

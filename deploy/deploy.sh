@@ -44,6 +44,12 @@ trap 'echo "DEPLOY FAILED"; rollback_runtime' ERR
 echo "==> Install dependencies"
 npm ci
 
+if ! command -v ffmpeg >/dev/null 2>&1; then
+  echo "==> Install ffmpeg (video previews)"
+  apt-get update -qq
+  apt-get install -y -qq ffmpeg
+fi
+
 echo "==> Database migrations"
 set +e
 node scripts/run-migrations.mjs

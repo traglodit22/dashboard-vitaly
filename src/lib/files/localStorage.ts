@@ -100,14 +100,18 @@ export async function saveLocalPreview(
   return rel
 }
 
-export async function readLocalRelative(relPath: string): Promise<Buffer> {
+export function localAbsolutePath(relPath: string): string {
   const root = process.env.UPLOAD_DIR ?? path.join(/* turbopackIgnore: true */ process.cwd(), 'uploads')
   const full = path.normalize(path.join(root, relPath))
   const rootNorm = path.normalize(root + path.sep)
   if (!full.startsWith(rootNorm) && full !== path.normalize(root)) {
     throw new Error('Invalid path')
   }
-  return fs.readFile(full)
+  return full
+}
+
+export async function readLocalRelative(relPath: string): Promise<Buffer> {
+  return fs.readFile(localAbsolutePath(relPath))
 }
 
 export async function writeLocalRelative(relPath: string, buffer: Buffer): Promise<void> {

@@ -4,9 +4,9 @@ import { requireAuth } from '@/lib/auth/requireAuth'
 import { ensureFilesSeed, getCategoryBySlug } from '@/lib/files/ensureFilesSeed'
 import { FILE_ITEM_FROM, FILE_ITEM_SELECT, rowToFileItem, rowToFileCategory } from '@/lib/files/mapRow'
 import { uploadFileItem } from '@/lib/files/fileService'
-import { resolveUploadMime, isPdfMime } from '@/lib/files/mimeDetect'
+import { resolveUploadMime, isPdfMime, isVideoMime } from '@/lib/files/mimeDetect'
 import { isThumbnailPreviewPath } from '@/lib/files/previewConstants'
-import { schedulePreviewGenerationBatch } from '@/lib/files/previewQueue'
+import { schedulePreviewGeneration, schedulePreviewGenerationBatch } from '@/lib/files/previewQueue'
 import type { FileStorageType } from '@/lib/files/types'
 
 export const runtime = 'nodejs'
@@ -52,7 +52,7 @@ export async function GET(req: Request) {
     const name = row.original_name as string
     if (
       !isThumbnailPreviewPath(row.preview_path as string | null, row.storage_path as string) &&
-      isPdfMime(mime, name)
+      (isPdfMime(mime, name) || isVideoMime(mime, name))
     ) {
       missingPreviewIds.push(row.id as string)
     }
@@ -113,6 +113,13 @@ export async function POST(req: Request) {
     })
     if (!result.item) {
       return NextResponse.json({ error: 'Не удалось сохранить файл' }, { status: 500 })
+    }
+    if (
+      !result.duplicate &&
+      !result.item.hasPreview &&
+      isVideoMime(mime, file.name)
+    ) {
+      schedulePreviewGeneration(result.item.id)
     }
     return NextResponse.json(
       { item: result.item, duplicate: result.duplicate },

@@ -3,7 +3,7 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ChevronRight, FileText, FolderTree, GripVertical, Loader2, Pencil, StickyNote, Trash2, Upload, Download } from "lucide-react";
+import { ChevronRight, FileText, FolderTree, GripVertical, Loader2, Pencil, Play, StickyNote, Trash2, Upload, Download } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,7 +32,9 @@ import { FilesListToolbar } from "@/components/files/FilesListToolbar";
 import { FilesSubfolderGrid } from "@/components/files/FilesSubfolderGrid";
 import { FilesMobileFolderDrawer } from "@/components/files/FilesMobileFolderDrawer";
 import { FilePreviewImage } from "@/components/files/FilePreviewImage";
+import { CloudImageLightbox } from "@/components/files/CloudImageLightbox";
 import { CloudPdfViewer } from "@/components/files/CloudPdfViewer";
+import { isVideoMime } from "@/lib/files/mimeDetect";
 import { TextNoteModal } from "@/components/files/TextNoteModal";
 import { FILE_GRID_CLASS } from "@/lib/files/fileCardLayout";
 import {
@@ -118,6 +120,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
   const [extFilter, setExtFilter] = useState("all");
   const [foldersDrawerOpen, setFoldersDrawerOpen] = useState(false);
   const [noteCreateOpen, setNoteCreateOpen] = useState(false);
+  const [lightboxId, setLightboxId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const loadItemsSeqRef = useRef(0);
 
@@ -255,10 +258,28 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
       items.filter(
         (i) =>
           !i.hasPreview &&
-          (i.mimeType.startsWith("image/") || i.mimeType === "application/pdf"),
+          (i.mimeType.startsWith("image/") ||
+            i.mimeType === "application/pdf" ||
+            isVideoMime(i.mimeType, i.originalName)),
       ).length,
     [items],
   );
+
+  const mediaItems = useMemo(
+    () =>
+      listItems.filter(
+        (i) => i.mimeType.startsWith("image/") || isVideoMime(i.mimeType, i.originalName),
+      ),
+    [listItems],
+  );
+
+  const lightboxIndex = lightboxId
+    ? mediaItems.findIndex((i) => i.id === lightboxId)
+    : -1;
+
+  const openMediaLightbox = useCallback((id: string) => {
+    if (mediaItems.some((i) => i.id === id)) setLightboxId(id);
+  }, [mediaItems]);
 
   useEffect(() => {
     if (pendingPreviewCount === 0) return;
@@ -752,6 +773,20 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
         />
       )}
 
+      {lightboxIndex >= 0 && (
+        <CloudImageLightbox
+          images={mediaItems.map((i) => ({
+            id: i.id,
+            title: i.title,
+            createdAt: i.createdAt,
+            mimeType: i.mimeType,
+          }))}
+          index={lightboxIndex}
+          onIndexChange={(i) => setLightboxId(mediaItems[i]?.id ?? null)}
+          onClose={() => setLightboxId(null)}
+        />
+      )}
+
       {category.storageType === "gcs" && !gcsConfigured && (
         <Card className="mb-4 border-amber-500/40 bg-amber-500/5">
           <CardContent className="py-3 text-sm text-muted-foreground">
@@ -870,6 +905,12 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
               }}
               onRemove={() => void removeItem(item)}
               onRename={(t) => void renameItem(item, t)}
+              onImageClick={
+                item.mimeType.startsWith("image/") ||
+                isVideoMime(item.mimeType, item.originalName)
+                  ? () => openMediaLightbox(item.id)
+                  : undefined
+              }
             />
           ))}
         </div>
@@ -926,15 +967,16 @@ function FileCard({
   const [textOpen, setTextOpen] = useState(false);
   const isPdf = item.mimeType === "application/pdf";
   const isImage = item.mimeType.startsWith("image/");
+  const isVideo = isVideoMime(item.mimeType, item.originalName);
   const isText = item.mimeType === "text/plain";
   const previewUrl =
-    isImage || isPdf || item.hasPreview
+    isImage || isPdf || isVideo || item.hasPreview
       ? `/api/files/${item.id}/preview?v=${
           item.hasPreview ? encodeURIComponent(item.updatedAt) : "src"
         }`
       : null;
   const showPreview = Boolean(previewUrl) && !previewFailed;
-  const showPending = isPdf && !item.hasPreview && !previewFailed;
+  const showPending = (isPdf || isVideo) && !item.hasPreview && !previewFailed;
 
   useEffect(() => {
     setDraft(item.title);
@@ -943,19 +985,28 @@ function FileCard({
     setTextOpen(false);
   }, [item.id, item.title, item.hasPreview, item.updatedAt]);
 
-  const useLightbox = Boolean(onImageClick && isImage);
+  const useLightbox = Boolean(onImageClick && (isImage || isVideo));
   const usePdfViewer = isPdf;
   const useTextEditor = isText;
 
   function renderPreviewBody() {
     if (showPreview && previewUrl) {
       return (
-        <FilePreviewImage
-          src={previewUrl}
-          className="size-full"
-          imgClassName="size-full object-cover object-top"
-          onFailed={() => setPreviewFailed(true)}
-        />
+        <>
+          <FilePreviewImage
+            src={previewUrl}
+            className="size-full"
+            imgClassName="size-full object-cover object-top"
+            onFailed={() => setPreviewFailed(true)}
+          />
+          {isVideo && (
+            <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20">
+              <span className="flex size-10 items-center justify-center rounded-full bg-black/55 text-white">
+                <Play className="size-5 fill-current pl-0.5" />
+              </span>
+            </span>
+          )}
+        </>
       );
     }
     if (showPending) {
@@ -970,6 +1021,7 @@ function FileCard({
       <div className="flex size-full flex-col items-center justify-center gap-0.5">
         <FileText className="size-7 text-muted-foreground/50" />
         {isPdf && <span className="text-[9px] text-muted-foreground">PDF</span>}
+        {isVideo && <span className="text-[9px] text-muted-foreground">VIDEO</span>}
         {isText && <span className="text-[9px] text-muted-foreground">TXT</span>}
       </div>
     );
@@ -1082,6 +1134,7 @@ function FileCard({
           type="button"
           onClick={onImageClick}
           className="relative block aspect-square w-full cursor-zoom-in bg-muted/40"
+          title={isVideo ? "Открыть видео" : "Открыть изображение"}
         >
           {renderPreviewBody()}
         </button>

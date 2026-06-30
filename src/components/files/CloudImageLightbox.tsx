@@ -9,6 +9,12 @@ export interface LightboxImage {
   id: string;
   title: string;
   createdAt: string;
+  mimeType?: string;
+}
+
+function isVideoItem(item: LightboxImage): boolean {
+  const mime = item.mimeType ?? "";
+  return mime.startsWith("video/") || mime === "video/mp4" || mime === "video/quicktime";
 }
 
 export function CloudImageLightbox({
@@ -29,6 +35,7 @@ export function CloudImageLightbox({
   const hasPrev = index > 0;
   const hasNext = index < images.length - 1;
   const src = item ? `/api/files/${item.id}/content` : "";
+  const isVideo = item ? isVideoItem(item) : false;
 
   useEffect(() => {
     setMounted(true);
@@ -56,7 +63,7 @@ export function CloudImageLightbox({
       className="fixed inset-0 z-[200] flex flex-col bg-black/92 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
-      aria-label="Просмотр фото"
+      aria-label={isVideo ? "Просмотр видео" : "Просмотр фото"}
     >
       <button
         type="button"
@@ -95,7 +102,7 @@ export function CloudImageLightbox({
         {hasPrev && (
           <button
             type="button"
-            aria-label="Предыдущее фото"
+            aria-label="Предыдущий файл"
             onClick={() => onIndexChange(index - 1)}
             className="absolute left-[max(0.5rem,env(safe-area-inset-left))] top-1/2 z-20 flex size-11 -translate-y-1/2 touch-manipulation items-center justify-center rounded-full bg-black/50 text-white transition-colors active:bg-black/70 sm:left-4"
           >
@@ -104,20 +111,30 @@ export function CloudImageLightbox({
         )}
 
         <div className="relative flex max-h-full max-w-full items-center justify-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            key={item.id}
-            src={src}
-            alt={item.title}
-            className="max-h-[calc(100dvh-6rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] max-w-full select-none object-contain"
-            draggable={false}
-          />
+          {isVideo ? (
+            <video
+              key={item.id}
+              src={src}
+              controls
+              playsInline
+              className="max-h-[calc(100dvh-6rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] max-w-full select-none bg-black"
+            />
+          ) : (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              key={item.id}
+              src={src}
+              alt={item.title}
+              className="max-h-[calc(100dvh-6rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] max-w-full select-none object-contain"
+              draggable={false}
+            />
+          )}
         </div>
 
         {hasNext && (
           <button
             type="button"
-            aria-label="Следующее фото"
+            aria-label="Следующий файл"
             onClick={() => onIndexChange(index + 1)}
             className="absolute right-[max(0.5rem,env(safe-area-inset-right))] top-1/2 z-20 flex size-11 -translate-y-1/2 touch-manipulation items-center justify-center rounded-full bg-black/50 text-white transition-colors active:bg-black/70 sm:right-4"
           >

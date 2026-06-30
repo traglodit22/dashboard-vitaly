@@ -3,7 +3,7 @@ import { requireAuth } from '@/lib/auth/requireAuth'
 import { ensureFilesSeed, getCategoryBySlug } from '@/lib/files/ensureFilesSeed'
 import { rowToFileCategory } from '@/lib/files/mapRow'
 import { completeGcsDirectUpload } from '@/lib/files/fileService'
-import { isImageMime, isPdfMime, resolveUploadMime } from '@/lib/files/mimeDetect'
+import { isImageMime, isPdfMime, isVideoMime, resolveUploadMime } from '@/lib/files/mimeDetect'
 import { schedulePreviewGeneration } from '@/lib/files/previewQueue'
 
 export const runtime = 'nodejs'
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
     if (
       !result.duplicate &&
       !item.hasPreview &&
-      (isImageMime(mime) || isPdfMime(mime, fileName))
+      (isImageMime(mime) || isPdfMime(mime, fileName) || isVideoMime(mime, fileName))
     ) {
       schedulePreviewGeneration(item.id)
     }
