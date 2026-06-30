@@ -1,28 +1,32 @@
-/** Safari/WebKit сбрасывает File после input.value = "" — для нескольких файлов читаем blob заранее. */
-export async function snapshotFilesForUpload(fileList: FileList | File[]): Promise<File[]> {
-  const list = Array.from(fileList)
-  if (list.length <= 1) return list
-
-  return Promise.all(
-    list.map(async (file) => {
-      try {
-        const buffer = await file.arrayBuffer()
-        return new File([buffer], file.name, {
-          type: file.type || 'application/octet-stream',
-          lastModified: file.lastModified,
-        })
-      } catch {
-        return file
-      }
-    }),
-  )
+/** Safari/WebKit: читаем blob в память до загрузки — иначе File сбрасывается. */
+export async function snapshotFileForUpload(file: File): Promise<File> {
+  try {
+    const buffer = await file.arrayBuffer()
+    if (!buffer.byteLength) throw new Error('empty')
+    return new File([buffer], file.name, {
+      type: file.type || 'application/octet-stream',
+      lastModified: file.lastModified,
+    })
+  } catch {
+    throw new Error(
+      `Safari не может прочитать «${file.name}». Перетащите из Finder или выберите из папки «Загрузки», не из «Фото».`,
+    )
+  }
 }
 
-/** Сообщение WebKit «The string did not match the expected pattern» при битом File в FormData. */
+export async function snapshotFilesForUpload(fileList: FileList | File[]): Promise<File[]> {
+  const list = Array.from(fileList)
+  if (!list.length) return list
+  return Promise.all(list.map((file) => snapshotFileForUpload(file)))
+}
+
 export function formatUploadClientError(err: unknown): string {
   if (!(err instanceof Error)) return 'Ошибка загрузки'
   if (/did not match the expected pattern/i.test(err.message)) {
     return 'Браузер не смог прочитать файл. Повторите загрузку или выберите файлы по одному.'
+  }
+  if (/load failed|failed to fetch|network error|i\/o read operation failed|notreadableerror/i.test(err.message)) {
+    return 'Safari не может прочитать файл. Перетащите из Finder или выберите из папки «Загрузки», не из «Фото».'
   }
   return err.message || 'Ошибка загрузки'
 }

@@ -17,7 +17,7 @@ type GcsStats = {
   breakdown: unknown[];
   fetchedAt: string;
   cached: boolean;
-  source: "gcs" | "database";
+  source: "database";
 };
 
 function GcsStorageStatsContent({
@@ -63,7 +63,7 @@ function GcsStorageStatsContent({
 
       {stats.source === "database" ? (
         <p className="text-xs text-muted-foreground">
-          Оценка по файлам в базе (без превью).
+          Оценка по файлам в базе (без превью и бэкапов вне учёта).
         </p>
       ) : null}
 

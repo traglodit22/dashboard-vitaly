@@ -133,6 +133,59 @@ export function photoDaysInMonth(items: FileItem[], year: number, month: number)
   return out
 }
 
+const MAX_DAYS_IN_REPORT = 8
+
+function formatDayBreakdown(days: GalleryDayGroup[], dayLabel: (d: GalleryDayGroup) => string): string {
+  if (!days.length) return ''
+  if (days.length <= MAX_DAYS_IN_REPORT) {
+    return days.map((d) => `${dayLabel(d)} (${d.items.length})`).join(', ')
+  }
+  const head = days
+    .slice(0, MAX_DAYS_IN_REPORT)
+    .map((d) => `${dayLabel(d)} (${d.items.length})`)
+    .join(', ')
+  const rest = days.length - MAX_DAYS_IN_REPORT
+  return `${head}, ещё ${rest} ${rest === 1 ? 'день' : rest < 5 ? 'дня' : 'дней'}`
+}
+
+/** Краткий отчёт для toast после загрузки в галерею. */
+export function formatGalleryUploadReport(items: FileItem[]): {
+  title: string
+  description: string
+} {
+  if (!items.length) {
+    return { title: '', description: '' }
+  }
+
+  if (items.length === 1) {
+    const { year, month, day } = itemYmd(items[0]!)
+    return {
+      title: 'Фото загружено',
+      description: `${day} ${MONTH_SHORT[month - 1]} ${year}`,
+    }
+  }
+
+  const byYear = groupGalleryByYearMonth(items)
+  const lines: string[] = []
+
+  for (const yearGroup of byYear) {
+    lines.push(`${yearGroup.year} — ${yearGroup.total} фото`)
+    for (const month of yearGroup.months) {
+      const dayLine = formatDayBreakdown(month.days, (d) => String(d.day))
+      lines.push(
+        dayLine
+          ? `${MONTH_NAMES[month.month - 1]}: ${month.items.length} — ${dayLine}`
+          : `${MONTH_NAMES[month.month - 1]}: ${month.items.length}`,
+      )
+    }
+  }
+
+  return {
+    title: `Загружено фото: ${items.length}`,
+    description: lines.join('\n'),
+  }
+}
+
 export function scrollToGalleryAnchor(
   year: number,
   month: number,

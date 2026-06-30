@@ -10,12 +10,15 @@ import { uploadFileToGcsWithFallback } from "@/lib/files/gcsDirectUpload";
 import type { FileItem } from "@/lib/files/types";
 import { GALLERY_SLUG } from "@/lib/files/types";
 import { apiFetch } from "@/lib/apiFetch";
+import { formatUploadClientError, snapshotFileForUpload } from "@/lib/files/uploadNames";
 import {
-  extractCapturedAtBrowser,
-  sha256HexBrowser,
-} from "@/lib/gallery/clientImageMeta";
+  isAbortError,
+  isSafariBrowser,
+  pickFilesViaSystemDialog,
+} from "@/lib/files/pickFilesDialog";
 import type { GalleryYearGroup } from "@/lib/gallery/groupByDate";
 import {
+  formatGalleryUploadReport,
   galleryDayAnchor,
   galleryMonthAnchor,
   parseGalleryHash,
@@ -30,12 +33,6 @@ import {
   DASHBOARD_PAGE_CLASS,
   DASHBOARD_PAGE_TITLE_CLASS,
 } from "@/lib/dashboard/pageLayout";
-
-interface PendingUpload {
-  file: File;
-  contentHash: string;
-  capturedAt: string | null;
-}
 
 export function GalleryClient() {
   const [items, setItems] = useState<FileItem[]>([]);
@@ -105,57 +102,7 @@ export function GalleryClient() {
     [load],
   );
 
-  async function prepareUploads(files: File[]): Promise<PendingUpload[]> {
-    const images = files.filter((f) => f.type.startsWith("image/"));
-    if (!images.length) {
-      toast.error("Выберите файлы изображений");
-      return [];
-    }
-    if (images.length < files.length) {
-      toast.message("Пропущены не-изображения", {
-        description: `Загружаем ${images.length} из ${files.length}`,
-      });
-    }
-
-    const pending: PendingUpload[] = [];
-    for (const file of images) {
-      const [contentHash, capturedAt] = await Promise.all([
-        sha256HexBrowser(file),
-        extractCapturedAtBrowser(file),
-      ]);
-      pending.push({ file, contentHash, capturedAt });
-    }
-
-    const res = await apiFetch("/api/gallery/check-hashes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ hashes: pending.map((p) => p.contentHash) }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(String(data.error ?? "Проверка дублей не удалась"));
-    }
-    const existing = data.existing as Record<string, FileItem>;
-
-    const unique: PendingUpload[] = [];
-    let skipped = 0;
-    for (const p of pending) {
-      if (existing[p.contentHash]) {
-        skipped += 1;
-        continue;
-      }
-      unique.push(p);
-    }
-    if (skipped) {
-      toast.message(
-        skipped === 1 ? "1 дубликат пропущен" : `${skipped} дубликатов пропущено`,
-      );
-    }
-    return unique;
-  }
-
-  async function uploadOne(pending: PendingUpload): Promise<FileItem | null> {
-    const { file, contentHash, capturedAt } = pending;
+  async function uploadOneFile(file: File): Promise<FileItem | null> {
     const initRes = await apiFetch(
       "/api/files/gcs-upload-url",
       {
@@ -196,11 +143,9 @@ export function GalleryClient() {
           fileName: file.name,
           size: file.size,
           mime: init.mime,
-          contentHash,
-          capturedAt,
         }),
       },
-      20_000,
+      120_000,
     );
     const done = await doneRes.json();
     if (!doneRes.ok) {
@@ -213,31 +158,54 @@ export function GalleryClient() {
   }
 
   async function uploadFiles(fileList: FileList | File[]) {
-    const files = Array.from(fileList);
-    if (!files.length) return;
+    const files = Array.from(fileList).filter((f) => f.type.startsWith("image/"));
+    if (!files.length) {
+      toast.error("Выберите файлы изображений");
+      return;
+    }
 
     setUploading(true);
     let ok = 0;
+    let skipped = 0;
+    const uploadedItems: FileItem[] = [];
     try {
-      const queue = await prepareUploads(files);
-      if (!queue.length) return;
-
-      for (const pending of queue) {
-        setUploadLabel(pending.file.name);
+      for (const raw of files) {
+        let file: File;
         try {
-          const item = await uploadOne(pending);
+          file = await snapshotFileForUpload(raw);
+        } catch (err) {
+          toast.error(`«${raw.name}»`, {
+            description: formatUploadClientError(err),
+          });
+          continue;
+        }
+        setUploadLabel(file.name);
+        try {
+          const item = await uploadOneFile(file);
           if (item) {
             ok += 1;
+            uploadedItems.push(item);
             setItems((prev) => [item, ...prev]);
+          } else {
+            skipped += 1;
           }
         } catch (err) {
-          toast.error(`«${pending.file.name}»`, {
+          toast.error(`«${file.name}»`, {
             description: err instanceof Error ? err.message : "Ошибка",
           });
         }
       }
+      if (skipped) {
+        toast.message(
+          skipped === 1 ? "1 дубликат пропущен" : `${skipped} дубликатов пропущено`,
+        );
+      }
       if (ok) {
-        toast.success(ok === 1 ? "Фото загружено" : `Загружено фото: ${ok}`);
+        const report = formatGalleryUploadReport(uploadedItems);
+        toast.success(report.title, {
+          description: report.description,
+          duration: ok > 3 ? 12_000 : 6_000,
+        });
         await load();
         notifyGalleryChanged();
       }
@@ -257,7 +225,21 @@ export function GalleryClient() {
           ? "opacity-60"
           : "cursor-pointer hover:border-primary/50 hover:bg-muted/30 active:bg-muted/40",
       )}
-      onClick={() => !uploading && inputRef.current?.click()}
+      onClick={() => {
+        if (uploading) return;
+        void (async () => {
+          if (isSafariBrowser() && "showOpenFilePicker" in window) {
+            try {
+              const files = await pickFilesViaSystemDialog(true);
+              await uploadFiles(files);
+              return;
+            } catch (err) {
+              if (isAbortError(err)) return;
+            }
+          }
+          inputRef.current?.click();
+        })();
+      }}
       onDragOver={(e) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = "copy";
@@ -276,8 +258,13 @@ export function GalleryClient() {
         multiple
         className="hidden"
         onChange={(e) => {
-          if (e.target.files?.length) void uploadFiles(e.target.files);
-          e.target.value = "";
+          void (async () => {
+            const input = e.target;
+            if (!input.files?.length) return;
+            const picked = Array.from(input.files);
+            input.value = "";
+            await uploadFiles(picked);
+          })();
         }}
       />
       {uploading ? (
@@ -294,6 +281,7 @@ export function GalleryClient() {
       </p>
       <p className="text-[11px] text-muted-foreground/80">
         Дата съёмки из EXIF · дубликаты пропускаются
+        {isSafariBrowser() ? " · Safari: выбирайте из Finder, не из «Фото»" : null}
       </p>
     </div>
   );

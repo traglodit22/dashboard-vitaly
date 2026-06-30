@@ -1,15 +1,17 @@
 import fs from 'fs'
 import { promises as fsp } from 'fs'
 import { Storage } from '@google-cloud/storage'
+import { signGcsV4Url, type GcsSigningCredentials } from '@/lib/files/gcsSignedUrl'
 import { MAX_FILE_BYTES, MAX_FILE_SIZE_ERROR, UPLOAD_TIMEOUT_MS } from '@/lib/files/types'
 
-type ServiceAccountCredentials = {
+type ServiceAccountCredentials = GcsSigningCredentials & {
   project_id?: string
-  client_email: string
-  private_key: string
 }
 
+let cachedCredentials: { projectId: string; credentials: ServiceAccountCredentials } | null = null
+
 function loadCredentials(): { projectId: string; credentials: ServiceAccountCredentials } {
+  if (cachedCredentials) return cachedCredentials
   const credPath = process.env.GCS_CREDENTIALS_PATH?.trim()
   if (credPath && fs.existsSync(credPath)) {
     const parsed = JSON.parse(fs.readFileSync(credPath, 'utf8')) as ServiceAccountCredentials
@@ -17,7 +19,8 @@ function loadCredentials(): { projectId: string; credentials: ServiceAccountCred
     if (!projectId || !parsed.client_email || !parsed.private_key) {
       throw new Error('Некорректный файл ключей GCS')
     }
-    return { projectId, credentials: parsed }
+    cachedCredentials = { projectId, credentials: parsed }
+    return cachedCredentials
   }
 
   const projectId = process.env.GCS_PROJECT_ID?.trim()
@@ -30,10 +33,11 @@ function loadCredentials(): { projectId: string; credentials: ServiceAccountCred
     )
   }
 
-  return {
+  cachedCredentials = {
     projectId,
     credentials: { client_email: clientEmail, private_key: privateKey, project_id: projectId },
   }
+  return cachedCredentials
 }
 
 function sleep(ms: number): Promise<void> {
@@ -90,44 +94,48 @@ async function withSignedUrlRetry<T>(label: string, fn: () => Promise<T>): Promi
   throw new Error(gcsErrorMessage(lastError))
 }
 
+function signReadUrl(
+  objectKey: string,
+  opts?: { attachment?: boolean; fileName?: string; expiresMs?: number },
+): string {
+  const { credentials } = loadCredentials()
+  const queryParams: Record<string, string> = {}
+  if (opts?.attachment && opts.fileName) {
+    const safe = opts.fileName.replace(/["\r\n]/g, '_')
+    queryParams['response-content-disposition'] =
+      `attachment; filename="${safe}"; filename*=UTF-8''${encodeURIComponent(opts.fileName)}`
+  }
+  return signGcsV4Url({
+    bucket: gcsBucketName(),
+    objectKey,
+    method: 'GET',
+    expiresMs: opts?.expiresMs ?? Date.now() + 60 * 60 * 1000,
+    queryParams: Object.keys(queryParams).length ? queryParams : undefined,
+    credentials,
+  })
+}
+
 /** Signed URL для прямой загрузки из браузера в GCS (обходит VPS→Google OAuth). */
 export async function getGcsUploadSignedUrl(
   objectKey: string,
   contentType: string,
 ): Promise<string> {
-  const storage = getSigningStorage()
-  const [url] = await storage.bucket(gcsBucketName()).file(objectKey).getSignedUrl({
-    version: 'v4',
-    action: 'write',
-    expires: Date.now() + 20 * 60 * 1000,
+  const { credentials } = loadCredentials()
+  return signGcsV4Url({
+    bucket: gcsBucketName(),
+    objectKey,
+    method: 'PUT',
+    expiresMs: Date.now() + 20 * 60 * 1000,
     contentType,
+    credentials,
   })
-  return url
 }
 
 export async function getGcsReadSignedUrl(
   objectKey: string,
   opts?: { attachment?: boolean; fileName?: string },
 ): Promise<string> {
-  const storage = getSigningStorage()
-  const signOpts: {
-    version: 'v4'
-    action: 'read'
-    expires: number
-    queryParams?: Record<string, string>
-  } = {
-    version: 'v4',
-    action: 'read',
-    expires: Date.now() + 60 * 60 * 1000,
-  }
-  if (opts?.attachment && opts.fileName) {
-    const safe = opts.fileName.replace(/["\r\n]/g, '_')
-    signOpts.queryParams = {
-      'response-content-disposition': `attachment; filename="${safe}"; filename*=UTF-8''${encodeURIComponent(opts.fileName)}`,
-    }
-  }
-  const [url] = await storage.bucket(gcsBucketName()).file(objectKey).getSignedUrl(signOpts)
-  return url
+  return signReadUrl(objectKey, opts)
 }
 
 export function assertGcsSignedUploadUrl(uploadUrl: string): void {
@@ -142,6 +150,16 @@ export function assertGcsSignedUploadUrl(uploadUrl: string): void {
   }
 }
 
+type SignedUploadBody = Buffer | Blob | ReadableStream<Uint8Array>
+
+function signedUploadHeaders(contentType: string, sizeBytes?: number): Record<string, string> {
+  const headers: Record<string, string> = { 'Content-Type': contentType }
+  if (sizeBytes != null && sizeBytes >= 0) {
+    headers['Content-Length'] = String(sizeBytes)
+  }
+  return headers
+}
+
 /** PUT через signed URL с сервера (без OAuth). */
 export async function putBufferToSignedUrl(
   uploadUrl: string,
@@ -152,16 +170,34 @@ export async function putBufferToSignedUrl(
   if (buffer.length > MAX_FILE_BYTES) {
     throw new Error(MAX_FILE_SIZE_ERROR)
   }
+  await putBodyToSignedUrl(uploadUrl, buffer, contentType, buffer.length)
+}
+
+/** Потоковая загрузка в GCS — без буфера всего файла в памяти. */
+export async function putBodyToSignedUrl(
+  uploadUrl: string,
+  body: SignedUploadBody,
+  contentType: string,
+  sizeBytes?: number,
+): Promise<void> {
+  assertGcsSignedUploadUrl(uploadUrl)
+  if (sizeBytes != null && sizeBytes > MAX_FILE_BYTES) {
+    throw new Error(MAX_FILE_SIZE_ERROR)
+  }
 
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), UPLOAD_TIMEOUT_MS)
   try {
-    const res = await fetch(uploadUrl, {
+    const init: RequestInit & { duplex?: 'half' } = {
       method: 'PUT',
-      body: new Uint8Array(buffer),
-      headers: { 'Content-Type': contentType },
+      body: body as BodyInit,
+      headers: signedUploadHeaders(contentType, sizeBytes),
       signal: controller.signal,
-    })
+    }
+    if (body instanceof ReadableStream) {
+      init.duplex = 'half'
+    }
+    const res = await fetch(uploadUrl, init)
     if (!res.ok) {
       const text = await res.text().catch(() => '')
       throw new Error(
@@ -285,11 +321,13 @@ export async function downloadFromGcs(objectKey: string): Promise<Buffer> {
 
 export async function deleteFromGcs(objectKey: string): Promise<void> {
   await withSignedUrlRetry(`delete ${objectKey}`, async () => {
-    const storage = getSigningStorage()
-    const [url] = await storage.bucket(gcsBucketName()).file(objectKey).getSignedUrl({
-      version: 'v4',
-      action: 'delete',
-      expires: Date.now() + 15 * 60 * 1000,
+    const { credentials } = loadCredentials()
+    const url = signGcsV4Url({
+      bucket: gcsBucketName(),
+      objectKey,
+      method: 'DELETE',
+      expiresMs: Date.now() + 15 * 60 * 1000,
+      credentials,
     })
     const res = await fetch(url, { method: 'DELETE' })
     if (!res.ok && res.status !== 404) {
@@ -302,7 +340,7 @@ export async function deleteFromGcs(objectKey: string): Promise<void> {
 export async function pingGcs(): Promise<boolean> {
   if (!isGcsConfigured()) return false
   try {
-    await getGcsReadSignedUrl(`${gcsObjectKey('_ping', '', 'test', 'txt')}`)
+    signReadUrl(gcsObjectKey('_ping', '', 'test', 'txt'), { expiresMs: Date.now() + 60_000 })
     return true
   } catch {
     return false

@@ -13,7 +13,31 @@ export class GcsUploadError extends Error {
   }
 }
 
-/** PUT напрямую в GCS по signed URL (только вне браузера). */
+function isSafari(): boolean {
+  if (typeof navigator === 'undefined') return false
+  return /Safari/i.test(navigator.userAgent) && !/Chrome|Chromium|CriOS|FxiOS|Edg/i.test(navigator.userAgent)
+}
+
+function xhrPostForm(fd: FormData, timeoutMs: number): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', '/api/files/gcs-proxy-put')
+    xhr.timeout = timeoutMs
+    xhr.withCredentials = true
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve()
+        return
+      }
+      reject(new GcsUploadError(`Ошибка загрузки через сервер (HTTP ${xhr.status})`, 'proxy'))
+    }
+    xhr.onerror = () => reject(new GcsUploadError('Сбой сети при загрузке через сервер', 'proxy'))
+    xhr.ontimeout = () => reject(new GcsUploadError('Таймаут загрузки через сервер', 'proxy'))
+    xhr.send(fd)
+  })
+}
+
+/** PUT напрямую в GCS по signed URL (минует VPS). */
 export async function putFileToGcsSignedUrl(
   uploadUrl: string,
   file: File,
@@ -41,8 +65,7 @@ export async function putFileToGcsSignedUrl(
     if (err instanceof Error && err.name === 'AbortError') {
       throw new GcsUploadError('Таймаут прямой загрузки в Google Cloud', 'direct')
     }
-    const message = err instanceof Error ? err.message : String(err)
-    throw new GcsUploadError(message || 'Не удалось загрузить в Google Cloud напрямую', 'direct')
+    throw new GcsUploadError(formatUploadClientError(err), 'direct')
   } finally {
     clearTimeout(timer)
   }
@@ -66,7 +89,12 @@ export async function putFileToGcsViaProxy(
   if (opts.folderId) fd.append('folderId', opts.folderId)
   fd.append('mime', opts.mime)
   fd.append('fileName', opts.fileName)
-  fd.append('file', opts.file)
+  fd.append('file', opts.file, 'upload')
+
+  if (typeof window !== 'undefined' && isSafari()) {
+    await xhrPostForm(fd, timeoutMs)
+    return
+  }
 
   let res: Response
   try {
@@ -92,8 +120,8 @@ export async function putFileToGcsViaProxy(
 }
 
 /**
- * В браузере всегда через прокси (Safari ломается на fetch к signed URL).
- * Вне браузера — прямой PUT с fallback на прокси.
+ * Safari: сначала прокси (XHR), потом прямой GCS.
+ * Остальные браузеры: сначала прямой GCS, потом прокси.
  */
 export async function uploadFileToGcsWithFallback(opts: {
   fileId: string
@@ -105,38 +133,46 @@ export async function uploadFileToGcsWithFallback(opts: {
   fileName: string
 }): Promise<'direct' | 'proxy'> {
   const folderId = opts.folderId ?? null
+  const proxyOpts = {
+    fileId: opts.fileId,
+    categorySlug: opts.categorySlug,
+    folderId,
+    file: opts.file,
+    mime: opts.mime,
+    fileName: opts.fileName,
+  }
 
-  if (typeof window !== 'undefined') {
-    await putFileToGcsViaProxy({
-      fileId: opts.fileId,
-      categorySlug: opts.categorySlug,
-      folderId,
-      file: opts.file,
-      mime: opts.mime,
-      fileName: opts.fileName,
-    })
-    return 'proxy'
+  const tryDirect = async () => {
+    await putFileToGcsSignedUrl(opts.uploadUrl, opts.file, opts.mime)
+    return 'direct' as const
+  }
+  const tryProxy = async () => {
+    await putFileToGcsViaProxy(proxyOpts)
+    return 'proxy' as const
+  }
+
+  if (typeof window !== 'undefined' && isSafari()) {
+    try {
+      return await tryProxy()
+    } catch (proxyErr) {
+      try {
+        return await tryDirect()
+      } catch (directErr) {
+        const proxyMsg = formatUploadClientError(proxyErr)
+        const directMsg = formatUploadClientError(directErr)
+        throw new GcsUploadError(`${proxyMsg} (прямая: ${directMsg})`, 'proxy')
+      }
+    }
   }
 
   try {
-    await putFileToGcsSignedUrl(opts.uploadUrl, opts.file, opts.mime)
-    return 'direct'
+    return await tryDirect()
   } catch (directErr) {
     try {
-      await putFileToGcsViaProxy({
-        fileId: opts.fileId,
-        categorySlug: opts.categorySlug,
-        folderId,
-        file: opts.file,
-        mime: opts.mime,
-        fileName: opts.fileName,
-      })
-      return 'proxy'
+      return await tryProxy()
     } catch (proxyErr) {
-      const directMsg =
-        directErr instanceof Error ? directErr.message : 'прямая загрузка не удалась'
-      const proxyMsg =
-        proxyErr instanceof Error ? proxyErr.message : 'загрузка через сервер не удалась'
+      const directMsg = formatUploadClientError(directErr)
+      const proxyMsg = formatUploadClientError(proxyErr)
       throw new GcsUploadError(`${proxyMsg} (прямая: ${directMsg})`, 'proxy')
     }
   }

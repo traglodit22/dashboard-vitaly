@@ -21,7 +21,12 @@ import {
   splitRelativePath,
 } from "@/lib/files/droppedFolderTree";
 import { ensureFolderPath, type FolderPathCache } from "@/lib/files/ensureFolderPath";
-import { formatUploadClientError, snapshotFilesForUpload, uploadBaseName } from "@/lib/files/uploadNames";
+import { formatUploadClientError, snapshotFileForUpload, uploadBaseName } from "@/lib/files/uploadNames";
+import {
+  isAbortError,
+  isSafariBrowser,
+  pickFilesViaSystemDialog,
+} from "@/lib/files/pickFilesDialog";
 import { CloudFolderView } from "@/components/files/CloudFolderView";
 import { FilesListToolbar } from "@/components/files/FilesListToolbar";
 import { FilesSubfolderGrid } from "@/components/files/FilesSubfolderGrid";
@@ -420,7 +425,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
       const total = files.length;
       if (total > 0) setUploadProgress({ done: 0, total });
 
-      for (const { file, relativePath } of files) {
+      for (const { file: rawFile, relativePath } of files) {
         setUploadLabel(relativePath);
         const { folderSegments } = splitRelativePath(relativePath);
         let targetFolderId = currentFolderId;
@@ -433,6 +438,10 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
               folderCache,
             );
           }
+          const file =
+            category.storageType === "gcs"
+              ? await snapshotFileForUpload(rawFile)
+              : rawFile;
           const { item, duplicate } =
             category.storageType === "gcs"
               ? await uploadGcsFile(file, targetFolderId)
@@ -476,6 +485,20 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     }
   }
 
+  async function openUploadPicker() {
+    if (uploading) return;
+    if (isSafariBrowser() && "showOpenFilePicker" in window) {
+      try {
+        const files = await pickFilesViaSystemDialog(false);
+        await uploadFiles(files);
+        return;
+      } catch (err) {
+        if (isAbortError(err)) return;
+      }
+    }
+    inputRef.current?.click();
+  }
+
   async function uploadFiles(fileList: FileList | File[]) {
     await uploadStructuredDrop(parseFileListWithPaths(fileList));
   }
@@ -488,8 +511,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
     const dt = e.nativeEvent.dataTransfer ?? e.dataTransfer;
 
     if (dt.files.length > 0) {
-      const picked = await snapshotFilesForUpload(dt.files);
-      await uploadStructuredDrop(parseFileListWithPaths(picked));
+      await uploadStructuredDrop(parseFileListWithPaths(dt.files));
       return;
     }
 
@@ -550,7 +572,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
         "flex flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed px-3 py-3 text-center transition-colors sm:gap-2 sm:py-5",
         uploading ? "opacity-60" : "cursor-pointer hover:border-primary/50 hover:bg-muted/30 active:bg-muted/40",
       )}
-      onClick={() => !uploading && inputRef.current?.click()}
+      onClick={() => void openUploadPicker()}
       onDragOver={(e) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = "copy";
@@ -569,7 +591,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
           void (async () => {
             const input = e.target;
             if (!input.files?.length) return;
-            const picked = await snapshotFilesForUpload(input.files);
+            const picked = Array.from(input.files);
             input.value = "";
             await uploadFiles(picked);
           })();
@@ -649,7 +671,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
             size="sm"
             className="h-9 shrink-0 gap-1.5"
             disabled={uploading}
-            onClick={() => inputRef.current?.click()}
+            onClick={() => void openUploadPicker()}
           >
             {uploading ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
             <span className="sr-only">Загрузить</span>
@@ -711,7 +733,7 @@ function FilesClientInner({ categorySlug }: { categorySlug: string }) {
               size="sm"
               className="hidden gap-1.5 sm:inline-flex"
               disabled={uploading}
-              onClick={() => inputRef.current?.click()}
+              onClick={() => void openUploadPicker()}
             >
               {uploading ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
               Загрузить

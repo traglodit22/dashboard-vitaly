@@ -1,5 +1,5 @@
 import { query } from '@/lib/db/index'
-import { gcsBucketName, getSigningStorage, isGcsConfigured } from '@/lib/files/gcsStorage'
+import { gcsBucketName, isGcsConfigured } from '@/lib/files/gcsStorage'
 
 export type GcsBucketStatsBreakdown = {
   prefix: string
@@ -15,12 +15,10 @@ export type GcsBucketStats = {
   breakdown: GcsBucketStatsBreakdown[]
   fetchedAt: string
   cached: boolean
-  source: 'gcs' | 'database'
+  source: 'database'
 }
 
 const CACHE_TTL_MS = 10 * 60 * 1000
-const LIST_RETRIES = 4
-const LIST_DELAYS_MS = [0, 1500, 4000, 8000]
 
 const BREAKDOWN_LABELS: Record<string, string> = {
   'dashboard/cloud': 'Облако',
@@ -30,82 +28,6 @@ const BREAKDOWN_LABELS: Record<string, string> = {
 }
 
 let cache: { stats: Omit<GcsBucketStats, 'cached'>; expiresAt: number } | null = null
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((r) => setTimeout(r, ms))
-}
-
-function isTransientListError(err: unknown): boolean {
-  const msg = (err instanceof Error ? err.message : String(err)).toLowerCase()
-  return (
-    msg.includes('premature close') ||
-    msg.includes('econnreset') ||
-    msg.includes('etimedout') ||
-    msg.includes('socket hang up') ||
-    msg.includes('fetch failed') ||
-    msg.includes('network') ||
-    msg.includes('503') ||
-    msg.includes('502')
-  )
-}
-
-function breakdownKey(objectName: string): string {
-  const parts = objectName.split('/')
-  if (parts[0] === 'dashboard' && parts.length >= 2) {
-    return `dashboard/${parts[1]}`
-  }
-  if (parts[0] === 'backups' && parts.length >= 2) {
-    return `backups/${parts[1]}`
-  }
-  return parts[0] || '(корень)'
-}
-
-function labelForKey(key: string): string {
-  return BREAKDOWN_LABELS[key] ?? key
-}
-
-async function listBucketFromGcs(): Promise<Omit<GcsBucketStats, 'cached' | 'source'>> {
-  const storage = getSigningStorage()
-  const bucket = storage.bucket(gcsBucketName())
-
-  const breakdownMap = new Map<string, { objectCount: number; sizeBytes: number }>()
-  let totalBytes = 0
-  let objectCount = 0
-
-  await new Promise<void>((resolve, reject) => {
-    bucket
-      .getFilesStream()
-      .on('data', (file) => {
-        const size = Number(file.metadata.size ?? 0)
-        totalBytes += size
-        objectCount += 1
-        const key = breakdownKey(file.name)
-        const cur = breakdownMap.get(key) ?? { objectCount: 0, sizeBytes: 0 }
-        cur.objectCount += 1
-        cur.sizeBytes += size
-        breakdownMap.set(key, cur)
-      })
-      .on('error', reject)
-      .on('end', () => resolve())
-  })
-
-  const breakdown = [...breakdownMap.entries()]
-    .map(([prefix, v]) => ({
-      prefix,
-      label: labelForKey(prefix),
-      objectCount: v.objectCount,
-      sizeBytes: v.sizeBytes,
-    }))
-    .sort((a, b) => b.sizeBytes - a.sizeBytes)
-
-  return {
-    bucket: gcsBucketName(),
-    objectCount,
-    totalBytes,
-    breakdown,
-    fetchedAt: new Date().toISOString(),
-  }
-}
 
 async function listBucketFromDatabase(): Promise<Omit<GcsBucketStats, 'cached' | 'source'>> {
   const fileRows = await query<{
@@ -191,26 +113,6 @@ async function listBucketFromDatabase(): Promise<Omit<GcsBucketStats, 'cached' |
   }
 }
 
-async function fetchBucketStats(): Promise<Omit<GcsBucketStats, 'cached'>> {
-  let lastError: unknown
-
-  for (let i = 0; i < LIST_RETRIES; i++) {
-    if (LIST_DELAYS_MS[i]) await sleep(LIST_DELAYS_MS[i])
-    try {
-      const stats = await listBucketFromGcs()
-      return { ...stats, source: 'gcs' }
-    } catch (err) {
-      lastError = err
-      console.error(`[gcs-stats] list attempt ${i + 1}/${LIST_RETRIES} failed:`, err)
-      if (!isTransientListError(err)) break
-    }
-  }
-
-  console.warn('[gcs-stats] falling back to database estimate:', lastError)
-  const stats = await listBucketFromDatabase()
-  return { ...stats, source: 'database' }
-}
-
 export async function getGcsBucketStats(forceRefresh = false): Promise<GcsBucketStats | null> {
   if (!isGcsConfigured()) return null
 
@@ -218,7 +120,8 @@ export async function getGcsBucketStats(forceRefresh = false): Promise<GcsBucket
     return { ...cache.stats, cached: true }
   }
 
-  const stats = await fetchBucketStats()
-  cache = { stats, expiresAt: Date.now() + CACHE_TTL_MS }
-  return { ...stats, cached: false }
+  const stats = await listBucketFromDatabase()
+  const fullStats = { ...stats, source: 'database' as const }
+  cache = { stats: fullStats, expiresAt: Date.now() + CACHE_TTL_MS }
+  return { ...fullStats, cached: false }
 }
