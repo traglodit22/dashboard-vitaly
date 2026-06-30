@@ -13,6 +13,7 @@
     "db:migrate": "node scripts/run-migrations.mjs",
     "deploy": "bash deploy/local-deploy.sh",
     "deploy:fast": "bash deploy/local-deploy.sh --fast",
+    "deploy:setup-secrets": "bash deploy/setup-cloud-secrets.sh",
     "backfill-previews": "tsx scripts/backfill-file-previews.ts",
     "import-klub": "tsx scripts/import-klub-procurement.ts",
     "import-funko": "tsx scripts/import-funko-animations.ts",

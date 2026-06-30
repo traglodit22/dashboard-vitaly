@@ -13,6 +13,12 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
+# Cursor Cloud Agent: секреты → .local/ перед деплоем
+if [[ ! -f "$ROOT/.local/GITHUB_ACTIONS_SSH_PRIVATE_KEY" ]] \
+  && [[ -n "${DEPLOY_SSH_PRIVATE_KEY:-}" || -n "${SSH_PRIVATE_KEY:-}" ]]; then
+  bash "$ROOT/deploy/setup-cloud-secrets.sh"
+fi
+
 MODE="git"
 BACKUP_GIT=true
 BACKUP_ONLY=false
