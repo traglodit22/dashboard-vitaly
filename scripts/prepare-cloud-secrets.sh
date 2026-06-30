@@ -10,6 +10,21 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
+if [[ "${CURSOR_AGENT:-}" == "1" || "${HOSTNAME:-}" == ubuntu-* ]]; then
+  echo "⚠️  Этот скрипт нужно запускать на Mac, не в Cloud Agent."
+  echo ""
+  echo "   На Mac открой Terminal и выполни:"
+  echo "   cd ~/path/to/dashboard-vitaly"
+  echo "   bash scripts/prepare-cloud-secrets.sh"
+  echo ""
+  echo "   Или вручную на Mac скопируй три файла в Cursor Dashboard → Secrets:"
+  echo "   • ~/.ssh/id_ed25519           → DEPLOY_SSH_PRIVATE_KEY"
+  echo "   • .local/CONTEXT.md           → PROJECT_CONTEXT"
+  echo "   • .env.local                  → ENV_LOCAL_CONTENT"
+  echo ""
+  exit 1
+fi
+
 SSH_KEY="${HOME}/.ssh/id_ed25519"
 CONTEXT_FILE="$ROOT/.local/CONTEXT.md"
 ENV_FILE="$ROOT/.env.local"
