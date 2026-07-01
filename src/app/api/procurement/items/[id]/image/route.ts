@@ -3,7 +3,7 @@ import fs from 'fs/promises'
 import { query } from '@/lib/db/index'
 import { requireAuth } from '@/lib/auth/requireAuth'
 import { rowToItem } from '@/lib/procurement/mapRow'
-import { ensureHotelProcurement } from '@/lib/procurement/ensureHotelSeed'
+import { ensureProcurementReady } from '@/lib/procurement/ensureHotelSeed'
 import {
   deleteItemImageFiles,
   findItemImageFile,
@@ -60,7 +60,7 @@ export async function POST(
   if (unauth) return unauth
 
   try {
-    await ensureHotelProcurement()
+    await ensureProcurementReady()
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     return NextResponse.json({ error: message }, { status: 500 })

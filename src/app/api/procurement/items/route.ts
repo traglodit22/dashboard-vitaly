@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { query } from '@/lib/db/index'
 import { requireAuth } from '@/lib/auth/requireAuth'
 import { ITEM_FROM_SQL, ITEM_SELECT_SQL, rowToItem } from '@/lib/procurement/mapRow'
-import { ensureHotelProcurement } from '@/lib/procurement/ensureHotelSeed'
+import { ensureProcurementReady } from '@/lib/procurement/ensureHotelSeed'
 import { STORES } from '@/types'
 
 export const runtime = 'nodejs'
@@ -12,7 +12,7 @@ export async function GET(req: Request) {
   if (unauth) return unauth
 
   try {
-    await ensureHotelProcurement()
+    await ensureProcurementReady()
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     console.error('[procurement/items] ensure schema:', message)
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
   if (unauth) return unauth
 
   try {
-    await ensureHotelProcurement()
+    await ensureProcurementReady()
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     console.error('[procurement/items] ensure schema:', message)

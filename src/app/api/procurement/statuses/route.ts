@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { query } from '@/lib/db/index'
 import { requireAuth } from '@/lib/auth/requireAuth'
 import { rowToStatus } from '@/lib/procurement/mapRow'
-import { ensureHotelProcurement } from '@/lib/procurement/ensureHotelSeed'
+import { ensureProcurementReady } from '@/lib/procurement/ensureHotelSeed'
 import { STATUS_COLOR_KEYS, type StatusColorKey } from '@/lib/procurement/statusColors'
 
 export const runtime = 'nodejs'
@@ -12,7 +12,7 @@ export async function GET(req: Request) {
   if (unauth) return unauth
 
   try {
-    await ensureHotelProcurement()
+    await ensureProcurementReady()
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     console.error('[procurement/statuses] ensure schema:', message)
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
   if (unauth) return unauth
 
   try {
-    await ensureHotelProcurement()
+    await ensureProcurementReady()
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     return NextResponse.json({ error: message }, { status: 500 })

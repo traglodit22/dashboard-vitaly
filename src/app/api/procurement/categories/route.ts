@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { query } from '@/lib/db/index'
 import { requireAuth } from '@/lib/auth/requireAuth'
 import { rowToCategory } from '@/lib/procurement/mapRow'
-import { ensureHotelProcurement } from '@/lib/procurement/ensureHotelSeed'
+import { ensureProcurementReady } from '@/lib/procurement/ensureHotelSeed'
 
 export const runtime = 'nodejs'
 
@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   if (unauth) return unauth
 
   try {
-    await ensureHotelProcurement()
+    await ensureProcurementReady()
     const rows = await query<Record<string, unknown>>(
       'SELECT * FROM procurement_categories ORDER BY sort_order ASC, name ASC',
     )

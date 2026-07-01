@@ -1,4 +1,6 @@
-import { pool, query } from '@/lib/db/index'
+import { runCategorySeedOnce } from '@/lib/procurement/ensureProcurementSeedState'
+
+const PHOTOHUB_CATEGORY = 'PhotoHub'
 
 const PHOTOHUB_SEED_SQL = `
 INSERT INTO procurement_categories (name, sort_order)
@@ -19,20 +21,9 @@ CROSS JOIN (VALUES
   (NULL::text, 'Карточки', 300, 50, 200, NULL::text, NULL::text, 'item', 80),
   (NULL::text, 'Пылесосы', 9, 2, 5, 'Есть: 1 + 1?; куплено/едут: 5', NULL::text, 'item', 90)
 ) AS v(group_name, name, need_qty, have_qty, in_transit_qty, notes, link, row_type, sort_order)
-WHERE c.name = 'PhotoHub'
-  AND NOT EXISTS (
-    SELECT 1 FROM procurement_items i
-    WHERE i.category_id = c.id AND i.name = v.name
-  );
+WHERE c.name = 'PhotoHub';
 `
 
 export async function ensurePhotoHubProcurement(): Promise<void> {
-  const [{ count }] = await query<{ count: string }>(
-    `SELECT COUNT(*)::text AS count FROM procurement_items i
-     JOIN procurement_categories c ON c.id = i.category_id
-     WHERE c.name = 'PhotoHub'`,
-  )
-  if (Number(count) > 0) return
-
-  await pool.query(PHOTOHUB_SEED_SQL)
+  await runCategorySeedOnce(PHOTOHUB_CATEGORY, PHOTOHUB_SEED_SQL)
 }

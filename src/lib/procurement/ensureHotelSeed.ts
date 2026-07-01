@@ -1,4 +1,4 @@
-import { pool, query } from '@/lib/db/index'
+import { pool } from '@/lib/db/index'
 import { ensureBesedkaProcurement } from '@/lib/procurement/ensureBesedkaSeed'
 import { ensureKlubProcurement } from '@/lib/procurement/ensureKlubSeed'
 import { ensurePhotoHubProcurement } from '@/lib/procurement/ensurePhotoHubSeed'
@@ -129,20 +129,29 @@ CROSS JOIN (VALUES
   ('Декор', 'Зеркало 1200 (с ¼ луной)', 4, 0, 0, NULL, 'https://www.21vek.by/mirrors/120_belux_08.html', 960),
   ('Декор', 'Зеркало 1200 (без луны)', 4, 0, 0, NULL, 'https://www.21vek.by/mirrors/120_belux_08.html', 970)
 ) AS v(group_name, name, need_qty, have_qty, in_transit_qty, notes, link, sort_order)
-WHERE c.name = 'Отель'
-  AND NOT EXISTS (
-    SELECT 1 FROM procurement_items i
-    WHERE i.category_id = c.id AND i.name = v.name
-  );
+WHERE c.name = 'Отель';
 `
 
 import { ensureAllCategoryStatuses } from '@/lib/procurement/ensureProcurementStatuses'
 import { backfillProcurementStores } from '@/lib/procurement/ensureProcurementStore'
+import {
+  backfillProcurementSeedState,
+  runCategorySeedOnce,
+} from '@/lib/procurement/ensureProcurementSeedState'
 
-export async function ensureHotelProcurement(): Promise<void> {
+const HOTEL_CATEGORY = 'Отель'
+
+/** Схема и справочники — безопасно на каждом запросе к API закупок. */
+export async function ensureProcurementReady(): Promise<void> {
   await ensureProcurementSchema()
   await ensureAllCategoryStatuses()
   await backfillProcurementStores()
+  await backfillProcurementSeedState()
+}
+
+/** Схема + одноразовый seed пустых категорий (только при старте / migrate-db). */
+export async function ensureHotelProcurement(): Promise<void> {
+  await ensureProcurementReady()
   await ensureHotelSeedOnly()
   await ensureBesedkaProcurement()
   await ensurePhotoHubProcurement()
@@ -173,12 +182,5 @@ async function ensureProcurementSchema(): Promise<void> {
 }
 
 async function ensureHotelSeedOnly(): Promise<void> {
-  const [{ count }] = await query<{ count: string }>(
-    `SELECT COUNT(*)::text AS count FROM procurement_items i
-     JOIN procurement_categories c ON c.id = i.category_id
-     WHERE c.name = 'Отель'`,
-  )
-  if (Number(count) > 0) return
-
-  await pool.query(HOTEL_SEED_SQL)
+  await runCategorySeedOnce(HOTEL_CATEGORY, HOTEL_SEED_SQL)
 }
